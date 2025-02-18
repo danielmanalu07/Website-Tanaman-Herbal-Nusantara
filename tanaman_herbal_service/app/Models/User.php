@@ -59,9 +59,4 @@ class User extends Authenticatable
         return $this->belongsTo(User::class, 'updated_by');
     }
 
-    public function forgot_password()
-    {
-        return $this->hasMany(ForgotPasswod::class);
-    }
-
 }

@@ -23,6 +23,7 @@ class UserResource extends JsonResource
             "updated_at"  => Carbon::parse($this->updated_at)->translatedFormat('d F Y h:i A'),
             "created_by"  => optional($this->createdBy)->username,
             "updated_by"  => optional($this->updatedBy)->username,
+            "deleted_at"  => Carbon::parse($this->deleted_at)->translatedFormat('d F Y h:i A'),
         ];
     }
 }
