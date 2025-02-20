@@ -13,21 +13,15 @@ class PermissionMiddleware
      *
      * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
      */
-    public function handle(Request $request, Closure $next, $role, $permission = null): Response
+    public function handle(Request $request, Closure $next, ...$roles): Response
     {
         $user = Auth::user();
 
-        if (! $user || ! $user->hasRole($role)) {
+        // Jika user tidak ada atau tidak memiliki salah satu role yang diizinkan, tolak akses
+        if (! $user || ! $user->hasAnyRole($roles)) {
             return response()->json([
                 "status_code" => 403,
-                "message"     => "Access denied. $role only.",
-            ], 403);
-        }
-
-        if ($permission && ! $user->can($permission)) {
-            return response()->json([
-                "status_code" => 403,
-                "message"     => "Access denied. You don't have permission for $permission.",
+                "message"     => "Access denied. Only " . implode(',', $roles) . " allowed.",
             ], 403);
         }
 

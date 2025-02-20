@@ -12,11 +12,11 @@ class RolePermissionSeeder extends Seeder
      */
     public function run(): void
     {
-        $roles = ['admin', 'staff'];
+        $roles = ['admin', 'koordinator', 'agronom'];
         foreach ($roles as $role) {
             Role::firstOrCreate(['name' => $role]);
         }
-        $admin_permissions = ['login', 'get profile', 'logout', 'get staffs', 'create staff', 'detail staff', 'update staff', 'delete staff'];
+        $admin_permissions = ['login', 'get profile', 'logout', 'CRUD Staff'];
 
         foreach ($admin_permissions as $permission) {
             Permission::firstOrCreate(['name' => $permission]);

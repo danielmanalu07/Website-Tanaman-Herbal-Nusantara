@@ -12,18 +12,23 @@ class CrudStaffController extends Controller
 {
     public function getAllStaff()
     {
-        $staffRole = Role::where('name', 'staff')->first();
+        $roles = ['koordinator', 'agronom'];
 
-        if (! $staffRole) {
-            return response()->json([
-                "message"     => "Role 'staff' not found",
-                "status_code" => 404,
-            ], 404);
-        }
-
-        $staff = User::whereHas('roles', function ($query) {
-            $query->where('name', 'staff');
+        $staff = User::whereHas('roles', function ($query) use ($roles) {
+            $query->whereIn('name', $roles);
         })->get();
+        // $staffRole = Role::where('name', 'koordinator')->first();
+
+        // if (! $staffRole) {
+        //     return response()->json([
+        //         "message"     => "Role 'koordinator' not found",
+        //         "status_code" => 404,
+        //     ], 404);
+        // }
+
+        // $staff = User::whereHas('roles', function ($query) {
+        //     $query->where('name', 'koordinator');
+        // })->get();
 
         return response()->json([
             "status_code" => 200,
@@ -34,18 +39,20 @@ class CrudStaffController extends Controller
 
     public function CreateStaff(Request $request)
     {
-        $staffRole = Role::where('name', 'staff')->first();
+
+        $credentials = $request->validate([
+            'username' => 'required|string|unique:users,username',
+            'password' => 'required|min:6',
+            'role'     => 'required|in:koordinator,agronom',
+        ]);
+
+        $staffRole = Role::where('name', $credentials['role'])->first();
         if (! $staffRole) {
             return response()->json([
-                "message"     => "Role 'staff' not found",
+                "message"     => "Role not found",
                 "status_code" => 404,
             ], 404);
         }
-
-        $credentials = $request->validate([
-            'username' => 'required|string',
-            'password' => 'required|min:6',
-        ]);
 
         $admin = Auth::user();
 
@@ -57,7 +64,7 @@ class CrudStaffController extends Controller
             'updated_by' => $admin->id,
         ]);
 
-        $staff->assignRole('staff');
+        $staff->assignRole($credentials['role']);
 
         return response()->json([
             "status_code" => 201,
@@ -68,8 +75,10 @@ class CrudStaffController extends Controller
 
     public function getDetailStaff($id)
     {
-        $staff = User::whereHas('roles', function ($query) {
-            $query->where('name', 'staff');
+        $roles = ['koordinator', 'agronom'];
+
+        $staff = User::whereHas('roles', function ($query) use ($roles) {
+            $query->whereIn('name', $roles);
         })->find($id);
 
         if (! $staff) {
@@ -79,22 +88,26 @@ class CrudStaffController extends Controller
                 "data"        => null,
             ], 404);
         }
+
         return response()->json([
             "status_code" => 200,
-            "message"     => "Get detail staff succefully",
+            "message"     => "Get detail staff successfully",
             "data"        => new UserResource($staff),
-        ]);
+        ], 200);
     }
 
     public function updateStaff(Request $request, $id)
     {
         $validate = $request->validate([
-            'username' => 'required|string',
+            'username' => 'required|string|unique:users,username,' . $id,
             'password' => 'required|min:6',
+            'role'     => 'required|in:koordinator,agronom',
         ]);
 
-        $staff = User::whereHas('roles', function ($query) {
-            $query->where('name', 'staff');
+        $roles = ['koordinator', 'agronom'];
+
+        $staff = User::whereHas('roles', function ($query) use ($roles) {
+            $query->whereIn('name', $roles);
         })->find($id);
 
         if (! $staff) {
@@ -109,21 +122,28 @@ class CrudStaffController extends Controller
 
         $staff->update([
             'username'   => $validate['username'],
-            'password'   => $validate['password'],
+            'password'   => bcrypt($validate['password']),
             'updated_by' => $admin->id,
         ]);
 
+        $newRole = Role::where('name', $validate['role'])->first();
+        if ($newRole) {
+            $staff->syncRoles([$validate['role']]);
+        }
+
         return response()->json([
             "status_code" => 200,
-            "message"     => "Update staff succefully",
+            "message"     => "Update staff successfully",
             "data"        => new UserResource($staff),
         ], 200);
     }
 
     public function deleteStaff($id)
     {
-        $staff = User::whereHas('roles', function ($query) {
-            $query->where('name', 'staff');
+        $roles = ['koordinator', 'agronom'];
+
+        $staff = User::whereHas('roles', function ($query) use ($roles) {
+            $query->whereIn('name', $roles);
         })->find($id);
 
         if (! $staff) {

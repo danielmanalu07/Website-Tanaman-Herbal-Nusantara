@@ -23,11 +23,12 @@ class AuthController extends Controller
 
         $user = Auth::user();
 
-        if (! $user->hasRole('admin') && ! $user->hasRole('staff')) {
+        if (! $user->hasRole('admin') && ! $user->hasRole('koordinator') && ! $user->hasRole('agronom')) {
             return response()->json(['message' => 'Unauthorized'], 403);
         }
 
-        $token = $user->createToken('ADMIN_TOKEN')->plainTextToken;
+        $roleTokenName = strtoupper($user->roles->first()->name) . "_TOKEN";
+        $token         = $user->createToken($roleTokenName)->plainTextToken;
 
         $user->remember_token = $token;
         $user->save();
@@ -38,6 +39,7 @@ class AuthController extends Controller
 
         return response()->json([
             'token'   => $token,
+            'role'    => $user->roles->pluck('name'),
             'user'    => new UserResource($user),
             'message' => 'Login Successfully',
         ]);

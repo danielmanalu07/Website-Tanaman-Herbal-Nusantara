@@ -1,9 +1,7 @@
 <?php
 namespace App\Response;
 
-use App\Http\Resources\VisitorCategoryResource;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Support\Collection;
 
 class Response
 {
@@ -13,11 +11,7 @@ class Response
             'success'     => true,
             'status_code' => $status_code,
             'message'     => $message,
-            'data'        => $data === null ? null : (
-                $data instanceof Collection || is_array($data)
-                ? VisitorCategoryResource::collection($data)
-                : new VisitorCategoryResource($data)
-            ),
+            'data'        => $data,
         ], $status_code);
     }
 

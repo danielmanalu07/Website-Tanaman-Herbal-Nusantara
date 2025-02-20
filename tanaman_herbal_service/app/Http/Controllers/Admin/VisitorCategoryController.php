@@ -2,6 +2,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\VisitorCategoryResource;
 use App\Response\Response;
 use App\Services\Admin\VisitorCategoryService;
 use Illuminate\Http\JsonResponse;
@@ -25,7 +26,7 @@ class VisitorCategoryController extends Controller
                 return $visitorCategories;
             }
 
-            return Response::success('Get data successfully', $visitorCategories, 200);
+            return Response::success('Get data successfully', VisitorCategoryResource::collection($visitorCategories), 200);
         } catch (\Throwable $th) {
             return Response::error('internal server error', $th->getMessage(), 500);
         }
@@ -40,12 +41,11 @@ class VisitorCategoryController extends Controller
         try {
             $data = $this->visitorCategoryService->create_visitorCategory($request->all());
 
-            // ✅ Cek apakah service mengembalikan response error
             if ($data instanceof JsonResponse) {
                 return $data;
             }
 
-            return Response::success('Created Successfully', $data, 201);
+            return Response::success('Created Successfully', new VisitorCategoryResource($data), 201);
         } catch (\Throwable $th) {
             return Response::error('internal server error', $th->getMessage(), 500);
         }
@@ -60,7 +60,7 @@ class VisitorCategoryController extends Controller
                 return $data;
             }
 
-            return Response::success('Get data successfully', $data, 200);
+            return Response::success('Get data successfully', new VisitorCategoryResource($data), 200);
         } catch (\Throwable $th) {
             return Response::error('internal server error', $th->getMessage(), 500);
         }
@@ -79,7 +79,7 @@ class VisitorCategoryController extends Controller
                 return $data;
             }
 
-            return Response::success('Updated Successfully', $data, 200);
+            return Response::success('Updated Successfully', new VisitorCategoryResource($data), 200);
         } catch (\Throwable $th) {
             return Response::error('internal server error', $th->getMessage(), 500);
         }
