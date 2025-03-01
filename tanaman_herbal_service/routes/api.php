@@ -1,12 +1,13 @@
 <?php
 
 use App\Http\Controllers\Admin\CrudStaffController;
+use App\Http\Controllers\Admin\HabitusController;
 use App\Http\Controllers\Admin\VisitorCategoryController;
 use App\Http\Controllers\Admin\VisitorController;
 use App\Http\Controllers\AuthController;
 use Illuminate\Support\Facades\Route;
 
-Route::post('/login', [AuthController::class, 'login'])->middleware('throttle:5,1');
+Route::post('/login', [AuthController::class, 'login']);
 Route::middleware(['auth:sanctum', 'auth.token_expiry'])->group(function () {
     Route::get('/profile', [AuthController::class, 'Profile']);
     Route::post('/logout', [AuthController::class, 'logout']);
@@ -32,6 +33,13 @@ Route::middleware(['auth:sanctum', 'auth.token_expiry'])->group(function () {
             Route::get('/{id}', [VisitorController::class, 'getDetailVisitor']);
             Route::put('/{id}/update', [VisitorController::class, 'updateVisitor']);
             Route::delete('/{id}/delete', [VisitorController::class, 'deleteVisitor']);
+        });
+
+        //CRUD Habitus
+        Route::prefix('/habitus')->group(function () {
+            Route::post('/create', [HabitusController::class, 'createHabitus']);
+            Route::get('/', [HabitusController::class, 'getAllHabitus']);
+            Route::get('/{id}', [HabitusController::class, 'getDetailHabitus']);
         });
     });
 

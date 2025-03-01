@@ -7,6 +7,7 @@ use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
 
 class AuthController extends Controller
 {
@@ -21,9 +22,17 @@ class AuthController extends Controller
             return response()->json(['message' => 'Invalid credentials'], 401);
         }
 
-        $user = Auth::user();
+        $user   = Auth::user();
+        $userId = $user->id;
 
-        if (! $user->hasRole('admin') && ! $user->hasRole('koordinator') && ! $user->hasRole('agronom')) {
+        $cacheKey = "user_roles_{$userId}";
+
+        $roles = Cache::remember($cacheKey, 3600, function () use ($user) {
+            return $user->roles->pluck('name');
+        });
+
+        $allowedRoles = ['admin', 'koordinator', 'agronom'];
+        if (! $roles->intersect($allowedRoles)->count()) {
             return response()->json(['message' => 'Unauthorized'], 403);
         }
 
@@ -54,7 +63,11 @@ class AuthController extends Controller
 
     public function logout(Request $request)
     {
-        $user = $request->user();
+        $user   = $request->user();
+        $userId = $user->id;
+
+        $cacheKey = "user_roles_{$userId}";
+        Cache::forget($cacheKey);
 
         $user->tokens()->delete();
 
