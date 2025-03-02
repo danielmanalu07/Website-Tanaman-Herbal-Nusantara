@@ -69,7 +69,8 @@ class AuthController extends Controller
         $cacheKey = "user_roles_{$userId}";
         Cache::forget($cacheKey);
 
-        $user->tokens()->delete();
+        // $user->tokens()->delete();
+        $request->user()->currentAccessToken()->delete();
 
         $user->remember_token = null;
         $user->save();

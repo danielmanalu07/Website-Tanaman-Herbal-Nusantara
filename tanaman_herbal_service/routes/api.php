@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Admin\CrudStaffController;
 use App\Http\Controllers\Admin\HabitusController;
+use App\Http\Controllers\Admin\LandsController;
 use App\Http\Controllers\Admin\VisitorCategoryController;
 use App\Http\Controllers\Admin\VisitorController;
 use App\Http\Controllers\AuthController;
@@ -35,12 +36,25 @@ Route::middleware(['auth:sanctum', 'auth.token_expiry'])->group(function () {
             Route::delete('/{id}/delete', [VisitorController::class, 'deleteVisitor']);
         });
 
-        //CRUD Habitus
-        Route::prefix('/habitus')->group(function () {
+    });
+    //CRUD Habitus
+    Route::prefix('/habitus')->group(function () {
+        Route::get('/', [HabitusController::class, 'getAllHabitus']);
+        Route::get('/{id}', [HabitusController::class, 'getDetailHabitus']);
+        Route::middleware('permission:admin')->group(function () {
             Route::post('/create', [HabitusController::class, 'createHabitus']);
-            Route::get('/', [HabitusController::class, 'getAllHabitus']);
-            Route::get('/{id}', [HabitusController::class, 'getDetailHabitus']);
+            Route::put('/{id}/update', [HabitusController::class, 'updateHabitus']);
+            Route::delete('/{id}/delete', [HabitusController::class, 'deleteHabitus']);
         });
+
     });
 
+    //CRUD Lands
+    Route::prefix('/land')->group(function () {
+        Route::get('/', [LandsController::class, 'getAllLands']);
+        Route::get('/{id}', [LandsController::class, 'getDetailLand']);
+        Route::middleware('permission:admin')->group(function () {
+            Route::post('/create', [LandsController::class, 'createLand']);
+        });
+    });
 });

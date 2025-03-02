@@ -19,4 +19,19 @@ class HabitusRepository
     {
         return Habitus::findOrFail($id);
     }
+
+    public function update_habitus(int $id, array $data)
+    {
+        $habitus = Habitus::findOrFail($id);
+        $habitus->update($data);
+        return $habitus;
+    }
+
+    public function delete_habitus(int $id)
+    {
+        $habitus = Habitus::findOrFail($id);
+        $habitus->delete();
+        return $habitus;
+    }
+
 }

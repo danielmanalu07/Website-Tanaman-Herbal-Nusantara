@@ -61,4 +61,35 @@ class HabitusController extends Controller
             return Response::error('internal server error', $th->getMessage(), 500);
         }
     }
+
+    public function updateHabitus(Request $request, int $id)
+    {
+        $request->validate([
+            'name' => 'required|string',
+        ]);
+        try {
+            $habitus = $this->habitus_service->update_habitus($request->all(), $id);
+            if ($habitus instanceof JsonResponse) {
+                return $habitus;
+            }
+
+            return Response::success('Updated Successfully', new HabitusResource($habitus), 200);
+        } catch (\Throwable $th) {
+            return Response::error('internal server error', $th->getMessage(), 500);
+        }
+    }
+
+    public function deleteHabitus(int $id)
+    {
+        try {
+            $habitus = $this->habitus_service->delete_habitus($id);
+            if ($habitus instanceof JsonResponse) {
+                return $habitus;
+            }
+
+            return Response::success('Deleted Successfully', null, 200);
+        } catch (\Throwable $th) {
+            return Response::error('internal server error', $th->getMessage(), 500);
+        }
+    }
 }

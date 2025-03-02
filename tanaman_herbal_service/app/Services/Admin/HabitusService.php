@@ -3,6 +3,7 @@ namespace App\Services\Admin;
 
 use App\Http\Repositories\HabitusRepository;
 use App\Response\Response;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\Auth;
 
 class HabitusService
@@ -26,7 +27,7 @@ class HabitusService
 
             return $habitus;
         } catch (\Throwable $th) {
-            return Response::error('Failed to create data visitors', $th->getMessage(), 500);
+            return Response::error('Failed to create data habitus', $th->getMessage(), 500);
         }
     }
 
@@ -40,7 +41,7 @@ class HabitusService
 
             return $habitus;
         } catch (\Throwable $th) {
-            return Response::error('Failed to get data visitors', $th->getMessage(), 500);
+            return Response::error('Failed to get data habitus', $th->getMessage(), 500);
         }
     }
 
@@ -53,8 +54,47 @@ class HabitusService
             }
 
             return $habitus;
+        } catch (ModelNotFoundException $e) {
+            return Response::error('Data not found', $e->getMessage(), 404);
         } catch (\Throwable $th) {
-            return Response::error('Failed to get data visitors', $th->getMessage(), 500);
+            return Response::error('Failed to get data habitus', $th->getMessage(), 500);
         }
     }
+
+    public function update_habitus(array $data, int $id)
+    {
+        try {
+            $admin   = Auth::user();
+            $habitus = $this->habitusRepo->get_detail_habitus($id);
+
+            if (! $habitus) {
+                return Response::error('data not found', null, '404');
+            }
+
+            $updatedData = [
+                'name'       => $data['name'],
+                'updated_by' => $admin->id,
+            ];
+
+            $updatedHabitus = $this->habitusRepo->update_habitus($id, $updatedData);
+
+            return $updatedHabitus;
+        } catch (ModelNotFoundException $e) {
+            return Response::error('Data not found', $e->getMessage(), 404);
+        } catch (\Throwable $th) {
+            return Response::error('Failed to update habitus data', $th->getMessage(), 500);
+        }
+    }
+
+    public function delete_habitus(int $id)
+    {
+        try {
+            return $this->habitusRepo->delete_habitus($id);
+        } catch (ModelNotFoundException $e) {
+            return Response::error('Data not found', $e->getMessage(), 404);
+        } catch (\Throwable $th) {
+            return Response::error('Failed to delete habitus data', $th->getMessage(), 500);
+        }
+    }
+
 }
