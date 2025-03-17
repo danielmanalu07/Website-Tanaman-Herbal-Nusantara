@@ -62,4 +62,38 @@ class LandService
             return Response::error('Failed to get data lands', $th->getMessage(), 500);
         }
     }
+
+    public function update_land(array $data, int $id)
+    {
+        try {
+            $admin = Auth::user();
+            $land  = $this->landRepo->get_all_by_id($id);
+
+            if (! $land) {
+                return Response::error('Data not found', null, 404);
+            }
+
+            $updateData = [
+                'name'       => $data['name'],
+                'updated_by' => $admin->id,
+            ];
+
+            return $this->landRepo->update_land($id, $updateData);
+        } catch (ModelNotFoundException $e) {
+            return Response::error('Data not found', $e->getMessage(), 404);
+        } catch (\Throwable $th) {
+            return Response::error('Failed to get data lands', $th->getMessage(), 500);
+        }
+    }
+
+    public function delete_land(int $id)
+    {
+        try {
+            return $this->landRepo->delete_land($id);
+        } catch (ModelNotFoundException $e) {
+            return Response::error('Data not found', $e->getMessage(), 404);
+        } catch (\Throwable $th) {
+            return Response::error('Failed to delete lands', $th->getMessage(), 500);
+        }
+    }
 }

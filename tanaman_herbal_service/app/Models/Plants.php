@@ -4,16 +4,24 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class Habitus extends Model
+class Plants extends Model
 {
     use SoftDeletes;
-    public $table = 'habituses';
+
+    public $table = 'plants';
 
     protected $fillable = [
+        'id',
         'name',
-        'qrcode',
+        'latin_name',
+        'advantage',
+        'ecology',
+        'endemic_information',
+        'status',
+        'habitus_id',
         'created_by',
         'updated_by',
+        'deleted_at',
     ];
 
     protected $dates = ['deleted_at'];
@@ -28,15 +36,8 @@ class Habitus extends Model
         return $this->belongsTo(User::class, 'updated_by');
     }
 
-    // public function getQRCodeUrlAttribute()
-    // {
-    //     $url = route('habitus.detail', $this->id);
-    //     return QrCode::format('png')->size(200)->generate($url);
-    // }
-
-    public function plants()
+    public function habitus()
     {
-        return $this->hasMany(Plants::class);
+        return $this->belongsTo(Habitus::class, 'habitus_id');
     }
-
 }

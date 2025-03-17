@@ -19,4 +19,18 @@ class LandRepository
     {
         return Lands::findOrFail($id);
     }
+
+    public function update_land(int $id, array $data)
+    {
+        $land = Lands::findOrFail($id);
+        $land->update($data);
+        return $land;
+    }
+
+    public function delete_land(int $id)
+    {
+        $land = Lands::findOrFail($id);
+        $land->delete();
+        return $land;
+    }
 }

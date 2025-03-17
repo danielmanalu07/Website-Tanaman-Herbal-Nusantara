@@ -3,6 +3,8 @@
 use App\Http\Controllers\Admin\CrudStaffController;
 use App\Http\Controllers\Admin\HabitusController;
 use App\Http\Controllers\Admin\LandsController;
+use App\Http\Controllers\Admin\PlantController;
+use App\Http\Controllers\Admin\PlantLandController;
 use App\Http\Controllers\Admin\VisitorCategoryController;
 use App\Http\Controllers\Admin\VisitorController;
 use App\Http\Controllers\AuthController;
@@ -40,7 +42,7 @@ Route::middleware(['auth:sanctum', 'auth.token_expiry'])->group(function () {
     //CRUD Habitus
     Route::prefix('/habitus')->group(function () {
         Route::get('/', [HabitusController::class, 'getAllHabitus']);
-        Route::get('/{id}', [HabitusController::class, 'getDetailHabitus']);
+        Route::get('/{id}', [HabitusController::class, 'getDetailHabitus'])->name('habitus.detail');
         Route::middleware('permission:admin')->group(function () {
             Route::post('/create', [HabitusController::class, 'createHabitus']);
             Route::put('/{id}/update', [HabitusController::class, 'updateHabitus']);
@@ -55,6 +57,30 @@ Route::middleware(['auth:sanctum', 'auth.token_expiry'])->group(function () {
         Route::get('/{id}', [LandsController::class, 'getDetailLand']);
         Route::middleware('permission:admin')->group(function () {
             Route::post('/create', [LandsController::class, 'createLand']);
+            Route::put('/{id}/edit', [LandsController::class, 'updateLand']);
+            Route::delete('{id}/delete', [LandsController::class, 'deleteLand']);
+        });
+    });
+
+    //CRUD Plants
+    Route::prefix('/plant')->group(function () {
+        Route::get('/', [PlantController::class, 'getAllPlant']);
+        Route::get('/{id}', [PlantController::class, 'getDetailPlant']);
+        Route::middleware('permission:admin')->group(function () {
+            Route::post('/create', [PlantController::class, 'createPlant']);
+            Route::put('/{id}/edit', [PlantController::class, 'updatePlant']);
+            Route::delete('/{id}/delete', [PlantController::class, 'deletePlant']);
+        });
+    });
+
+    //CRUD Plant Land
+    Route::prefix('/plant-land')->group(function () {
+        Route::get('/', [PlantLandController::class, 'getAllPlantLand']);
+        Route::get('/{id}', [PlantLandController::class, 'getDetailPlantLand']);
+        Route::middleware('permission:admin')->group(function () {
+            Route::post('/create', [PlantLandController::class, 'createPlantLand']);
+            Route::put('/{id}/edit', [PlantLandController::class, 'updatePlantLand']);
+            Route::delete('/{id}/delete', [PlantLandController::class, 'deletePlantLand']);
         });
     });
 });

@@ -78,6 +78,14 @@ class VisitorService
             if (! $visitor_category) {
                 return Response::error('Visitor Category not found', null, 404);
             }
+
+            $existing_visitor = Visitor::where('visitor_category_id', $data['visitor_category_id'])
+                ->where('id', '!=', $id)
+                ->first();
+            if ($existing_visitor) {
+                return Response::error('Visitor with this category already exists', null, 409);
+            }
+
             $visitor->update([
                 'visitor_total'       => $data['visitor_total'],
                 'visitor_category_id' => $data['visitor_category_id'],

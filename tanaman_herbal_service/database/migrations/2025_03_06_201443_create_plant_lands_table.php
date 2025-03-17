@@ -11,10 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('habituses', function (Blueprint $table) {
+        Schema::create('plant_lands', function (Blueprint $table) {
             $table->id();
-            $table->string('name')->unique();
-            $table->string('qrcode')->unique()->nullable();
+            $table->unsignedBigInteger('plant_id');
+            $table->foreign('plant_id')->references('id')->on('plants')->onDelete('CASCADE')->onUpdate('CASCADE');
+            $table->unsignedBigInteger('land_id');
+            $table->foreign('land_id')->references('id')->on('lands')->onDelete('CASCADE')->onUpdate('CASCADE');
+            $table->boolean('status')->default(false);
             $table->foreignId('created_by')->nullable()->constrained('users')->nullOnDelete();
             $table->foreignId('updated_by')->nullable()->constrained('users')->nullOnDelete();
             $table->timestamps();
@@ -27,6 +30,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('habituses');
+        Schema::dropIfExists('plant_lands');
     }
 };

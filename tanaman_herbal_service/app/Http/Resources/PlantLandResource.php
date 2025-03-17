@@ -4,7 +4,7 @@ namespace App\Http\Resources;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class HabitusResource extends JsonResource
+class PlantLandResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -16,10 +16,12 @@ class HabitusResource extends JsonResource
         if (is_null($this->resource)) {
             return [];
         }
+
         return [
             'id'         => $this->id,
-            'name'       => $this->name,
-            'qrcode'     => $this->qrcode ? asset("storage/{$this->qrcode}") : null,
+            'plant'      => new PlantResource($this->plant),
+            'land'       => new LandResource($this->land),
+            'status'     => $this->status ? true : false,
             'created_by' => optional($this->createdBy)->username,
             'updated_by' => optional($this->createdBy)->username,
             'created_at' => $this->created_at,

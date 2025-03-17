@@ -63,4 +63,35 @@ class LandsController extends Controller
             return Response::error('internal server error', $th->getMessage(), 500);
         }
     }
+
+    public function updateLand(Request $request, int $id)
+    {
+        $request->validate([
+            'name' => 'required|string',
+        ]);
+
+        try {
+            $land = $this->land_service->update_land($request->all(), $id);
+            if ($land instanceof JsonResponse) {
+                return $land;
+            }
+
+            return Response::success('Updated land successfully', $land, 200);
+        } catch (\Throwable $th) {
+            return Response::error('internal server error', $th->getMessage(), 500);
+        }
+    }
+
+    public function deleteLand(int $id)
+    {
+        try {
+            $result = $this->land_service->delete_land($id);
+            if ($result instanceof JsonResponse) {
+                return $result;
+            }
+            return Response::success('Delete land successfully', $result, 200);
+        } catch (\Throwable $th) {
+            return Response::error('internal server error', $th->getMessage(), 500);
+        }
+    }
 }
