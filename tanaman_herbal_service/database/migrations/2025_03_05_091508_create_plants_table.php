@@ -18,6 +18,7 @@ return new class extends Migration
             $table->text('advantage');
             $table->string('ecology');
             $table->string('endemic_information');
+            $table->string('qrcode')->unique()->nullable();
             $table->boolean('status')->default(0);
             $table->unsignedBigInteger('habitus_id');
             $table->foreign('habitus_id')->references('id')->on('habituses')->onDelete('CASCADE')->onUpdate('CASCADE');

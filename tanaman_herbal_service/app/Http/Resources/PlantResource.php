@@ -1,6 +1,7 @@
 <?php
 namespace App\Http\Resources;
 
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -24,13 +25,14 @@ class PlantResource extends JsonResource
             'advantage'           => $this->advantage,
             'ecology'             => $this->ecology,
             'endemic_information' => $this->endemic_information,
+            'qrcode'              => $this->qrcode ? asset("storage/{$this->qrcode}") : null,
             'status'              => $this->status ? true : false,
             'habitus'             => new HabitusResource($this->habitus),
             'created_by'          => optional($this->createdBy)->username,
             'updated_by'          => optional($this->createdBy)->username,
-            'created_at'          => $this->created_at,
-            'updated_at'          => $this->updated_at,
-            'deleted_at'          => $this->deleted_at,
+            "created_at"          => Carbon::parse($this->created_at)->translatedFormat('d F Y h:i A'),
+            "updated_at"          => Carbon::parse($this->updated_at)->translatedFormat('d F Y h:i A'),
+            'deleted_at'          => Carbon::parse($this->created_at)->translatedFormat('d F Y h:i A'),
         ];
     }
 }

@@ -16,9 +16,13 @@ class UserResource extends JsonResource
     {
         return [
             'id'          => $this->id,
+            'full_name'   => $this->full_name,
+            'email'       => $this->email,
+            'phone'       => $this->phone,
             'username'    => $this->username,
             'roles'       => $this->getRoleNames(),
             'permissions' => $this->getAllPermissions()->pluck('name'),
+            'active'      => $this->active ? 'true' : 'false',
             "created_at"  => Carbon::parse($this->created_at)->translatedFormat('d F Y h:i A'),
             "updated_at"  => Carbon::parse($this->updated_at)->translatedFormat('d F Y h:i A'),
             "created_by"  => optional($this->createdBy)->username,

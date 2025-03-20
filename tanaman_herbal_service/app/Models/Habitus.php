@@ -11,7 +11,6 @@ class Habitus extends Model
 
     protected $fillable = [
         'name',
-        'qrcode',
         'created_by',
         'updated_by',
     ];

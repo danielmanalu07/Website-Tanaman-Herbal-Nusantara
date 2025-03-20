@@ -19,9 +19,10 @@ class HabitusController extends Controller
     public function createHabitus(Request $request)
     {
         $request->validate([
-            'name' => 'required|string',
+            'name' => 'required|string|unique:habituses,name',
         ]);
         try {
+
             $habitus = $this->habitus_service->create_habitus($request->all());
 
             if ($habitus instanceof JsonResponse) {

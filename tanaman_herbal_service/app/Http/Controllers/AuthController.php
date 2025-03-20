@@ -27,7 +27,7 @@ class AuthController extends Controller
 
         $cacheKey = "user_roles_{$userId}";
 
-        $roles = Cache::remember($cacheKey, 3600, function () use ($user) {
+        $roles = Cache::remember($cacheKey, 60, function () use ($user) {
             return $user->roles->pluck('name');
         });
 

@@ -7,6 +7,8 @@ use App\Models\Plants;
 use App\Response\Response;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
+use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
 class PlantService
 {
@@ -37,6 +39,16 @@ class PlantService
             ]);
 
             $plant = $this->plantRepo->create_plant($plantData);
+
+            // Gunakan ID yang baru saja dibuat untuk QR Code
+            $qrData = route('plant.detail', ['id' => $plant->id]);
+            $qrCode = QrCode::format('png')->size(200)->generate($qrData);
+
+            $qrPath = "qrcodes/plants_{$plant->name}.png";
+            Storage::disk('public')->put($qrPath, $qrCode);
+
+            // Update plant dengan QR Code
+            $plant->update(['qrcode' => $qrPath]);
 
             return $plant;
 
@@ -97,7 +109,18 @@ class PlantService
                 return Response::error('Plant with this habitus already exists', null, 409);
             }
 
+            if ($plant->qrcode && Storage::disk('public')->exists($plant->qrcode)) {
+                Storage::disk('public')->delete($plant->qrcode);
+            }
+
+            $qrData = route('plant.detail', ['id' => $id]);
+            $qrCode = QrCode::format('png')->size(200)->generate($qrData);
+
+            $qrPath = "qrcodes/plants_{$data['name']}.png";
+            Storage::disk('public')->put($qrPath, $qrCode);
+
             $updateData = array_merge($data, [
+                'qrcode'     => $qrPath,
                 'updated_by' => $admin->id,
             ]);
 
@@ -118,6 +141,19 @@ class PlantService
         } catch (\Throwable $th) {
             return Response::error('Failed to delete data plant', $th->getMessage(), 500);
         }
+    }
+
+    public function getQrCode($fileName)
+    {
+        $path = "qrcodes/{$fileName}";
+
+        if (! Storage::disk('public')->exists($path)) {
+            return Response::error('QR Code not found', null, 404);
+        }
+
+        $url = asset("storage/{$path}");
+
+        return Response::success('QR Code retrieved successfully', ['url' => $url], 200);
     }
 
 }

@@ -17,6 +17,7 @@ class Plants extends Model
         'advantage',
         'ecology',
         'endemic_information',
+        'qrcode',
         'status',
         'habitus_id',
         'created_by',

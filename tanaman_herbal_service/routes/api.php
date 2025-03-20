@@ -22,6 +22,7 @@ Route::middleware(['auth:sanctum', 'auth.token_expiry'])->group(function () {
         Route::get("/get-staff/{id}", [CrudStaffController::class, 'getDetailStaff']);
         Route::put("/update-staff/{id}", [CrudStaffController::class, 'updateStaff']);
         Route::delete("/delete-staff/{id}", [CrudStaffController::class, 'deleteStaff']);
+        Route::put('/edit-status/{id}', [CrudStaffController::class, 'update_status']);
 
         Route::get("/visitor-categories", [VisitorCategoryController::class, 'getVisitorCategories']);
         Route::post("/visitor-category", [VisitorCategoryController::class, 'createVisitorCategory']);
@@ -65,7 +66,7 @@ Route::middleware(['auth:sanctum', 'auth.token_expiry'])->group(function () {
     //CRUD Plants
     Route::prefix('/plant')->group(function () {
         Route::get('/', [PlantController::class, 'getAllPlant']);
-        Route::get('/{id}', [PlantController::class, 'getDetailPlant']);
+        Route::get('/{id}', [PlantController::class, 'getDetailPlant'])->name('plant.detail');
         Route::middleware('permission:admin')->group(function () {
             Route::post('/create', [PlantController::class, 'createPlant']);
             Route::put('/{id}/edit', [PlantController::class, 'updatePlant']);

@@ -25,7 +25,6 @@ class LandService
                 'created_by' => $admin->id,
                 'updated_by' => $admin->id,
             ]);
-
             return $land;
         } catch (\Throwable $th) {
             return Response::error('Failed to create data land', $th->getMessage(), 500);

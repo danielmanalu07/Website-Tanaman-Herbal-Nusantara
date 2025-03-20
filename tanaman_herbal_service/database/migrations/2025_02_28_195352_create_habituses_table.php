@@ -13,8 +13,7 @@ return new class extends Migration
     {
         Schema::create('habituses', function (Blueprint $table) {
             $table->id();
-            $table->string('name')->unique();
-            $table->string('qrcode')->unique()->nullable();
+            $table->string('name');
             $table->foreignId('created_by')->nullable()->constrained('users')->nullOnDelete();
             $table->foreignId('updated_by')->nullable()->constrained('users')->nullOnDelete();
             $table->timestamps();
