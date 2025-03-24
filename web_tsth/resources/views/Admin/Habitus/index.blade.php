@@ -25,33 +25,6 @@
             });
         });
     </script>
-    @if (Session::has('success'))
-        <script>
-            $(document).ready(function() {
-                Swal.fire({
-                    title: "Success!",
-                    text: "{{ session('success') }}",
-                    imageUrl: "https://cdn-icons-png.flaticon.com/512/190/190411.png",
-                    imageWidth: 100,
-                    imageHeight: 100,
-                    imageAlt: "Checklist icon",
-                    draggable: true
-                });
-            });
-        </script>
-    @endif
-
-    @if (Session::has('error'))
-        <script>
-            $(document).ready(function() {
-                Swal.fire({
-                    title: "Error!",
-                    text: "{{ session('error') }}",
-                    icon: "error",
-                });
-            });
-        </script>
-    @endif
 @endpush
 @section('content')
     {{-- Modal Create --}}
@@ -201,8 +174,7 @@
                                         <i class="ph-pencil"></i>
                                     </button>
                                     <button type="button" class="btn btn-sm btn-danger" data-bs-toggle="modal"
-                                        data-bs-target="#formDeleteHabitus{{ $habitus_item->id }}"
-                                        data-id="{{ $habitus_item->id }}">
+                                        data-bs-target="#formDeleteHabitus{{ $habitus_item->id }}">
                                         <i class="ph-trash"></i>
                                     </button>
                                 </td>

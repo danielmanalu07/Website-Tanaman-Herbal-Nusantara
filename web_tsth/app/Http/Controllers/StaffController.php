@@ -28,23 +28,67 @@ class StaffController extends Controller
 
     public function create(Request $request)
     {
-        $request->validate([
-            'full_name' => 'required',
-            'email'     => 'required|email|unique:users,email',
-            'phone'     => 'required|unique:users,phone',
-            'username'  => 'required|string|unique:users,username',
-            'password'  => 'required|min:6',
-            'role'      => 'required|in:koordinator,agronom',
-        ]);
         try {
+            $request->validate([
+                'full_name' => 'required',
+                'email'     => 'required|email|unique:users,email',
+                'phone'     => 'required|unique:users,phone',
+                'username'  => 'required|string|unique:users,username',
+                'password'  => 'required|min:6',
+                'role'      => 'required|in:koordinator,agronom',
+            ]);
             $result = $this->staff_service->create_staff($request->all());
-            if (isset($result['success']) && $result['success'] != 201) {
-                return redirect()->back()->with('error', $result['message']);
-            }
             return redirect()->back()->with('success', $result['message']);
-
         } catch (\Throwable $th) {
-            return redirect()->back()->with('error', 'Something went wrong.');
+            return redirect()->back()->with('error', $th->getMessage());
         }
     }
+
+    public function update(Request $request, int $id)
+    {
+        try {
+            $request->validate([
+                'username'  => 'nullable|string|unique:users,username,' . $id,
+                'full_name' => 'nullable|string',
+                'email'     => 'nullable|email|unique:users,email,' . $id,
+                'phone'     => 'nullable|string|unique:users,phone,' . $id,
+                'password'  => 'nullable|min:6',
+                'role'      => 'nullable|in:koordinator,agronom',
+            ]);
+            $result = $this->staff_service->update_staff($request->all(), $id);
+            return redirect()->back()->with('success', $result['message']);
+        } catch (\Throwable $th) {
+            return redirect()->back()->with('error', $th->getMessage());
+        }
+    }
+
+    public function delete(int $id)
+    {
+        try {
+            $result = $this->staff_service->delete_staff($id);
+            return redirect()->back()->with('success', $result['message']);
+        } catch (\Throwable $th) {
+            return redirect()->back()->with('error', $th->getMessage());
+        }
+    }
+
+    public function update_status(Request $request, int $id)
+    {
+        try {
+            $request->validate([
+                'active' => 'required|boolean',
+            ]);
+
+            $result = $this->staff_service->update_status($request->active, $id);
+            // dd($result);
+            if ($result['success']) {
+                return redirect()->back()->with('success', $result['message']);
+            } else {
+                return redirect()->back()->with('error', $result['message']);
+            }
+        } catch (\Throwable $th) {
+            return redirect()->back()->with('error', $th->getMessage());
+        }
+    }
+
 }

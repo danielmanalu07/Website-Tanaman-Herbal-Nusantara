@@ -101,12 +101,12 @@ class CrudStaffController extends Controller
     public function updateStaff(Request $request, $id)
     {
         $validate = $request->validate([
-            'username'  => 'required|string|unique:users,username,' . $id,
-            'full_name' => 'required',
-            'email'     => 'required|email|unique:users,email',
-            'phone'     => 'required|unique:users,phone',
-            'password'  => 'required|min:6',
-            'role'      => 'required|in:koordinator,agronom',
+            'username'  => 'nullable|string|unique:users,username,' . $id,
+            'full_name' => 'nullable|string',
+            'email'     => 'nullable|email|unique:users,email,' . $id,
+            'phone'     => 'nullable|string|unique:users,phone,' . $id,
+            'password'  => 'nullable|min:6',
+            'role'      => 'nullable|in:koordinator,agronom',
         ]);
 
         $roles = ['koordinator', 'agronom'];
@@ -125,18 +125,25 @@ class CrudStaffController extends Controller
 
         $admin = Auth::user();
 
-        $staff->update([
-            'full_name'  => $validate['full_name'],
-            'email'      => $validate['email'],
-            'phone'      => $validate['phone'],
-            'username'   => $validate['username'],
-            'password'   => bcrypt($validate['password']),
+        $updateData = array_filter([
+            'full_name'  => $validate['full_name'] ?? $staff->full_name,
+            'email'      => $validate['email'] ?? $staff->email,
+            'phone'      => $validate['phone'] ?? $staff->phone,
+            'username'   => $validate['username'] ?? $staff->username,
             'updated_by' => $admin->id,
         ]);
 
-        $newRole = Role::where('name', $validate['role'])->first();
-        if ($newRole) {
-            $staff->syncRoles([$validate['role']]);
+        if (! empty($validate['password'])) {
+            $updateData['password'] = bcrypt($validate['password']);
+        }
+
+        $staff->update($updateData);
+
+        if (! empty($validate['role'])) {
+            $newRole = Role::where('name', $validate['role'])->first();
+            if ($newRole) {
+                $staff->syncRoles([$validate['role']]);
+            }
         }
 
         return response()->json([

@@ -37,7 +37,11 @@ class Plants extends Model
         return $this->belongsTo(User::class, 'updated_by');
     }
 
-    public function habitus()
+    // public function habitus()
+    // {
+    //     return $this->belongsTo(Habitus::class, 'habitus_id');
+    // }
+    public function habituses()
     {
         return $this->belongsTo(Habitus::class, 'habitus_id');
     }

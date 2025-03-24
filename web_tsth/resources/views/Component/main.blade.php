@@ -55,6 +55,36 @@
 
     <!-- JS SweetAlert2 -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.js"></script>
+
+    <!-- CK EDITOR -->
+    <script src="https://cdn.ckeditor.com/ckeditor5/41.2.1/classic/ckeditor.js"></script>
+
+    @if (Session::has('success'))
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                Swal.fire({
+                    title: "Welcome Back!",
+                    text: "{{ session('success') }}",
+                    imageUrl: "https://cdn-icons-png.flaticon.com/512/190/190411.png", // URL gambar checklist online
+                    imageWidth: 100,
+                    imageHeight: 100,
+                    imageAlt: "Checklist icon",
+                    draggable: true
+                });
+            });
+        </script>
+    @endif
+    @if (Session::has('error'))
+        <script>
+            $(document).ready(function() {
+                Swal.fire({
+                    title: "Error!",
+                    text: "{{ session('error') }}",
+                    icon: "error",
+                });
+            });
+        </script>
+    @endif
     @stack('resource')
 </head>
 

@@ -62,17 +62,11 @@
             </li>
             <li class="nav-item nav-item-submenu">
                 <a href="#" class="nav-link">
-                    <i class="ph-swatches"></i>
-                    <span>Themes</span>
+                    <i class="ph ph-leaf"></i>
+                    <span>Plant Manage</span>
                 </a>
                 <ul class="nav-group-sub collapse">
-                    <li class="nav-item"><a href="index.html" class="nav-link active">Default</a></li>
-                    <li class="nav-item"><a href="{{ asset('/adminLTR/material/full/index.html') }}"
-                            class="nav-link disabled">Material <span class="badge align-self-center ms-auto">Coming
-                                soon</span></a></li>
-                    <li class="nav-item"><a href="{{ asset('/adminLTR/clean/full/index.html') }}"
-                            class="nav-link disabled">Clean <span class="badge align-self-center ms-auto">Coming
-                                soon</span></a></li>
+                    <li class="nav-item"><a href="{{ route('plant.index') }}" class="nav-link">List Plant Data</a></li>
                 </ul>
             </li>
             <li class="nav-item nav-item-submenu">

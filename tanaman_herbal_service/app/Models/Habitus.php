@@ -10,6 +10,7 @@ class Habitus extends Model
     public $table = 'habituses';
 
     protected $fillable = [
+        'id',
         'name',
         'created_by',
         'updated_by',
@@ -25,17 +26,6 @@ class Habitus extends Model
     public function updatedBy()
     {
         return $this->belongsTo(User::class, 'updated_by');
-    }
-
-    // public function getQRCodeUrlAttribute()
-    // {
-    //     $url = route('habitus.detail', $this->id);
-    //     return QrCode::format('png')->size(200)->generate($url);
-    // }
-
-    public function plants()
-    {
-        return $this->hasMany(Plants::class);
     }
 
 }

@@ -33,7 +33,7 @@ class StaffService
                 });
                 return StaffResource::collection($collection);
             }
-            return collect();
+            throw new \Exception($result['message'] ?? 'Failed to get staff data');
         } catch (\Throwable $th) {
             return response()->json([
                 'message' => "Failed to get data",
@@ -44,23 +44,78 @@ class StaffService
 
     public function create_staff(array $data)
     {
-        $token    = $this->token->GetToken();
-        $response = Http::withHeaders([
-            'Authorization' => "Bearer {$token}",
-        ])->post("{$this->api_url}/create-staff", [
-            'full_name' => $data['full_name'],
-            'email'     => $data['email'],
-            'phone'     => $data['phone'],
-            'username'  => $data['username'],
-            'password'  => $data['password'],
-            'role'      => $data['role'],
-        ]);
+        try {
+            $token    = $this->token->GetToken();
+            $response = Http::withHeaders([
+                'Authorization' => "Bearer {$token}",
+            ])->post("{$this->api_url}/create-staff", $data);
 
-        $result = $response->json();
-        if ($response->failed()) {
-            return $result['message'];
+            $result = $response->json();
+
+            if ($response->failed()) {
+                throw new \Exception($result['message'] ?? 'Failed to create staff');
+            }
+
+            return $result;
+        } catch (\Throwable $th) {
+            throw new \Exception($th->getMessage());
         }
-        return $result;
+    }
 
+    public function update_staff(array $data, int $id)
+    {
+        try {
+            $token    = $this->token->GetToken();
+            $response = Http::withHeaders([
+                'Authorization' => "Bearer {$token}",
+            ])->put("{$this->api_url}/update-staff/$id", $data);
+
+            $result = $response->json();
+            if ($response->failed()) {
+                throw new \Exception($result['message'] ?? 'Failed to update staff');
+            }
+
+            return $result;
+        } catch (\Throwable $th) {
+            throw new \Exception($th->getMessage());
+        }
+    }
+
+    public function delete_staff(int $id)
+    {
+        try {
+            $token    = $this->token->GetToken();
+            $response = Http::withHeaders([
+                'Authorization' => "Bearer {$token}",
+            ])->delete("{$this->api_url}/delete-staff/$id");
+
+            $result = $response->json();
+            if ($response->failed()) {
+                throw new \Exception($result['message'] ?? 'Failed to delete staff');
+            }
+            return $result;
+        } catch (\Throwable $th) {
+            throw new \Exception($th->getMessage());
+        }
+    }
+
+    public function update_status(bool $status, int $id)
+    {
+        try {
+            $token    = $this->token->GetToken();
+            $response = Http::withHeaders([
+                'Authorization' => "Bearer {$token}",
+            ])->put("{$this->api_url}/edit-status/$id", [
+                'active' => $status,
+            ]);
+            $result = $response->json();
+            if ($response->failed()) {
+                throw new \Exception($result['message'] ?? 'Failed to edit staff');
+            }
+
+            return $result;
+        } catch (\Throwable $th) {
+            throw new \Exception($th->getMessage());
+        }
     }
 }

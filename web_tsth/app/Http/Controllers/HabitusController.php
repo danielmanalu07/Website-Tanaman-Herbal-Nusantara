@@ -49,7 +49,7 @@ class HabitusController extends Controller
     public function update_habitus(Request $request, int $id)
     {
         $request->validate([
-            'name' => 'required' . $id,
+            'name' => 'required',
         ]);
         try {
             $result = $this->habitus_service->update_habitus($request->name, $id);

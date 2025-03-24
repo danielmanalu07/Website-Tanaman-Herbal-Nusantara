@@ -18,14 +18,14 @@ class VisitorResource extends JsonResource
         }
 
         return [
-            'id'                  => $this->id,
-            'visitor_total'       => $this->visitor_total,
-            'visitor_category_id' => $this->visitor_category->name,
-            'created_by'          => optional($this->createdBy)->username,
-            'updated_by'          => optional($this->createdBy)->username,
-            'created_at'          => $this->created_at,
-            'updated_at'          => $this->updated_at,
-            'deleted_at'          => $this->deleted_at,
+            'id'               => $this->id,
+            'visitor_total'    => $this->visitor_total,
+            'visitor_category' => $this->visitor_category,
+            'created_by'       => optional($this->createdBy)->username,
+            'updated_by'       => optional($this->createdBy)->username,
+            'created_at'       => $this->created_at,
+            'updated_at'       => $this->updated_at,
+            'deleted_at'       => $this->deleted_at,
         ];
     }
 }

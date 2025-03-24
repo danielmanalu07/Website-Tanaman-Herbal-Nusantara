@@ -22,7 +22,7 @@ class VisitorCategoryResource extends JsonResource
             'name'       => $this->name,
             'created_by' => optional($this->createdBy)->username,
             'updated_by' => optional($this->createdBy)->username,
-            'created_at' => $this->created_at->username,
+            'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
             'deleted_at' => $this->deleted_at,
         ];

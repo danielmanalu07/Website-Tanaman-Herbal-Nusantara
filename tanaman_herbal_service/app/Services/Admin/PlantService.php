@@ -3,7 +3,6 @@ namespace App\Services\Admin;
 
 use App\Http\Repositories\PlantRepository;
 use App\Models\Habitus;
-use App\Models\Plants;
 use App\Response\Response;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\Auth;
@@ -28,10 +27,10 @@ class PlantService
                 return Response::error('Habitus not found', null, 404);
             }
 
-            $existing_habitus = Plants::where('habitus_id', $data['habitus_id'])->first();
-            if ($existing_habitus) {
-                return Response::error('Plant with this habitus already exists', null, 409);
-            }
+            // $existing_habitus = Plants::where('habitus_id', $data['habitus_id'])->first();
+            // if ($existing_habitus) {
+            //     return Response::error('Plant with this habitus already exists', null, 409);
+            // }
 
             $plantData = array_merge($data, [
                 'created_by' => $admin->id,
@@ -101,13 +100,13 @@ class PlantService
                 return Response::error('Habitus not found', null, 404);
             }
 
-            $existing_habitus = Plants::where('habitus_id', $data['habitus_id'])
-                ->where('id', '!=', $id)
-                ->first();
+            // $existing_habitus = Plants::where('habitus_id', $data['habitus_id'])
+            //     ->where('id', '!=', $id)
+            //     ->first();
 
-            if ($existing_habitus) {
-                return Response::error('Plant with this habitus already exists', null, 409);
-            }
+            // if ($existing_habitus) {
+            //     return Response::error('Plant with this habitus already exists', null, 409);
+            // }
 
             if ($plant->qrcode && Storage::disk('public')->exists($plant->qrcode)) {
                 Storage::disk('public')->delete($plant->qrcode);

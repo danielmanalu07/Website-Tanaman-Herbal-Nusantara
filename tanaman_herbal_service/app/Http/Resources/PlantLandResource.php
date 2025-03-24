@@ -19,8 +19,8 @@ class PlantLandResource extends JsonResource
 
         return [
             'id'         => $this->id,
-            'plant'      => new PlantResource($this->plant),
-            'land'       => new LandResource($this->land),
+            'plant'      => $this->plant,
+            'land'       => $this->land,
             'status'     => $this->status ? true : false,
             'created_by' => optional($this->createdBy)->username,
             'updated_by' => optional($this->createdBy)->username,
