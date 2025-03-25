@@ -26,7 +26,6 @@
                     console.error(error);
                 });
 
-            // Inisialisasi CKEditor untuk setiap modal edit
             @foreach ($plants as $plant)
                 ClassicEditor
                     .create(document.querySelector('#advantage-edit-{{ $plant->id }}'))

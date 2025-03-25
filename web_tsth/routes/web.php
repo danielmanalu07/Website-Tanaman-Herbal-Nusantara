@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\HabitusController;
+use App\Http\Controllers\LandController;
 use App\Http\Controllers\PlantController;
 use App\Http\Controllers\StaffController;
 use App\Http\Middleware\Authorization;
@@ -40,5 +41,13 @@ Route::prefix('/admin')->middleware(Authorization::class)->group(function () {
         Route::post('/create', [PlantController::class, 'create'])->name('plant.create');
         Route::put('/{id}/update', [PlantController::class, 'update'])->name('plant.update');
         Route::delete('/{id}/delete', [PlantController::class, 'delete'])->name('plant.delete');
+    });
+
+    // CRUD Land
+    Route::prefix('/land')->group(function () {
+        Route::get('/', [LandController::class, 'index'])->name('land.index');
+        Route::post('/create', [LandController::class, 'create'])->name('land.create');
+        Route::put('/{id}/edit', [LandController::class, 'update'])->name('land.update');
+        Route::delete('/{id}/delete', [LandController::class, 'delete'])->name('land.delete');
     });
 });

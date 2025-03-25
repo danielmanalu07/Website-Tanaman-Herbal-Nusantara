@@ -71,39 +71,11 @@
             </li>
             <li class="nav-item nav-item-submenu">
                 <a href="#" class="nav-link">
-                    <i class="ph-note-blank"></i>
-                    <span>Starter kit</span>
+                    <i class="ph-browser"></i>
+                    <span>Land Manage</span>
                 </a>
                 <ul class="nav-group-sub collapse">
-                    <li class="nav-item"><a href="{{ asset('/admin/seed/layout_static.html') }}" class="nav-link">Static
-                            layout</a></li>
-                    <li class="nav-item"><a href="{{ asset('/admin/seed/layout_no_header.html') }}" class="nav-link">No
-                            header</a></li>
-                    <li class="nav-item"><a href="{{ asset('/admin/seed/layout_no_footer.html') }}" class="nav-link">No
-                            footer</a></li>
-                    <li class="nav-item-divider"></li>
-                    <li class="nav-item"><a href="{{ asset('/admin/seed/layout_fixed_header.html') }}"
-                            class="nav-link">Fixed
-                            header</a></li>
-                    <li class="nav-item"><a href="{{ asset('/admin/seed/layout_fixed_footer.html') }}"
-                            class="nav-link">Fixed
-                            footer</a></li>
-                    <li class="nav-item-divider"></li>
-                    <li class="nav-item"><a href="{{ asset('/admin/seed/layout_2_sidebars_1_side.html') }}"
-                            class="nav-link">2
-                            sidebars on 1 side</a></li>
-                    <li class="nav-item"><a href="{{ asset('/admin/seed/layout_2_sidebars_2_sides.html') }}"
-                            class="nav-link">2
-                            sidebars on 2 sides</a></li>
-                    <li class="nav-item"><a href="{{ asset('/admin/seed/layout_3_sidebars.html') }}" class="nav-link">3
-                            sidebars</a></li>
-                    <li class="nav-item-divider"></li>
-                    <li class="nav-item"><a href="{{ asset('/admin/seed/layout_boxed_page.html') }}"
-                            class="nav-link">Boxed
-                            page</a></li>
-                    <li class="nav-item"><a href="{{ asset('/admin/seed/layout_boxed_content.html') }}"
-                            class="nav-link">Boxed
-                            content</a></li>
+                    <li class="nav-item"><a href="{{ route('land.index') }}" class="nav-link">List Land Data</a></li>
                 </ul>
             </li>
 
