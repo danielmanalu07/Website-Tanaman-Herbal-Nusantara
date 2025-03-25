@@ -38,57 +38,54 @@
 @endpush
 @section('content')
     {{-- Modal Create --}}
-    @foreach ($habitus as $habitus_item)
-        <div class="modal fade" id="formAddPlant" tabindex="1" aria-labelledby="modalTitle" aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5>Form Add Plant</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body">
-                        <form action="{{ route('plant.create') }}" method="POST">
-                            @csrf
-                            <div class="mb-3">
-                                <label for="name" class="form-label">Plant Name</label><span
-                                    class="text-danger">*</span>
-                                <input type="text" class="form-control" name="name" id="name" required>
-                            </div>
-                            <div class="mb-3">
-                                <label for="latin_name" class="form-label">Latin Name</label><span
-                                    class="text-danger">*</span>
-                                <input type="text" class="form-control" name="latin_name" id="latin_name" required>
-                            </div>
-                            <div class="mb-3">
-                                <label for="advantage" class="form-label">Advantage</label><span
-                                    class="text-danger">*</span>
-                                <textarea name="advantage" class="form-control w-100 h-100 me-auto" id="advantage"></textarea>
-                            </div>
-                            <div class="mb-3">
-                                <label for="ecology" class="form-label">Ecology</label><span class="text-danger">*</span>
-                                <input type="text" class="form-control" name="ecology" id="ecology" required>
-                            </div>
-                            <div class="mb-3">
-                                <label for="endemic_information" class="form-label">endemic_information</label><span
-                                    class="text-danger">*</span>
-                                <input type="text" class="form-control" name="endemic_information"
-                                    id="endemic_information" required>
-                            </div>
-                            <div class="mb-3">
-                                <label for="habitus_id" class="form-label">Plant Habitus</label><span
-                                    class="text-danger">*</span>
-                                <select name="habitus_id" id="habitus_id" class="form-control" required>
-                                    <option value="-">--- Choose Habitus ---</option>
+    <div class="modal fade" id="formAddPlant" tabindex="1" aria-labelledby="modalTitle" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5>Form Add Plant</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form action="{{ route('plant.create') }}" method="POST">
+                        @csrf
+                        <div class="mb-3">
+                            <label for="name" class="form-label">Plant Name</label><span class="text-danger">*</span>
+                            <input type="text" class="form-control" name="name" id="name" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="latin_name" class="form-label">Latin Name</label><span class="text-danger">*</span>
+                            <input type="text" class="form-control" name="latin_name" id="latin_name" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="advantage" class="form-label">Advantage</label><span class="text-danger">*</span>
+                            <textarea name="advantage" class="form-control w-100 h-100 me-auto" id="advantage"></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label for="ecology" class="form-label">Ecology</label><span class="text-danger">*</span>
+                            <input type="text" class="form-control" name="ecology" id="ecology" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="endemic_information" class="form-label">endemic_information</label><span
+                                class="text-danger">*</span>
+                            <input type="text" class="form-control" name="endemic_information" id="endemic_information"
+                                required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="habitus_id" class="form-label">Plant Habitus</label><span
+                                class="text-danger">*</span>
+                            <select name="habitus_id" id="habitus_id" class="form-control" required>
+                                <option value="-">--- Choose Habitus ---</option>
+                                @foreach ($habitus as $habitus_item)
                                     <option value="{{ $habitus_item->id }}">{{ $habitus_item->name }}</option>
-                                </select>
-                            </div>
-                            <button type="submit" class="btn btn-success">Save</button>
-                        </form>
-                    </div>
+                                @endforeach
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-success">Save</button>
+                    </form>
                 </div>
             </div>
         </div>
-    @endforeach
+    </div>
 
     {{-- Modal view --}}
     @foreach ($plants as $plant)

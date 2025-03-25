@@ -53,7 +53,7 @@
             </ul>
             <li class="nav-item nav-item-submenu">
                 <a href="#" class="nav-link">
-                    <i class="ph-users-three"></i>
+                    <i class="ph ph-user-list"></i>
                     <span>Staff Manage</span>
                 </a>
                 <ul class="nav-group-sub collapse">
@@ -76,6 +76,18 @@
                 </a>
                 <ul class="nav-group-sub collapse">
                     <li class="nav-item"><a href="{{ route('land.index') }}" class="nav-link">List Land Data</a></li>
+                </ul>
+            </li>
+            <li class="nav-item nav-item-submenu">
+                <a href="#" class="nav-link">
+                    <i class="ph-users-three"></i>
+                    <span>Visitor Manage</span>
+                </a>
+                <ul class="nav-group-sub collapse">
+                    <li class="nav-item"><a href="{{ route('visitor.index') }}" class="nav-link">List Visitor Data</a>
+                    </li>
+                    <li class="nav-item"><a href="{{ route('visitor.category.index') }}" class="nav-link">List Visitor
+                            Category Data</a></li>
                 </ul>
             </li>
 

@@ -6,7 +6,7 @@
     Staff
 @endsection
 @section('icon')
-    <i class="ph-users-three"></i>
+    <i class="ph ph-user-list"></i>
 @endsection
 @push('resource')
     <script>
