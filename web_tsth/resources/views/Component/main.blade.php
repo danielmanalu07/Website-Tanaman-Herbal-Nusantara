@@ -59,6 +59,13 @@
     <!-- CK EDITOR -->
     <script src="https://cdn.ckeditor.com/ckeditor5/41.2.1/classic/ckeditor.js"></script>
 
+    <!-- External Resources -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.3/css/lightbox.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.3/js/lightbox.min.js"></script>
+    <script src="https://unpkg.com/filepond@4.30.4/dist/filepond.js"></script>
+    <link href="https://unpkg.com/filepond@4.30.4/dist/filepond.css" rel="stylesheet">
+
+
     @if (Session::has('success'))
         <script>
             document.addEventListener('DOMContentLoaded', function() {

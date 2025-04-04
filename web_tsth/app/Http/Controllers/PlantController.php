@@ -37,10 +37,22 @@ class PlantController extends Controller
             'ecology'             => 'required|string',
             'endemic_information' => 'required',
             'habitus_id'          => 'required',
+            'images'              => 'required',
+            'images.*'            => 'image|mimes:jpeg,png,jpg',
         ]);
-        try {
-            $result = $this->plant_service->create_plant($request->all());
 
+        try {
+            $multipartData = [
+                'name'                => $request->name,
+                'latin_name'          => $request->latin_name,
+                'advantage'           => $request->advantage,
+                'ecology'             => $request->ecology,
+                'endemic_information' => $request->endemic_information,
+                'habitus_id'          => $request->habitus_id,
+                'images'              => $request->file('images'),
+            ];
+
+            $result = $this->plant_service->create_plant($multipartData);
             return redirect()->back()->with('success', $result['message']);
         } catch (\Throwable $th) {
             return redirect()->back()->with('error', $th->getMessage());
@@ -50,21 +62,35 @@ class PlantController extends Controller
     public function update(Request $request, int $id)
     {
         $request->validate([
-            'name'                => 'nullable|string',
-            'latin_name'          => 'nullable|string',
-            'advantage'           => 'nullable',
-            'ecology'             => 'nullable|string',
-            'endemic_information' => 'nullable',
-            'habitus_id'          => 'nullable',
+            'name'                => 'required|string',
+            'latin_name'          => 'required|string',
+            'advantage'           => 'required',
+            'ecology'             => 'required|string',
+            'endemic_information' => 'required',
+            'habitus_id'          => 'required',
+            'new_images'          => 'nullable|array|min:1',
+            'new_images.*'        => 'image|mimes:jpeg,png,jpg',
+            'deleted_images'      => 'nullable|array',
+            'deleted_images.*'    => 'integer|exists:images,id',
         ]);
         try {
-            $result = $this->plant_service->update_plant($request->all(), $id);
+            $data = [
+                'name'                => $request->name,
+                'latin_name'          => $request->latin_name,
+                'advantage'           => $request->advantage,
+                'ecology'             => $request->ecology,
+                'endemic_information' => $request->endemic_information,
+                'habitus_id'          => $request->habitus_id,
+                'new_images'          => $request->file('new_images'),
+                'deleted_images'      => $request->array('deleted_images'),
+            ];
+            $result = $this->plant_service->update_plant($data, $id);
+            // dd($request->all());
             return redirect()->back()->with('success', $result['message']);
         } catch (\Throwable $th) {
             return redirect()->back()->with('error', $th->getMessage());
         }
     }
-
     public function delete(int $id)
     {
         try {
@@ -74,4 +100,41 @@ class PlantController extends Controller
             return redirect()->back()->with('error', $th->getMessage());
         }
     }
+
+    public function update_status(Request $request, int $id)
+    {
+        $request->validate([
+            'status' => 'required|boolean',
+        ]);
+        try {
+            $result = $this->plant_service->update_status($request->status, $id);
+            return redirect()->back()->with('success', $result['message']);
+        } catch (\Throwable $th) {
+            return redirect()->back()->with('error', $th->getMessage());
+        }
+    }
+
+    public function upload(Request $request)
+    {
+        try {
+            $file = $request->file('upload');
+            if (! $file) {
+                throw new \Exception('No file uploaded');
+            }
+
+            $result = $this->plant_service->upload($file);
+
+            return response()->json([
+                'fileName' => $result['fileName'],
+                'uploaded' => $result['uploaded'],
+                'url'      => $result['url'],
+            ]);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'uploaded' => false,
+                'error'    => ['message' => $th->getMessage()],
+            ], 400);
+        }
+    }
+
 }

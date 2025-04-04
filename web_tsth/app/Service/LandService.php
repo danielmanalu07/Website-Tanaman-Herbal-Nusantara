@@ -38,15 +38,13 @@ class LandService
         }
     }
 
-    public function create_land(string $name)
+    public function create_land(array $data)
     {
         try {
             $token    = $this->token->GetToken();
             $response = Http::withHeaders([
                 'Authorization' => "Bearer {$token}",
-            ])->post("{$this->api_url}/land/create", [
-                'name' => $name,
-            ]);
+            ])->post("{$this->api_url}/land/create", $data);
 
             $result = $response->json();
 
@@ -61,15 +59,13 @@ class LandService
         }
     }
 
-    public function update_land(string $name, int $id)
+    public function update_land(array $data, int $id)
     {
         try {
             $token    = $this->token->GetToken();
             $response = Http::withHeaders([
                 'Authorization' => "Bearer {$token}",
-            ])->put("{$this->api_url}/land/$id/edit", [
-                'name' => $name,
-            ]);
+            ])->put("{$this->api_url}/land/$id/edit", $data);
 
             $result = $response->json();
 

@@ -9,8 +9,14 @@
     <i class="ph-browser"></i>
 @endsection
 @push('resource')
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
     <script>
         $(document).ready(function() {
+            $('.select2').select2({
+                placeholder: "--- Choose Plants ---",
+                allowClear: true,
+                width: "100%"
+            });
             $('#landTable').DataTable({
                 "responsive": true,
                 "autoWidth": true,
@@ -38,9 +44,14 @@
                         <div class="mb-3">
                             <label for="name" class="form-label">Name</label><span class="text-danger">*</span>
                             <input type="text" class="form-control" name="name" id="name" required>
-                            @error('name')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
+                        </div>
+                        <div class="mb-3">
+                            <label for="plants" class="form-label">Plants</label>
+                            <select name="plants[]" id="plants" class="form-control select2" multiple>
+                                @foreach ($plants as $plant)
+                                    <option value="{{ $plant->id }}">{{ $plant->name }}</option>
+                                @endforeach
+                            </select>
                         </div>
                         <button type="submit" class="btn btn-success">Save</button>
                     </form>
@@ -56,11 +67,12 @@
             <div class="modal-dialog modal-dialog-centered">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title">Detail Habitus</h5>
+                        <h5 class="modal-title">Detail Land</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
                         <p><strong>Land Name:</strong> {{ $land->name }}</p>
+                        <p><strong>Plants:</strong> {{ collect($land->plants)->pluck('name')->implode(', ') }}</p>
                         <p><strong>Created By:</strong> {{ $land->created_by }}</p>
                         <p><strong>Created At:</strong> {{ $land->created_at }}</p>
                         <p><strong>Updated At:</strong> {{ $land->updated_at }}</p>
@@ -91,6 +103,18 @@
                                 <label for="name" class="form-label">Land Name</label><span class="text-danger">*</span>
                                 <input type="text" class="form-control" name="name" id="name"
                                     value="{{ $land->name }}" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="plants" class="form-label">Plants</label>
+                                <select name="plants[]" id="plants-{{ $land->id }}" class="form-control select2"
+                                    multiple required>
+                                    @foreach ($plants as $plant)
+                                        <option value="{{ $plant->id }}"
+                                            {{ in_array($plant->id, collect($land->plants)->pluck('id')->toArray()) == $plant->id ? 'selected' : '' }}>
+                                            {{ $plant->name }}
+                                        </option>
+                                    @endforeach
+                                </select>
                             </div>
                             <button type="submit" class="btn btn-success">Update</button>
                         </form>

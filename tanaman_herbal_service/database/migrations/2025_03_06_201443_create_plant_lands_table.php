@@ -18,10 +18,7 @@ return new class extends Migration
             $table->unsignedBigInteger('land_id');
             $table->foreign('land_id')->references('id')->on('lands')->onDelete('CASCADE')->onUpdate('CASCADE');
             $table->boolean('status')->default(false);
-            $table->foreignId('created_by')->nullable()->constrained('users')->nullOnDelete();
-            $table->foreignId('updated_by')->nullable()->constrained('users')->nullOnDelete();
             $table->timestamps();
-            $table->softDeletes();
         });
     }
 

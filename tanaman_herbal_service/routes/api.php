@@ -1,8 +1,10 @@
 <?php
 
+use App\Http\Controllers\Admin\ContentController;
 use App\Http\Controllers\Admin\CrudStaffController;
 use App\Http\Controllers\Admin\HabitusController;
 use App\Http\Controllers\Admin\LandsController;
+use App\Http\Controllers\Admin\NewsController;
 use App\Http\Controllers\Admin\PlantController;
 use App\Http\Controllers\Admin\PlantLandController;
 use App\Http\Controllers\Admin\VisitorCategoryController;
@@ -71,6 +73,7 @@ Route::middleware(['auth:sanctum', 'auth.token_expiry'])->group(function () {
             Route::post('/create', [PlantController::class, 'createPlant']);
             Route::put('/{id}/edit', [PlantController::class, 'updatePlant']);
             Route::delete('/{id}/delete', [PlantController::class, 'deletePlant']);
+            Route::put('/{id}/update-status', [PlantController::class, 'updateStatus']);
         });
     });
 
@@ -82,6 +85,30 @@ Route::middleware(['auth:sanctum', 'auth.token_expiry'])->group(function () {
             Route::post('/create', [PlantLandController::class, 'createPlantLand']);
             Route::put('/{id}/edit', [PlantLandController::class, 'updatePlantLand']);
             Route::delete('/{id}/delete', [PlantLandController::class, 'deletePlantLand']);
+        });
+    });
+
+    //CRUD News
+    Route::prefix('/news')->group(function () {
+        Route::get('/', [NewsController::class, 'get_all_news']);
+        Route::get('/{id}', [NewsController::class, 'get_detail_news']);
+        Route::middleware('permission:admin')->group(function () {
+            Route::post('/create', [NewsController::class, 'create_news']);
+            Route::put('/{id}/edit', [NewsController::class, 'update_news']);
+            Route::delete('/{id}/delete', [NewsController::class, 'delete_news']);
+            Route::post('/upload', [NewsController::class, 'uploadCkeditor']);
+        });
+    });
+
+    //CRUD Content
+    Route::prefix('/content')->group(function () {
+        Route::get('/', [ContentController::class, 'get_all']);
+        Route::get('/{id}', [ContentController::class, 'get_detail']);
+        Route::middleware('permission:admin')->group(function () {
+            Route::post('/create', [ContentController::class, 'create']);
+            Route::put('/{id}/edit', [ContentController::class, 'update']);
+            Route::delete('/{id}/delete', [ContentController::class, 'delete']);
+            Route::post('/upload', [ContentController::class, 'uploadCkeditor']);
         });
     });
 });

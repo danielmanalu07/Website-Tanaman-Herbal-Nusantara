@@ -4,7 +4,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class Lands extends Model
+class Land extends Model
 {
     use SoftDeletes;
 
@@ -26,5 +26,10 @@ class Lands extends Model
     public function updatedBy()
     {
         return $this->belongsTo(User::class, 'updated_by');
+    }
+
+    public function plants()
+    {
+        return $this->belongsToMany(Plant::class, 'plant_lands');
     }
 }

@@ -20,7 +20,9 @@ class LandsController extends Controller
     public function createLand(Request $request)
     {
         $request->validate([
-            'name' => 'required|string',
+            'name'     => 'required|string',
+            'plants'   => 'nullable|array',
+            'plants.*' => 'integer|exists:plants,id',
         ]);
 
         try {
@@ -67,7 +69,9 @@ class LandsController extends Controller
     public function updateLand(Request $request, int $id)
     {
         $request->validate([
-            'name' => 'required|string',
+            'name'     => 'required|string',
+            'plants'   => 'nullable|array',
+            'plants.*' => 'integer|exists:plants,id',
         ]);
 
         try {
@@ -76,7 +80,7 @@ class LandsController extends Controller
                 return $land;
             }
 
-            return Response::success('Updated land successfully', $land, 200);
+            return Response::success('Updated land successfully', new LandResource($land), 200);
         } catch (\Throwable $th) {
             return Response::error('internal server error', $th->getMessage(), 500);
         }

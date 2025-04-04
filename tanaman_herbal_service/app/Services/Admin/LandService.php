@@ -20,11 +20,15 @@ class LandService
         try {
             $admin = Auth::user();
 
-            $land = $this->landRepo->create_land([
-                'name'       => $data['name'],
+            $landData = array_merge($data, [
                 'created_by' => $admin->id,
                 'updated_by' => $admin->id,
             ]);
+            $land = $this->landRepo->create_land($landData);
+
+            if (! empty($landData['plants'])) {
+                $land->plants()->sync($landData['plants']);
+            }
             return $land;
         } catch (\Throwable $th) {
             return Response::error('Failed to create data land', $th->getMessage(), 500);
@@ -76,6 +80,10 @@ class LandService
                 'name'       => $data['name'],
                 'updated_by' => $admin->id,
             ];
+
+            if (! empty($data['plants'])) {
+                $land->plants()->sync($data['plants']);
+            }
 
             return $this->landRepo->update_land($id, $updateData);
         } catch (ModelNotFoundException $e) {

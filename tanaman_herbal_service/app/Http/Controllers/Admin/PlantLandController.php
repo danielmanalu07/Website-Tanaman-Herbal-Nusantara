@@ -20,8 +20,10 @@ class PlantLandController extends Controller
     public function createPlantLand(Request $request)
     {
         $request->validate([
-            'plant_id' => 'required',
-            'land_id'  => 'required',
+            'plant_id'   => 'required|array|min:1',
+            'plant_id.*' => 'integer|exists:plants,id',
+            'land_id'    => 'required|array|min:1',
+            'land_id.*'  => 'required|exists:lands,id',
         ]);
 
         try {
@@ -31,9 +33,13 @@ class PlantLandController extends Controller
                 return $result;
             }
 
-            return Response::success('Created Plant Land Successfully', new PlantLandResource($result), 201);
+            return Response::success(
+                'Created Plant Land Successfully',
+                PlantLandResource::collection($result), // Menggunakan collection karena data bisa lebih dari satu
+                201
+            );
         } catch (\Throwable $th) {
-            return Response::error('internal server error', $th->getMessage(), 500);
+            return Response::error('Internal server error', $th->getMessage(), 500);
         }
     }
 
@@ -68,8 +74,10 @@ class PlantLandController extends Controller
     public function updatePlantLand(Request $request, int $id)
     {
         $request->validate([
-            'plant_id' => 'required',
-            'land_id'  => 'required',
+            'plant_id'   => 'required|array|min:1',
+            'plant_id.*' => 'integer|exists:plants,id',
+            'land_id'    => 'required|array|min:1',
+            'land_id.*'  => 'required|exists:lands,id',
         ]);
 
         try {
@@ -77,7 +85,7 @@ class PlantLandController extends Controller
             if ($result instanceof JsonResponse) {
                 return $result;
             }
-            return Response::success('Update Plant Land Successfully', new PlantLandResource($result), 200);
+            return Response::success('Update Plant Land Successfully', PlantLandResource::collection($result), 200);
         } catch (\Throwable $th) {
             return Response::error('internal server error', $th->getMessage(), 500);
         }

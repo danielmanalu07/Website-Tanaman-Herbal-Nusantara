@@ -20,6 +20,7 @@ class LandResource extends JsonResource
         return [
             'id'         => $this->id,
             'name'       => $this->name,
+            'plants'     => $this->plants,
             'created_by' => optional($this->createdBy)->username,
             'updated_by' => optional($this->createdBy)->username,
             'created_at' => Carbon::parse($this->created_at)->translatedFormat('d F Y h:i A'),

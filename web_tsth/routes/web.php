@@ -1,8 +1,10 @@
 <?php
 
 use App\Http\Controllers\Auth\AuthController;
+use App\Http\Controllers\ContentController;
 use App\Http\Controllers\HabitusController;
 use App\Http\Controllers\LandController;
+use App\Http\Controllers\NewsController;
 use App\Http\Controllers\PlantController;
 use App\Http\Controllers\StaffController;
 use App\Http\Controllers\VisitorCategoryController;
@@ -43,6 +45,8 @@ Route::prefix('/admin')->middleware(Authorization::class)->group(function () {
         Route::post('/create', [PlantController::class, 'create'])->name('plant.create');
         Route::put('/{id}/update', [PlantController::class, 'update'])->name('plant.update');
         Route::delete('/{id}/delete', [PlantController::class, 'delete'])->name('plant.delete');
+        Route::put('/{id}/update-status', [PlantController::class, 'update_status'])->name('plant.update.status');
+        Route::post('/upload', [PlantController::class, 'upload'])->name('plant.upload');
     });
 
     // CRUD Land
@@ -67,5 +71,23 @@ Route::prefix('/admin')->middleware(Authorization::class)->group(function () {
         Route::post('/create', [VisitorController::class, 'create'])->name('visitor.create');
         Route::put('/{id}/edit', [VisitorController::class, 'update'])->name('visitor.update');
         Route::delete('/{id}/delete', [VisitorController::class, 'delete'])->name('visitor.delete');
+    });
+
+    //CRUD News
+    Route::prefix('/news')->group(function () {
+        Route::get('/', [NewsController::class, 'index'])->name('news.index');
+        Route::post('/create', [NewsController::class, 'create'])->name('news.create');
+        Route::post('/upload', [NewsController::class, 'upload'])->name('news.upload');
+        Route::put('/{id}/edit', [NewsController::class, 'edit'])->name('new.edit');
+        Route::delete('/{id}/delete', [NewsController::class, 'delete'])->name('news.delete');
+    });
+
+    //CRUD Content
+    Route::prefix('/content')->group(function () {
+        Route::get('/', [ContentController::class, 'index'])->name('content.index');
+        Route::post('/upload', [ContentController::class, 'upload'])->name('content.upload');
+        Route::post('/create', [ContentController::class, 'create'])->name('content.create');
+        Route::put('/{id}/edit', [ContentController::class, 'edit'])->name('content.edit');
+        Route::delete('/{id}/delete', [ContentController::class, 'delete'])->name('content.delete');
     });
 });

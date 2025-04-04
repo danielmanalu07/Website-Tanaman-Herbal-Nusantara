@@ -28,6 +28,7 @@ class PlantResource extends JsonResource
             'qrcode'              => $this->qrcode ? asset("storage/{$this->qrcode}") : null,
             'status'              => $this->status ? true : false,
             'habitus'             => $this->habituses,
+            'images'              => ImageResource::collection($this->images),
             'created_by'          => optional($this->createdBy)->username,
             'updated_by'          => optional($this->createdBy)->username,
             "created_at"          => Carbon::parse($this->created_at)->translatedFormat('d F Y h:i A'),
