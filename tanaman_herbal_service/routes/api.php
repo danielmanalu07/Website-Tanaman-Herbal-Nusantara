@@ -97,6 +97,7 @@ Route::middleware(['auth:sanctum', 'auth.token_expiry'])->group(function () {
             Route::put('/{id}/edit', [NewsController::class, 'update_news']);
             Route::delete('/{id}/delete', [NewsController::class, 'delete_news']);
             Route::post('/upload', [NewsController::class, 'uploadCkeditor']);
+            Route::put('/{id}/update-status', [NewsController::class, 'updateStatus']);
         });
     });
 
@@ -109,6 +110,7 @@ Route::middleware(['auth:sanctum', 'auth.token_expiry'])->group(function () {
             Route::put('/{id}/edit', [ContentController::class, 'update']);
             Route::delete('/{id}/delete', [ContentController::class, 'delete']);
             Route::post('/upload', [ContentController::class, 'uploadCkeditor']);
+            Route::put('/{id}/update-status', [ContentController::class, 'updateStatus']);
         });
     });
 });

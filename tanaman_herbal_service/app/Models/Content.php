@@ -13,6 +13,7 @@ class Content extends Model
         'key',
         'title',
         'content',
+        'status',
         'created_at',
         'updated_at',
         'created_by',

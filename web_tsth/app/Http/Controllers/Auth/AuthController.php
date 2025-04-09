@@ -3,16 +3,18 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Service\AuthService;
+use App\Service\HabitusService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 
 class AuthController extends Controller
 {
-    private $auth_service;
+    private $auth_service, $habitus_service;
 
-    public function __construct(AuthService $authService)
+    public function __construct(AuthService $authService, HabitusService $habitus_service)
     {
-        $this->auth_service = $authService;
+        $this->auth_service    = $authService;
+        $this->habitus_service = $habitus_service;
     }
     public function login(Request $request)
     {
@@ -36,8 +38,11 @@ class AuthController extends Controller
     public function dashboard()
     {
         try {
-            $data = $this->auth_service->dashboard();
-            return view('Admin.dashboard', compact('data'));
+            $habitus    = $this->habitus_service->get_all();
+            $habituses  = $habitus->count();
+            $avgHabitus = round($habituses / (now()->hour ?: 1));
+            $data       = $this->auth_service->dashboard();
+            return view('Admin.dashboard', compact('data', 'habituses', 'avgHabitus'));
         } catch (\Throwable $th) {
             return redirect()->route('admin.login')->with('error', 'You must be logged in.');
         }

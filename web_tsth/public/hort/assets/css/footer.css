@@ -1,0 +1,196 @@
+/*---------------------------------
+        Footer CSS 
+-----------------------------------*/
+/*---------------------------------
+          Mixins CSS
+-----------------------------------*/
+.footer-wrap {
+  position: relative;
+}
+.footer-wrap .footer-top {
+  position: relative;
+}
+.footer-wrap .footer-top .footer-shape-1 {
+  position: absolute;
+  bottom: -5px;
+  left: 40px;
+}
+.footer-wrap .footer-top .footer-widget {
+  margin-bottom: 30px;
+}
+.footer-wrap .footer-top .footer-widget .footer-widget-title {
+  color: #132728;
+  margin: 0 0 25px;
+  font-weight: 600;
+  line-height: 1;
+}
+.footer-wrap .footer-top .footer-widget .footer-menu li a {
+  color: #132728;
+  margin: 0 0 14px;
+  display: inline-block;
+  font-size: 15px;
+  position: relative;
+}
+.footer-wrap .footer-top .footer-widget .footer-menu li a:after {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  content: "";
+  width: 0;
+  height: 1px;
+  visibility: hidden;
+  opacity: 0;
+  transition: 0.3s;
+}
+.footer-wrap .footer-top .footer-widget .footer-menu li a:hover {
+  color: #24A77E;
+}
+.footer-wrap .footer-top .footer-widget .footer-menu li a:hover:after {
+  width: 100%;
+  visibility: visible;
+  opacity: 1;
+}
+.footer-wrap .footer-top .footer-widget .footer-menu li:last-child a {
+  margin-bottom: 0;
+}
+.footer-wrap .footer-top .footer-widget .newsletter-form {
+  margin-bottom: 25px;
+}
+.footer-wrap .footer-top .footer-widget .newsletter-form .form-group input {
+  width: 100%;
+  height: 48px;
+  border: none;
+  padding: 10px 18px;
+  background-color: transparent;
+  color: #fff;
+}
+.footer-wrap .footer-top .footer-widget .newsletter-form .form-group input::-moz-placeholder {
+  color: #fff;
+}
+.footer-wrap .footer-top .footer-widget .newsletter-form .form-group input::placeholder {
+  color: #fff;
+}
+.footer-wrap .footer-top .footer-widget .newsletter-form .form-group button {
+  margin-top: 15px;
+  width: 100%;
+  padding: 10px;
+  display: block;
+  border-radius: 0;
+  background: linear-gradient(90deg, rgb(240, 19, 54) 0%, rgb(250, 74, 23) 35%, rgb(255, 97, 10) 100%);
+}
+.footer-wrap .footer-bottom {
+  position: relative;
+  padding: 20px 0;
+}
+.footer-wrap .footer-bottom .copyright p {
+  color: #fff;
+  margin: 0;
+}
+.footer-wrap .footer-bottom .copyright p a {
+  color: #fff;
+  text-decoration: underline;
+}
+.footer-wrap.style1 {
+  position: relative;
+}
+.footer-wrap.style1 .footer-shape-1 {
+  position: absolute;
+  bottom: 0;
+  left: 30px;
+}
+.footer-wrap.style1 .container {
+  position: relative;
+  z-index: 1;
+}
+.footer-wrap.style1 .container .contact-item .contact-icon {
+  box-shadow: 0 0 15px rgba(36, 167, 126, 0.2);
+}
+.footer-wrap.style1 .container .footer-menu li a {
+  color: #01040F;
+}
+.footer-wrap.style1 .container .footer-menu li a:after {
+  background-color: #24A77E;
+}
+.footer-wrap.style1 .footer-top {
+  border-top: 1px solid #eee;
+}
+.footer-wrap.style2 {
+  position: relative;
+}
+.footer-wrap.style2 .container {
+  position: relative;
+  z-index: 1;
+}
+.footer-wrap.style2 .container .contact-item .contact-icon {
+  box-shadow: 0 5px 15px -1px rgba(36, 167, 126, 0.15);
+}
+.footer-wrap.style2 .container .footer-menu li a {
+  color: #132728;
+}
+.footer-wrap.style2 .container .footer-menu li a:after {
+  background-color: #24A77E;
+}
+.footer-wrap.style3 .footer-top {
+  position: relative;
+}
+.footer-wrap.style3 .footer-top .newsletter-form .form-group input {
+  background-color: #fff;
+  color: #01040F;
+}
+.footer-wrap.style3 .footer-top .newsletter-form .form-group input::-moz-placeholder {
+  color: #01040F;
+}
+.footer-wrap.style3 .footer-top .newsletter-form .form-group input::placeholder {
+  color: #01040F;
+}
+.footer-wrap.style3 .footer-bottom {
+  border-top: 1px solid rgba(255, 255, 255, 0.4);
+}
+.footer-wrap.style3 .footer-bottom .copyright p a {
+  color: #fff;
+  text-decoration: underline;
+  font-weight: 600;
+}
+
+.comp-desc {
+  color: #727473;
+}
+
+.contact-item {
+  position: relative;
+  padding-left: 42px;
+  margin: 0 0 25px;
+}
+.contact-item:last-child {
+  margin-bottom: 0;
+}
+.contact-item .contact-icon {
+  position: absolute;
+  top: -5px;
+  left: 0;
+  width: 30px;
+  height: 30px;
+  background-color: #fff;
+  text-align: center;
+}
+.contact-item .contact-icon i {
+  color: #24A77E;
+  font-size: 16px;
+  line-height: 1;
+  position: relative;
+  top: 3px;
+}
+.contact-item .contact-info p {
+  color: #132728;
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1.1;
+  margin: 0 0 5px;
+}
+.contact-item .contact-info span,
+.contact-item .contact-info a {
+  display: block;
+  color: #132728;
+  font-size: 15px;
+  line-height: 1.6;
+}/*# sourceMappingURL=footer.css.map */

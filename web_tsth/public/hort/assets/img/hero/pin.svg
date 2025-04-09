@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="17" height="36" viewBox="0 0 17 36">
+  <g id="pin" transform="translate(-15 -0.194)">
+    <line id="Line_84" data-name="Line 84" y2="18" transform="translate(24 17.194)" fill="none" stroke="#556080" stroke-linecap="round" stroke-miterlimit="10" stroke-width="2"/>
+    <circle id="Ellipse_35" data-name="Ellipse 35" cx="8.5" cy="8.5" r="8.5" transform="translate(15 0.194)" fill="#24a77e"/>
+    <ellipse id="Ellipse_36" data-name="Ellipse 36" cx="1.5" cy="2" rx="1.5" ry="2" transform="translate(19 4.194)" fill="#fff"/>
+  </g>
+</svg>

@@ -23,7 +23,7 @@ class NewsResource extends JsonResource
             'title'      => $this->title,
             'content'    => $this->content,
             'status'     => $this->status ? true : false,
-            'published'  => $this->published,
+            'published'  => $this->published_at ? Carbon::parse($this->published_at)->translatedFormat('d F Y h:i A') : null,
             'images'     => ImageResource::collection($this->images),
             'created_by' => optional($this->createdBy)->username,
             'updated_by' => optional($this->createdBy)->username,

@@ -1,0 +1,251 @@
+/*-------------------------------
+         Responsive CSS
+-------------------------------*/
+@media only screen and (max-width: 767px) {
+  .sm-none {
+    display: none !important;
+  }
+  .sm-center {
+    text-align: center !important;
+  }
+  .pt-100 {
+    padding-top: 50px;
+  }
+  .pb-100 {
+    padding-bottom: 50px;
+  }
+  .mt-100 {
+    margin-top: 50px !important;
+  }
+  .ptb-100 {
+    padding-top: 50px;
+    padding-bottom: 50px;
+  }
+  .pt-70 {
+    padding-top: 20px;
+  }
+  .pb-70 {
+    padding-bottom: 20px;
+  }
+  .pb-75 {
+    padding-bottom: 25px;
+  }
+  .pb-50 {
+    padding-bottom: 0px;
+  }
+  .mb-40 {
+    margin-bottom: 25px !important;
+  }
+  .content-title h2,
+  .section-title h2 {
+    font-size: 36px;
+  }
+  .section-title span,
+  .content-title span {
+    font-size: 14px;
+  }
+  .back-to-top {
+    font-size: 20px;
+    width: 30px;
+    height: 30px;
+    line-height: 32px;
+  }
+  .back-to-top i {
+    font-size: 18px;
+  }
+  .breadcrumb-wrap .breadcrumb-title h2 {
+    font-size: 28px;
+  }
+}
+
+@media only screen and (min-width: 768px) and (max-width: 991px) {
+  .pt-100 {
+    padding-top: 70px;
+  }
+  .pb-100 {
+    padding-bottom: 70px;
+  }
+  .mt-100 {
+    margin-top: 70px !important;
+  }
+  .smb-25 {
+    margin-bottom: 25px;
+  }
+  .ptb-100 {
+    padding-top: 70px;
+    padding-bottom: 70px;
+  }
+  .pt-70 {
+    padding-top: 40px;
+  }
+  .pb-70 {
+    padding-bottom: 40px;
+  }
+  .pb-75 {
+    padding-bottom: 45px;
+  }
+  .pb-50 {
+    padding-bottom: 20px;
+  }
+}
+
+@media only screen and (max-width: 1199px) {
+  .content-wrapper {
+    margin: 134px 0 0;
+  }
+}
+
+@media only screen and (max-width: 991px) {
+  .page-wrapper {
+    overflow-x: hidden !important;
+  }
+  .container-full-left {
+    padding: 0 15px;
+  }
+  .md-none {
+    display: none !important;
+  }
+  .md-center {
+    text-align: center !important;
+  }
+  .content-wrapper {
+    margin: 68px 0 0;
+  }
+  .sidebar {
+    margin: 50px 0 0;
+  }
+  .user-info-box {
+    margin-top: 30px;
+  }
+}
+
+@media only screen and (max-width: 1199px) {
+  .lg-center {
+    text-align: center !important;
+  }
+  .lg-none {
+    display: none !important;
+  }
+  .page-wrapper {
+    overflow-x: hidden;
+  }
+  .content-wrapper {
+    margin: 76px 0 0;
+  }
+}
+
+@media only screen and (min-width: 1200px) {
+  .xl-none {
+    display: none !important;
+  }
+  .container {
+    max-width: 1200px;
+  }
+  .container-full {
+    padding: 0 60px;
+  }
+  .container-full-left {
+    padding-left: calc((100% - 1200px) / 2 + 15px);
+  }
+  .content-wrapper {
+    margin: 134px 0 0;
+  }
+}
+
+@media only screen and (min-width: 1450px) {
+  .container {
+    max-width: 1410px;
+  }
+  .container-full {
+    padding: 0 80px;
+  }
+  .container-full-left {
+    padding-left: calc((100% - 1410px) / 2 + 15px);
+  }
+}
+
+@media only screen and (min-width: 992px) and (max-width: 1199px) {
+  .container-full-left {
+    padding-left: calc((100% - 960px) / 2 + 15px);
+  }
+}
+
+@media only screen and (min-width: 768px) and (max-width: 991px) {
+  .container-full {
+    padding-left: calc((100% - 720px) / 2 + 15px);
+    padding-right: 0;
+  }
+}
+
+@media only screen and (max-width: 575px) {
+  .xs-center {
+    text-align: center;
+  }
+  .content-title h2,
+  .section-title h2 {
+    font-size: 28px;
+  }
+  p {
+    font-size: 14px;
+    line-height: 26px;
+  }
+}
+
+@media only screen and (max-width: 375px) {
+  .btn.style4 {
+    padding: 6px 28px;
+  }
+  p {
+    font-size: 14px;
+    line-height: 24px;
+  }
+  .content-title h2,
+  .section-title h2 {
+    font-size: 26px;
+  }
+  .btn {
+    font-size: 13px;
+    padding: 7px 15px;
+  }
+  .btn i {
+    font-size: 13px;
+  }
+  .page-navigation .page-nav li a {
+    width: 40px;
+    height: 40px;
+    font-size: 16px;
+    line-height: 37px;
+  }
+  .page-navigation .page-nav li a i {
+    line-height: 42px;
+  }
+  .btn.style7 {
+    font-size: 16px;
+  }
+  .event-countdown .event-cd .countdown span {
+    font-size: 22px;
+  }
+  .comment-item .comment-author-img {
+    width: 50px;
+    height: 50px;
+  }
+  .comment-item .comment-author-wrap {
+    width: calc(100% - 65px);
+    margin-left: 15px;
+  }
+  .comment-item .comment-author-wrap .comment-author-name h5 {
+    font-size: 16px;
+  }
+  .comment-item.reply {
+    margin-left: 10px;
+  }
+  .error-content span {
+    font-size: 70px;
+    line-height: 52px;
+  }
+  .my-account-tab .nav-item .nav-link {
+    font-size: 13px;
+    margin: 0 15px;
+  }
+}
+/*# sourceMappingURL=responsive.css.map */

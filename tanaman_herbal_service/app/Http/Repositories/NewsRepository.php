@@ -33,4 +33,12 @@ class NewsRepository
         $news->delete();
         return $news;
     }
+
+    public function update_status(int $id, array $data)
+    {
+        $news = News::findOrFail($id);
+        $news->update($data);
+
+        return $news;
+    }
 }

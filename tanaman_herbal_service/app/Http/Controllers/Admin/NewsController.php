@@ -118,4 +118,20 @@ class NewsController extends Controller
             'error'    => ['message' => 'Upload gagal'],
         ], 400);
     }
+
+    public function updateStatus(Request $request, int $id)
+    {
+        $request->validate([
+            'status' => 'required|boolean',
+        ]);
+        try {
+            $result = $this->new_service->update_status($id, $request->all());
+            if ($result instanceof JsonResponse) {
+                return $result;
+            }
+            return Response::success('Update Status Successfully', new NewsResource($result), 200);
+        } catch (\Throwable $th) {
+            return Response::error('internal server error', $th->getMessage(), 500);
+        }
+    }
 }

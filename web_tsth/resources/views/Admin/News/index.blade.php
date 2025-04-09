@@ -7,6 +7,25 @@
 @endsection
 
 @push('resource')
+    <style>
+        .custom-select {
+            transition: all 0.3s ease;
+            padding: 0.375rem 1.75rem 0.375rem 0.75rem;
+            cursor: pointer;
+            min-width: 100px;
+        }
+
+        .custom-select:hover {
+            opacity: 0.9;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+        }
+
+        .custom-select:focus {
+            border-color: #80bdff;
+            box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, .25);
+        }
+    </style>
+
     <script>
         $(document).ready(function() {
             $('form').on('submit', function(e) {
@@ -71,6 +90,55 @@
                     acceptedFileTypes: ['image/png', 'image/jpeg', 'image/jpg']
                 });
             @endforeach
+        });
+
+        let selectedElement = null;
+        let previousValue = null;
+
+        function showConfirmModal(id, newValue, oldValue, element) {
+            newValue = parseInt(newValue);
+            oldValue = parseInt(oldValue);
+
+            if (newValue === oldValue) return;
+
+            selectedElement = element;
+            previousValue = oldValue;
+
+            const form = document.getElementById('statusForm');
+            form.action = `/admin/news/${id}/update-status`;
+            document.getElementById('statusValue').value = newValue;
+
+            const modal = new bootstrap.Modal(document.getElementById('confirmStatusModal'));
+            modal.show();
+
+            document.getElementById('confirmStatusModal').addEventListener('hidden.bs.modal', function() {
+                resetDropdown();
+            }, {
+                once: true
+            });
+        }
+
+        function resetDropdown() {
+            if (selectedElement && previousValue !== null) {
+                selectedElement.value = previousValue;
+                updateDropdownStyle(selectedElement, previousValue);
+            }
+        }
+
+        function updateDropdownStyle(element, value) {
+            if (parseInt(value) === 1) {
+                element.classList.remove('bg-danger');
+                element.classList.add('bg-success');
+            } else {
+                element.classList.remove('bg-success');
+                element.classList.add('bg-danger');
+            }
+        }
+
+        document.querySelectorAll('.custom-select').forEach(select => {
+            select.addEventListener('change', function() {
+                updateDropdownStyle(this, this.value);
+            });
         });
     </script>
 @endpush
@@ -259,6 +327,32 @@
             </div>
         </div>
     @endforeach
+
+    <!-- Modal Confirmation Status -->
+    <div class="modal fade" id="confirmStatusModal" tabindex="-1" aria-labelledby="confirmStatusModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="confirmStatusModalLabel">Update News Status</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    Are you sure you want to update this data?
+                </div>
+                <div class="modal-footer">
+                    <form id="statusForm" method="POST">
+                        @csrf
+                        @method('PUT')
+                        <input type="hidden" name="status" id="statusValue">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
+                            onclick="resetDropdown()">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Update Status</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
     <!-- Main Content -->
     <div class="card">
         <div class="card-header d-flex justify-content-between align-items-center">
@@ -275,6 +369,7 @@
                             <th>No</th>
                             <th>Title</th>
                             <th>Content</th>
+                            <th>Status</th>
                             <th>Created By</th>
                             <th>Published At</th>
                             <th>Created At</th>
@@ -288,8 +383,18 @@
                                 <td>{{ $key + 1 }}</td>
                                 <td>{{ $new->title }}</td>
                                 <td>{!! $new->content !!}</td>
+                                <td>
+                                    <select
+                                        class="form-select form-select-sm custom-select {{ $new->status ? 'bg-success text-white' : 'bg-danger text-white' }}"
+                                        onchange="showConfirmModal({{ $new->id }}, this.value, {{ $new->status ? 1 : 0 }}, this)">
+                                        <option value="1" {{ $new->status ? 'selected' : '' }}
+                                            class="bg-white text-dark">Published</option>
+                                        <option value="0" {{ !$new->status ? 'selected' : '' }}
+                                            class="bg-white text-dark">Draft</option>
+                                    </select>
+                                </td>
                                 <td>{{ $new->created_by }}</td>
-                                <td>{{ $new->published_at ?? '-' }}</td>
+                                <td>{{ $new->published ?? '-' }}</td>
                                 <td>{{ $new->created_at }}</td>
                                 <td>{{ $new->updated_at }}</td>
                                 <td class="d-flex gap-2">

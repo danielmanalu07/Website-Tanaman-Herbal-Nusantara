@@ -86,4 +86,20 @@ class ContentService
             return Response::error("Failed to create news data", $th->getMessage(), 500);
         }
     }
+
+    public function update_status(int $id, bool $status)
+    {
+        try {
+            $admin   = Auth::user();
+            $content = $this->contentRepository->get_detail($id);
+
+            $result = $this->contentRepository->update_status($id, $status);
+
+            return $result;
+        } catch (ModelNotFoundException $e) {
+            return Response::error('Data not found', $e->getMessage(), 404);
+        } catch (\Throwable $th) {
+            return Response::error('Failed to update data content', $th->getMessage(), 500);
+        }
+    }
 }

@@ -116,4 +116,26 @@ class ContentService
             throw new \Exception($th->getMessage());
         }
     }
+
+    public function update_status(bool $status, int $id)
+    {
+        try {
+            $token    = $this->token->GetToken();
+            $response = Http::withHeaders([
+                'Authorization' => "Bearer {$token}",
+            ])->put("{$this->api_url}/content/$id/update-status", [
+                'status' => $status,
+            ]);
+
+            $result = $response->json();
+            if ($response->failed()) {
+                throw new \Exception($result['message']);
+            }
+
+            return $result;
+
+        } catch (\Throwable $th) {
+            throw new \Exception($th->getMessage());
+        }
+    }
 }

@@ -115,4 +115,23 @@ class ContentController extends Controller
             'error'    => ['message' => 'Upload gagal'],
         ], 400);
     }
+
+    public function updateStatus(Request $request, int $id)
+    {
+        $request->validate([
+            'status' => 'required|boolean',
+        ]);
+
+        try {
+            $result = $this->content_service->update_status($id, $request->status);
+            if ($result instanceof JsonResponse) {
+                return $result;
+            }
+
+            return Response::success('Update Status Successfully', new ContentResource($result), 200);
+        } catch (\Throwable $th) {
+            return Response::error('internal server error', $th->getMessage(), 500);
+        }
+    }
+
 }

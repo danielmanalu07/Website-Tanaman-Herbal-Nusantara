@@ -1,0 +1,431 @@
+/*-------------------------------
+    Dark Theme  CSS
+-------------------------------*/
+
+//Color Variable
+$clr_white: #fff;
+$clr_offwhite: rgba(255,255,255,0.85);
+$clr_black: #000;
+$clr_aztech: #0E1C1F;
+$clr_cod: #0A0A0A;
+$clr_grey: #ABA8B0;
+$clr_jungle_green: #24A77E;
+$clr_timber_green: #132728;
+$clr_mine_shaft: #3B3B3B;
+.switch-theme-mode{
+    position: fixed;
+    top: 200px;
+    right: 20px;
+    z-index: 999999;
+}
+/* The switch - the box around the slider */
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 60px;
+    height: 34px;
+    input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+      }
+}
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    -webkit-transition: 0.4s;
+    transition: 0.4s;
+    &.round {
+        border-radius: 34px;
+        &:before{
+            border-radius: 50%;
+        }
+    }
+    &:before {
+        position: absolute;
+        content: "";
+        height: 40px;
+        width: 40px;
+        left: 0px;
+        bottom: 4px;
+        top: 0;
+        bottom: 0;
+        margin: auto 0;
+        -webkit-transition: 0.4s;
+        transition: 0.4s;
+        box-shadow: 0 0px 15px #2020203d;
+        background: white url('https://i.ibb.co/7JfqXxB/night.png');
+        background-repeat: no-repeat;
+        background-position: center;
+    }
+}
+input:checked + .slider {
+  background-color: $clr_black;
+}
+input:focus + .slider {
+  box-shadow: 0 0 1px  $clr_black;
+}
+input:checked + .slider:before {
+  -webkit-transform: translateX(24px);
+  -ms-transform: translateX(24px);
+  transform: translateX(24px);
+  background: white url('https://i.ibb.co/FxzBYR9/sunny.png');
+  background-repeat: no-repeat;
+  background-position: center;
+}
+/*---------------------------------
+    Color CSS For Elements 
+-----------------------------------*/
+.theme-light {
+    .logo{
+        .logo-dark{
+            display: none!important;
+        }
+        .logo-light{
+            display: block!important;
+        }
+    }
+}
+
+.theme-dark {
+    .dpt-100{
+        padding-top: 100px;
+    }
+    .logo{
+        .logo-light{
+            display: none!important;
+        }
+        .logo-dark{
+            display: block!important;
+        }
+    }
+    .td-cod{
+        background-color: $clr_cod;
+    }
+    .counter-card,
+    .slider-thumb{
+        &.bg-link-ice{
+            background-color: rgba(222, 228, 243, 0.14);
+        }
+        &.bg-vanila-ice{
+            background-color: rgba(243, 222, 233, 0.29);
+        }
+        &.bg-peppermint-dark {
+            background: rgba(225, 243, 222, 0.37);
+        }
+        &.bg-ecru {
+            background: rgba(242, 243, 222,0.5);
+        }
+        &.bg-apple-green {
+            background: rgba(222, 243, 234, 0.45);
+        }
+    }
+    body,
+    .bg-white,
+    .hero-wrap.style2,
+    .newsletter-wrap.bg-vista-white,
+    .service-card.style1:hover,
+    .service-card.style3,
+    .testimonial-slider-item.style2 .client-info-wrap,
+    .service-card.style2,
+    .about-wrap.style3 .about-content,
+    .ab-service-cat,
+    .wishlist-table table tbody tr td,
+    .wishlist-table{
+        background-color: $clr_black!important;
+    }
+    
+    .header-wrap.style2{
+        background-color: transparent;
+    }
+    .header-wrap.style2 .header-bottom,
+    .promo-wrap.style2::after,
+    .promo-wrap.style3 {
+        background-color: $clr_cod;
+    }
+    .td-aztech,
+    .bg-vista-white,
+    .gd-cat,
+    .footer-wrap.style1 .footer-top,
+    .footer-wrap.style2 .footer-top,
+    .newsletter-wrap.style2.bg-apple-green,
+    .service-card.style1,
+    .testimonial-slider-item.style2,
+    .testimonial-slider-item.style3,
+    .service-wrap.bg-apple-green,
+    .why-choose-wrap.style3,
+    .hero-wrap.style3,
+    .header-wrap.style3,
+    .header-wrap.style2::after,
+    .accordion-button:not(.collapsed),
+    .category-box ul li:hover a:before,
+    .project-img-wrap .project-desc,
+    .quote-bg .contact-form,
+    .comp-map .contact-form,
+    .wp-block-quote,
+    .post-author,
+    .wishlist-table table thead tr th,
+    .checkout-promobox,
+    .checkout-form,
+    .login-form{
+        background-color: $clr_aztech!important;
+    }
+    .service-card.style1 .service-header .service-header-title h3::after,
+    .service-card.style3 .service-header .service-header-title h3::after,
+    .main-menu-wrap.style3 #menu > ul > li > a::after,
+    .category-box ul li a:before {
+        background-color: $clr_offwhite;
+    }
+    .gallery-item .gallery-info span,
+    .gallery-item .gallery-info h5 a{
+        color: $clr_black!important;
+    }
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6,
+    h3 a,
+    a,
+    .btn.style1:hover,
+    .btn.style2:hover,
+    .btn.style3:hover,
+    .btn.style4:hover,
+    .hero-wrap.style2 .hero-content .hero-btn .btn.style2,
+    .fun-facts-card,
+    .header-contact-item .contact-item .contact-text a,
+    .header-contact-item .contact-item .contact-text p,
+    .footer-wrap .footer-top .footer-widget .footer-widget-title,
+    .footer-wrap .container .footer-menu li a,
+    .contact-item .contact-info span,
+    .contact-item .contact-info a,
+    .gallery-tablist .nav-item .nav-link,
+    .why-choose-wrap.style2 .wh-item-wrap .wh-item .wh-text h5 a,
+    .main-menu-wrap.style2 #menu > ul > li a,
+    .about-wrap.style2 .exp-text,
+    .why-choose-wrap.style3 .wh-item-wrap .wh-item .wh-text h5 a,
+    .navbar-language .dropdown-toggle i,
+    .navbar-language .dropdown-toggle,
+    .why-choose-wrap.style4 .whi-img-one .exp_text,
+    .wishlist-table table thead tr th,
+    .wishlist-table table tbody tr td,
+    .checkout-form .form-group label,
+    .or-text p{
+        color: $clr_white!important;
+    }
+    p,span,
+    .client-quote .client-info span,
+    .about-wrap.style2 .about-content .about-feature-list li,
+    .service-subinfo .features-list li,
+    .content-feature-list li,
+    .checkbox label,
+    .form_group label,
+    .login-form .login-body .form-group label{
+        color: $clr_offwhite!important;
+    }
+    h3:hover a,
+    .contact-item .contact-info span:hover,
+    .contact-item .contact-info a:hover,
+    .footer-wrap .container .footer-menu li a:hover,
+    .gallery-tablist .nav-item .nav-link.active,
+    .why-choose-wrap.style2 .wh-item-wrap .wh-item .wh-text h5 a:hover,
+    .why-choose-wrap.style3 .wh-item-wrap .wh-item .wh-text h5:hover a,
+    .service-card.style3 .service-header .service-header-icon i,
+    .ab-service-cat .ab-service-icon i,
+    .gallery-item .gallery-info h5:hover a,
+    .pp-post-item .pp-post-info h6 a:hover,
+    .product-card:hover .product-info h4 a{
+        color: $clr_jungle_green!important;
+    }
+    .testimonial-item .client-info span,
+    .wh-item .wh-text p,
+    .section-title p,
+    .content-title p,
+    .client-quote p{
+        opacity: 0.96;
+    }
+    .service-wrap .service-shape-1 {
+        opacity: 0.35;
+    }
+    .service-card.style1{
+        border: 1px solid transparent;
+    }
+    .hero-wrap.style2 .hero-content .hero-btn .btn.style2,
+    .header-wrap.style3 .header-bottom,
+    .service-card.style1:hover,
+    .footer-wrap.style1 .footer-top,
+    .blog-card:hover,
+    .header-wrap.style2,
+    article,
+    .checkout-details .content-box-title h5,
+    .bill-item-wrap,
+    .total-wrap,
+    .single-product-gallery,
+    .wishlist-table table thead tr th{
+        border-color: rgba(255,255,255,0.19);
+    }
+    .hero-wrap.style3 .hero-slide-item .hero-content::before,
+    .why-choose-wrap.style3 .wh-item-wrap::before,
+    .why-choose-wrap.style3 .wh-item-wrap::after,
+    .why-choose-wrap.style3 .wh-item-wrap .wh-item:before,
+    .why-choose-wrap.style3 .wh-item-wrap .wh-item:after {
+        background: rgba(255,255,255,0.19);
+    }
+    .slider-pagination .swiper-pagination-bullet{
+        border: 1px solid rgba(255,255,255,1);
+    }
+    .footer-wrap.style2,
+    .newsletter-wrap.style1{
+        border-top: 1px solid rgba(255,255,255,0.2);
+    }
+    .sidebar .sidebar-widget.box{
+        background-color: transparent!important;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+    .newsletter-form .form-group input,
+    .newsletter-wrap.style2 .newsletter-form .form-group input,
+    .search-box input,
+    .filter-view,
+    .accordion-item .accordion-header .accordion-button,
+    .quote-form .form-group input,
+    .comp-map .contact-form .form-wrap .form-group input,
+    .quote-bg .contact-form .form-wrap .form-group textarea,
+    .quote-bg .contact-form .form-wrap .form-group input,
+    .comp-map .contact-form .form-wrap .form-group input,
+    .comp-map .contact-form .form-wrap .form-group textarea,
+    .tag-list ul li a,
+    .comment-item,
+    .checkout-details .form-group input,
+    .comment-form .form-group input,
+    .comment-form .form-group textarea,
+    .product-quantity .qtySelector input,
+    .product-quantity .qtySelector span,
+    .checkout-form .form-group input,
+    .checkout-form .form-group textarea,
+    .checkout-details,
+    .payment-method,
+    .login-form .login-body .form-group input{
+        background-color: transparent!important;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        color: $clr_white;
+    }
+    .filter-item-num select{
+        background-color: $clr_black!important;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        color: $clr_white;
+        background-image: url(../img/down-arrow-2.png);
+    }
+    .comp-map .contact-form .form-wrap .form-group select,
+    .quote-bg .contact-form .form-wrap .form-group select{
+        background-color: transparent!important;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        color: $clr_white;
+        background-image: url(../img/down-arrow-2.png);
+    }
+    .brt-1{
+        border-top: 1px solid rgba(255, 255, 255, 0.2);
+    }
+    .or-text p{
+        background-color: $clr_aztech;
+        &:before{
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+    }
+    .or-text{
+        &:before{
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+    }
+    .social-profile.style4 li a{
+        background-color: transparent;
+        border: 1px solid rgba(255, 255, 255, 0.32);
+        i{
+            color: $clr_jungle_green;
+        }
+        &:hover{
+            background-color: $clr_jungle_green;
+            border-color: transparent;
+            i{
+                color: $clr_white;
+            }
+        }
+    }
+    .tag-list ul li a:hover{
+        background: $clr_jungle_green!important;
+        border-color: transparent;
+        color: $clr_white;
+    }
+    .contact-item {
+        .contact-icon{
+            background-color: transparent;
+            border: 1px solid rgba(255,255,255,0.2);
+            color: $clr_white;
+            i{
+                color: $clr_jungle_green;
+            }
+        }
+    }
+    .newsletter-wrap .nl-shape-2 {
+        filter: brightness(0) invert(1);
+    }
+}
+@media only screen and (max-width:1199px) {
+    .theme-dark{
+        .header-wrap .header-top,
+        .header-wrap.style3 .header-bottom{
+            background-color: $clr_black;
+        }
+        .main-menu-wrap{
+            background-color: $clr_aztech;
+        }
+        .mobile-top-bar span,
+        .header-wrap.style2 .mobile-top-bar span,
+        .header-wrap.style3 .mobile-top-bar span{
+            background-color: $clr_white;
+        }
+        .main-menu > li.has-children.menu-open > span.menu-expand i,
+        .main-menu li > span.menu-expand i,
+        .main-menu li a,
+        .menu-close i,
+        .header-wrap .header-top .header-top-left .contact-item p,
+        .header-wrap .header-top .header-top-left .contact-item a,
+        .header-wrap .header-top .header-top-right .select-lang .navbar-language .dropdown-toggle,
+        .header-wrap .header-top .header-top-right .select-currency select,
+        .close-header-top button i,
+        .navbar-language .dropdown-toggle,
+        .navbar-language .dropdown-toggle i{
+            color: $clr_white!important;
+        }
+        .main-menu li a:hover{
+            color: $clr_timber_green;
+        }
+        .header-wrap .select-lang select{
+            background-image: linear-gradient(45deg, transparent 50%, #fff 60%), linear-gradient(135deg, #fff 40%, transparent 50%) !important;
+        }
+        .main-menu li a.active,
+        .main-menu li a{
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+        .header-wrap .select-lang .navbar-language .dropdown-toggle::before {
+            border-left: 4px solid transparent;
+            border-right: 4px solid transparent;
+            border-top: 4px solid #fff;
+        }
+        .header-wrap .header-top .header-top-right .select-lang::after {
+            border-color: rgba(255, 255, 255, 0.72);
+        }
+    }
+}
+@media only screen and (min-width:1200px) {
+    .theme-dark{
+        .main-menu-wrap #menu ul li.has-children .sub-menu{
+            background-color: $clr_aztech;
+        }
+    }
+}

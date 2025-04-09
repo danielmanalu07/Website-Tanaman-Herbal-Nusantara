@@ -87,4 +87,17 @@ class ContentController extends Controller
         }
     }
 
+    public function update_status(Request $request, int $id)
+    {
+        $request->validate([
+            'status' => 'required|boolean',
+        ]);
+        try {
+            $result = $this->content_service->update_status($request->status, $id);
+            return redirect()->back()->with('success', $result['message']);
+        } catch (\Throwable $th) {
+            return redirect()->back()->with('error', $th->getMessage());
+        }
+    }
+
 }

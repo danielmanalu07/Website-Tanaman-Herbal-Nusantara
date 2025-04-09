@@ -140,4 +140,29 @@ class NewService
             return Response::error("Failed to update news data", $th->getMessage(), 500);
         }
     }
+
+    public function update_status(int $id, array $data)
+    {
+        try {
+            $admin = Auth::user();
+            $new   = $this->new_repo->getDetail($id);
+
+            $updateData = [
+                'status'     => $data['status'],
+                'updated_by' => $admin->id,
+            ];
+
+            if ($data['status'] && is_null($new->published_at)) {
+                $updateData['published_at'] = now();
+            }
+
+            $result = $this->new_repo->update_status($id, $updateData);
+
+            return $result;
+        } catch (ModelNotFoundException $e) {
+            return Response::error('Data not found', $e->getMessage(), 404);
+        } catch (\Throwable $th) {
+            return Response::error('Failed to update data plant', $th->getMessage(), 500);
+        }
+    }
 }

@@ -7,6 +7,7 @@ use App\Http\Controllers\LandController;
 use App\Http\Controllers\NewsController;
 use App\Http\Controllers\PlantController;
 use App\Http\Controllers\StaffController;
+use App\Http\Controllers\UserController;
 use App\Http\Controllers\VisitorCategoryController;
 use App\Http\Controllers\VisitorController;
 use App\Http\Middleware\Authorization;
@@ -80,6 +81,7 @@ Route::prefix('/admin')->middleware(Authorization::class)->group(function () {
         Route::post('/upload', [NewsController::class, 'upload'])->name('news.upload');
         Route::put('/{id}/edit', [NewsController::class, 'edit'])->name('new.edit');
         Route::delete('/{id}/delete', [NewsController::class, 'delete'])->name('news.delete');
+        Route::put('/{id}/update-status', [NewsController::class, 'update_status'])->name('news.update.status');
     });
 
     //CRUD Content
@@ -89,5 +91,9 @@ Route::prefix('/admin')->middleware(Authorization::class)->group(function () {
         Route::post('/create', [ContentController::class, 'create'])->name('content.create');
         Route::put('/{id}/edit', [ContentController::class, 'edit'])->name('content.edit');
         Route::delete('/{id}/delete', [ContentController::class, 'delete'])->name('content.delete');
+        Route::put('/{id}/update-status', [ContentController::class, 'update_status'])->name('content.update.status');
     });
 });
+
+//ROUTE USER
+Route::get('/', [UserController::class, 'home'])->name('home');

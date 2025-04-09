@@ -32,4 +32,14 @@ class ContentRepository
         $content->delete();
         return $content;
     }
+
+    public function update_status(int $id, bool $status)
+    {
+        $contents = Content::findOrFail($id);
+        $contents->update([
+            'status' => $status,
+        ]);
+
+        return $contents;
+    }
 }
