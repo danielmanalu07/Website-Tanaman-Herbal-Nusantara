@@ -3,22 +3,25 @@ namespace App\Http\Controllers;
 
 use App\Service\AuthService;
 use App\Service\ContentService;
+use App\Service\LanguageService;
 use Illuminate\Http\Request;
 
 class ContentController extends Controller
 {
-    private $auth_service, $content_service;
-    public function __construct(AuthService $auth_service, ContentService $content_service)
+    private $auth_service, $content_service, $language_service;
+    public function __construct(AuthService $auth_service, ContentService $content_service, LanguageService $languageService)
     {
-        $this->auth_service    = $auth_service;
-        $this->content_service = $content_service;
+        $this->auth_service     = $auth_service;
+        $this->content_service  = $content_service;
+        $this->language_service = $languageService;
     }
     public function index()
     {
         try {
-            $data     = $this->auth_service->dashboard();
-            $contents = $this->content_service->get_all_content();
-            return view('Admin.Content.index', compact('data', 'contents'));
+            $data      = $this->auth_service->dashboard();
+            $contents  = $this->content_service->get_all_content();
+            $languages = $this->language_service->get_all_lang();
+            return view('Admin.Content.index', compact('data', 'contents', 'languages'));
         } catch (\Throwable $th) {
             return redirect()->back()->with('error', 'Something went wrong.');
         }
@@ -71,9 +74,10 @@ class ContentController extends Controller
         ]);
         try {
             $result = $this->content_service->edit_content($request->all(), $id);
+            // dd($result);
             return redirect()->back()->with('success', $result['message']);
         } catch (\Throwable $th) {
-            return redirect()->back()->with('error', 'Something went wrong.');
+            return redirect()->back()->with('error', $th->getMessage());
         }
     }
 

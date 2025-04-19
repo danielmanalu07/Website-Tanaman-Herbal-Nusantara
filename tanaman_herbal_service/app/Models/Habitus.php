@@ -12,6 +12,7 @@ class Habitus extends Model
     protected $fillable = [
         'id',
         'name',
+        'image',
         'created_by',
         'updated_by',
     ];
@@ -26,6 +27,28 @@ class Habitus extends Model
     public function updatedBy()
     {
         return $this->belongsTo(User::class, 'updated_by');
+    }
+
+    public function languages()
+    {
+        return $this->belongsToMany(Language::class, 'habitus_languages')
+            ->withPivot('name')
+            ->withTimestamps();
+    }
+
+    public function translate($langCode)
+    {
+        $language = Language::where('code', $langCode)->first();
+        if (! $language) {
+            return [
+                'name' => $this->name,
+            ];
+        }
+
+        $translation = $this->languages()->where('language_id', $language->id)->first();
+        return [
+            'name' => $translation?->pivot->name ?? $this->name,
+        ];
     }
 
 }

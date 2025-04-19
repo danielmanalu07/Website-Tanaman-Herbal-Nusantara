@@ -30,7 +30,6 @@ class NewsController extends Controller
             if ($result instanceof JsonResponse) {
                 return $result;
             }
-
             return Response::success('Created news successfully', new NewsResource($result), 201);
         } catch (\Throwable $th) {
             return Response::error('internal server error', $th->getMessage(), 500);

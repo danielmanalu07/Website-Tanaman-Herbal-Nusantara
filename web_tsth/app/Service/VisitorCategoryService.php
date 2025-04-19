@@ -2,6 +2,7 @@
 namespace App\Service;
 
 use App\Http\Constant\ApiConstant;
+use App\Http\Constant\LanguageConstant;
 use App\Http\Constant\TokenConstant;
 use App\Http\Resources\VisitorCategoryResource;
 use Illuminate\Support\Facades\Http;
@@ -9,20 +10,23 @@ use Illuminate\Support\Facades\Http;
 class VisitorCategoryService
 {
     private $api_url;
-    private $token;
+    private $token, $language;
 
-    public function __construct(TokenConstant $token)
+    public function __construct(TokenConstant $token, LanguageConstant $language_constant)
     {
-        $this->api_url = ApiConstant::BASE_URL;
-        $this->token   = $token;
+        $this->api_url  = ApiConstant::BASE_URL;
+        $this->token    = $token;
+        $this->language = $language_constant;
     }
 
     public function get_all_visitor_category()
     {
         try {
+            $lang     = $this->language->GetLanguage();
             $token    = $this->token->GetToken();
             $response = Http::withHeaders([
-                'Authorization' => "Bearer {$token}",
+                'Authorization'   => "Bearer {$token}",
+                'Accept-Language' => "{$lang}",
             ])->get("{$this->api_url}/visitor-categories");
 
             $result = $response->json();

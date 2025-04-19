@@ -4,17 +4,19 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use App\Service\AuthService;
 use App\Service\HabitusService;
+use App\Service\LanguageService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 
 class AuthController extends Controller
 {
-    private $auth_service, $habitus_service;
+    private $auth_service, $habitus_service, $language_service;
 
-    public function __construct(AuthService $authService, HabitusService $habitus_service)
+    public function __construct(AuthService $authService, HabitusService $habitus_service, LanguageService $languageService)
     {
-        $this->auth_service    = $authService;
-        $this->habitus_service = $habitus_service;
+        $this->auth_service     = $authService;
+        $this->habitus_service  = $habitus_service;
+        $this->language_service = $languageService;
     }
     public function login(Request $request)
     {
@@ -42,7 +44,8 @@ class AuthController extends Controller
             $habituses  = $habitus->count();
             $avgHabitus = round($habituses / (now()->hour ?: 1));
             $data       = $this->auth_service->dashboard();
-            return view('Admin.dashboard', compact('data', 'habituses', 'avgHabitus'));
+            $languages  = $this->language_service->get_all_lang();
+            return view('Admin.dashboard', compact('data', 'habituses', 'avgHabitus', 'languages'));
         } catch (\Throwable $th) {
             return redirect()->route('admin.login')->with('error', 'You must be logged in.');
         }

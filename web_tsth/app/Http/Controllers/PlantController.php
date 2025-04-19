@@ -3,26 +3,29 @@ namespace App\Http\Controllers;
 
 use App\Service\AuthService;
 use App\Service\HabitusService;
+use App\Service\LanguageService;
 use App\Service\PlantService;
 use Illuminate\Http\Request;
 
 class PlantController extends Controller
 {
-    private $auth_service, $plant_service, $habitus_service;
+    private $auth_service, $plant_service, $habitus_service, $language_service;
 
-    public function __construct(AuthService $auth_service, PlantService $plant_service, HabitusService $habitus_service)
+    public function __construct(AuthService $auth_service, PlantService $plant_service, HabitusService $habitus_service, LanguageService $languageService)
     {
-        $this->auth_service    = $auth_service;
-        $this->plant_service   = $plant_service;
-        $this->habitus_service = $habitus_service;
+        $this->auth_service     = $auth_service;
+        $this->plant_service    = $plant_service;
+        $this->habitus_service  = $habitus_service;
+        $this->language_service = $languageService;
     }
     public function index()
     {
         try {
-            $data    = $this->auth_service->dashboard();
-            $plants  = $this->plant_service->get_all_plant();
-            $habitus = $this->habitus_service->get_all();
-            return view('Admin.Plant.index', compact('data', 'plants', 'habitus'));
+            $data      = $this->auth_service->dashboard();
+            $plants    = $this->plant_service->get_all_plant();
+            $habitus   = $this->habitus_service->get_all();
+            $languages = $this->language_service->get_all_lang();
+            return view('Admin.Plant.index', compact('data', 'plants', 'habitus', 'languages'));
         } catch (\Throwable $th) {
             return redirect()->back()->with('error', 'Something went wrong.');
         }

@@ -17,6 +17,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'permission'        => \App\Http\Middleware\PermissionMiddleware::class,
             'auth.token_expiry' => \App\Http\Middleware\CheckTokenExpiry::class,
             'admin'             => \App\Http\Middleware\AdminMiddleware::class,
+            'set.language'      => \App\Http\Middleware\SetLanguage::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {

@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('habituses', function (Blueprint $table) {
             $table->id();
             $table->string('name');
+            $table->string('image');
             $table->foreignId('created_by')->nullable()->constrained('users')->nullOnDelete();
             $table->foreignId('updated_by')->nullable()->constrained('users')->nullOnDelete();
             $table->timestamps();

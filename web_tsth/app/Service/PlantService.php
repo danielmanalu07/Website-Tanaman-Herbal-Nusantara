@@ -2,6 +2,7 @@
 namespace App\Service;
 
 use App\Http\Constant\ApiConstant;
+use App\Http\Constant\LanguageConstant;
 use App\Http\Constant\TokenConstant;
 use App\Http\Resources\PlantResource;
 use Illuminate\Support\Facades\Http;
@@ -9,20 +10,23 @@ use Illuminate\Support\Facades\Http;
 class PlantService
 {
     private $api_url;
-    private $token;
+    private $token, $language;
 
-    public function __construct(TokenConstant $token)
+    public function __construct(TokenConstant $token, LanguageConstant $languageConstant)
     {
-        $this->token   = $token;
-        $this->api_url = ApiConstant::BASE_URL;
+        $this->token    = $token;
+        $this->api_url  = ApiConstant::BASE_URL;
+        $this->language = $languageConstant;
     }
 
     public function get_all_plant()
     {
         try {
             $token    = $this->token->GetToken();
+            $lang     = $this->language->GetLanguage();
             $response = Http::withHeaders([
-                'Authorization' => "Bearer {$token}",
+                'Authorization'   => "Bearer {$token}",
+                'Accept-Language' => "{$lang}",
             ])->get("{$this->api_url}/plant");
 
             $result = $response->json();
@@ -33,6 +37,46 @@ class PlantService
                 return (object) $item;
             });
             return PlantResource::collection($collection);
+        } catch (\Throwable $th) {
+            throw new \Exception($th->getMessage());
+        }
+    }
+
+    public function get_all_plant_user()
+    {
+        try {
+            $lang     = $this->language->GetLanguage();
+            $response = Http::withHeaders([
+                'Accept-Language' => "{$lang}",
+            ])->get("{$this->api_url}/plants-user");
+
+            $result = $response->json();
+            if ($response->failed()) {
+                return collect();
+            }
+            $collection = collect($result['data'])->map(function ($item) {
+                return (object) $item;
+            });
+            return PlantResource::collection($collection);
+        } catch (\Throwable $th) {
+            throw new \Exception($th->getMessage());
+        }
+    }
+
+    public function get_detail_plant_user(int $id)
+    {
+        try {
+            $lang     = $this->language->GetLanguage();
+            $response = Http::withHeaders([
+                'Accept-Language' => "{$lang}",
+            ])->get("{$this->api_url}/plants-user/$id");
+
+            $result = $response->json();
+            if ($response->failed()) {
+                throw new \Exception($result['message']);
+            }
+
+            return $result;
         } catch (\Throwable $th) {
             throw new \Exception($th->getMessage());
         }
@@ -180,7 +224,7 @@ class PlantService
                 'upload',
                 file_get_contents($file->getRealPath()),
                 $file->getClientOriginalName()
-            )->post("{$this->api_url}/news/upload");
+            )->post("{$this->api_url}/plant/upload");
 
             $result = $response->json();
 

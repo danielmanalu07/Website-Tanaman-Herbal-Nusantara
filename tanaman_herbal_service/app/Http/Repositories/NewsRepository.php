@@ -12,17 +12,25 @@ class NewsRepository
 
     public function getAll()
     {
-        return News::all();
+        $news = News::with(['languages' => function ($query) {
+            $query->where('language_id', currentLanguageId());
+        }])->get();
+        return $news;
     }
 
     public function getDetail(int $id)
     {
-        return News::findOrFail($id);
+        $news = News::with(['languages' => function ($query) {
+            $query->where('language_id', currentLanguageId());
+        }])->findOrFail($id);
+        return $news;
     }
 
     public function update(array $data, int $id)
     {
-        $news = News::findOrFail($id);
+        $news = News::with(['languages' => function ($query) {
+            $query->where('language_id', currentLanguageId());
+        }])->findOrFail($id);
         $news->update($data);
         return $news;
     }

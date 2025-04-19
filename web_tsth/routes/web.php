@@ -1,16 +1,20 @@
 <?php
 
 use App\Http\Controllers\Auth\AuthController;
+use App\Http\Controllers\ContactUsController;
 use App\Http\Controllers\ContentController;
 use App\Http\Controllers\HabitusController;
 use App\Http\Controllers\LandController;
+use App\Http\Controllers\LanguageController;
 use App\Http\Controllers\NewsController;
+use App\Http\Controllers\OurGardenController;
 use App\Http\Controllers\PlantController;
 use App\Http\Controllers\StaffController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\VisitorCategoryController;
 use App\Http\Controllers\VisitorController;
 use App\Http\Middleware\Authorization;
+use App\Http\Middleware\SetAcceptLanguage;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -82,6 +86,7 @@ Route::prefix('/admin')->middleware(Authorization::class)->group(function () {
         Route::put('/{id}/edit', [NewsController::class, 'edit'])->name('new.edit');
         Route::delete('/{id}/delete', [NewsController::class, 'delete'])->name('news.delete');
         Route::put('/{id}/update-status', [NewsController::class, 'update_status'])->name('news.update.status');
+        Route::post('/language', [LanguageController::class, 'SetLanguage'])->name('news.language');
     });
 
     //CRUD Content
@@ -93,7 +98,35 @@ Route::prefix('/admin')->middleware(Authorization::class)->group(function () {
         Route::delete('/{id}/delete', [ContentController::class, 'delete'])->name('content.delete');
         Route::put('/{id}/update-status', [ContentController::class, 'update_status'])->name('content.update.status');
     });
+
+    //CRUD Language
+    Route::prefix('/languages')->group(function () {
+        Route::get('/', [LanguageController::class, 'index'])->name('language.index');
+        Route::post('/create', [LanguageController::class, 'create_language'])->name('language.create');
+        Route::put('/{id}/edit', [LanguageController::class, 'update_language'])->name('language.edit');
+        Route::delete('/{id}/delete', [LanguageController::class, 'delete_language'])->name('language.delete');
+    });
+
+    //CRUD Contact Us
+    Route::prefix('/contact-us')->group(function () {
+        Route::get('/', [ContactUsController::class, 'index'])->name('contact.index');
+        Route::post('/create', [ContactUsController::class, 'create'])->name('contact.create');
+        Route::post('/upload', [ContactUsController::class, 'upload'])->name('contact.updload');
+        Route::put('/{id}/edit', [ContactUsController::class, 'edit'])->name('contact.edit');
+        Route::delete('/{id}/delete', [ContactUsController::class, 'delete'])->name('contact.delete');
+    });
 });
 
 //ROUTE USER
-Route::get('/', [UserController::class, 'home'])->name('home');
+Route::middleware(SetAcceptLanguage::class)->group(function () {
+    Route::get('/', [UserController::class, 'home'])->name('home');
+    Route::get('/news', [UserController::class, 'news'])->name('news');
+    Route::post('/lang', [LanguageController::class, 'SetLanguageUser'])->name('user.language');
+    Route::get('/our-garden', [OurGardenController::class, 'index'])->name('user.ourgarden');
+    Route::get('/our-garden/{id}', [OurGardenController::class, 'detail'])->name('user.ourgarden.detail');
+    Route::get('/our-garden/plant/{id}', [OurGardenController::class, 'detail_plant'])->name('user.ourgarden.plant.detail');
+    Route::get('/news/{id}', [UserController::class, 'news_detail'])->name('user.news.detail');
+
+    Route::get('/profile/{id}', [UserController::class, 'profile_detail'])->name('user.profile.detail');
+    Route::get('/contact-us-user', [UserController::class, 'contact_us'])->name('user.contact');
+});

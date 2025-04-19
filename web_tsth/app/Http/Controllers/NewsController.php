@@ -2,25 +2,28 @@
 namespace App\Http\Controllers;
 
 use App\Service\AuthService;
+use App\Service\LanguageService;
 use App\Service\NewsService;
 use Illuminate\Http\Request;
 
 class NewsController extends Controller
 {
-    private $auth_service, $news_service;
+    private $auth_service, $news_service, $language_service;
 
-    public function __construct(AuthService $auth_service, NewsService $news_service)
+    public function __construct(AuthService $auth_service, NewsService $news_service, LanguageService $languageService)
     {
-        $this->auth_service = $auth_service;
-        $this->news_service = $news_service;
+        $this->auth_service     = $auth_service;
+        $this->news_service     = $news_service;
+        $this->language_service = $languageService;
     }
 
     public function index()
     {
         try {
-            $data = $this->auth_service->dashboard();
-            $news = $this->news_service->get_all_news();
-            return view('Admin.News.index', compact('data', 'news'));
+            $data      = $this->auth_service->dashboard();
+            $news      = $this->news_service->get_all_news();
+            $languages = $this->language_service->get_all_lang();
+            return view('Admin.News.index', compact('data', 'news', 'languages'));
         } catch (\Throwable $th) {
             return redirect()->back()->with('error', 'Something went wrong.');
         }
@@ -38,7 +41,7 @@ class NewsController extends Controller
             $result = $this->news_service->create_news($request->all());
             return redirect()->back()->with('success', $result['message']);
         } catch (\Throwable $th) {
-            return redirect()->back()->with('error', 'Something went wrong.');
+            return redirect()->back()->with('error', $th->getMessage());
         }
     }
 

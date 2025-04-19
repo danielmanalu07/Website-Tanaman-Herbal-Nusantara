@@ -17,9 +17,15 @@ class HabitusResource extends JsonResource
         if (is_null($this->resource)) {
             return [];
         }
+
+        $translation = $this->languages()
+            ->where('language_id', currentLanguageId())
+            ->first();
+
         return [
             'id'         => $this->id,
-            'name'       => $this->name,
+            'name'       => $translation ? $translation->pivot->name : $this->name,
+            'image'      => $this->image ? asset("{$this->image}") : null,
             'created_by' => optional($this->createdBy)->username,
             'updated_by' => optional($this->createdBy)->username,
             'created_at' => Carbon::parse($this->created_at)->translatedFormat('d F Y h:i A'),

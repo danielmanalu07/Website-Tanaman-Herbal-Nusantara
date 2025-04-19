@@ -58,6 +58,16 @@
 
     <!-- CK EDITOR -->
     <script src="https://cdn.ckeditor.com/ckeditor5/41.2.1/classic/ckeditor.js"></script>
+    {{-- <link rel="stylesheet" href="https://cdn.ckeditor.com/ckeditor5/45.0.0/ckeditor5.css"> --}}
+
+    {{-- <link rel="stylesheet" href="https://cdn.ckeditor.com/ckeditor5/45.0.0/ckeditor5.css" crossorigin>
+    <link rel="stylesheet"
+        href="https://cdn.ckeditor.com/ckeditor5-premium-features/45.0.0/ckeditor5-premium-features.css" crossorigin> --}}
+
+    {{-- <script src="https://cdn.ckeditor.com/ckeditor5/36.0.1/classic/ckeditor.js"></script>
+    <script src="https://cdn.ckeditor.com/ckeditor5/36.0.1/classic/translations/id.js"></script> --}}
+    {{-- <link rel="stylesheet" href="https://cdn.ckeditor.com/ckeditor5/45.0.0/ckeditor5.css" />
+    <script src="https://cdn.ckeditor.com/ckeditor5/45.0.0/ckeditor5.umd.js"></script> --}}
 
     <!-- External Resources -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.3/css/lightbox.min.css">
@@ -70,7 +80,7 @@
         <script>
             document.addEventListener('DOMContentLoaded', function() {
                 Swal.fire({
-                    title: "Welcome Back!",
+                    title: "Success",
                     text: "{{ session('success') }}",
                     imageUrl: "https://cdn-icons-png.flaticon.com/512/190/190411.png", // URL gambar checklist online
                     imageWidth: 100,
@@ -131,9 +141,25 @@
                             </a>
                         </div>
 
-                        <div class="collapse d-lg-block my-lg-auto ms-lg-auto" id="page_header">
-                            <span id="tanggal"></span>
+                        <div class="d-flex justify-content-between align-items-center my-lg-auto ms-lg-auto flex-wrap"
+                            id="page_header">
+                            <span id="tanggal" class="me-3"></span>
+
+                            <form action="{{ route('news.language') }}" method="POST" id="language-form">
+                                @csrf
+                                <select name="language" class="form-select"
+                                    onchange="document.getElementById('language-form').submit()"
+                                    style="min-width: 120px;">
+                                    @foreach ($languages as $language)
+                                        <option value="{{ $language->code }}"
+                                            {{ session('app_language', 'id') == $language->code ? 'selected' : '' }}>
+                                            {{ $language->name }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </form>
                         </div>
+
                     </div>
 
                     <div class="page-header-content d-lg-flex border-top">
@@ -206,6 +232,11 @@
         setInterval(updateTime, 1000);
         updateTime();
     </script>
+    {{-- <script src="https://cdn.ckeditor.com/ckeditor5/45.0.0/ckeditor5.umd.js"></script> --}}
+    {{-- <script src="https://cdn.ckeditor.com/ckeditor5/45.0.0/ckeditor5.umd.js" crossorigin></script>
+    <script src="https://cdn.ckeditor.com/ckeditor5-premium-features/45.0.0/ckeditor5-premium-features.umd.js" crossorigin> --}}
+    </script>
+    {{-- <script src="https://cdn.ckbox.io/ckbox/2.6.1/ckbox.js" crossorigin></script> --}}
 
     {{-- <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script> --}}
 

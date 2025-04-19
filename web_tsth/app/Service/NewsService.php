@@ -2,6 +2,7 @@
 namespace App\Service;
 
 use App\Http\Constant\ApiConstant;
+use App\Http\Constant\LanguageConstant;
 use App\Http\Constant\TokenConstant;
 use App\Http\Resources\NewsResource;
 use Illuminate\Support\Facades\Http;
@@ -9,20 +10,24 @@ use Illuminate\Support\Facades\Http;
 class NewsService
 {
     private $api_url;
-    private $token;
+    private $token, $language;
 
-    public function __construct(TokenConstant $token)
+    public function __construct(TokenConstant $token, LanguageConstant $language)
     {
-        $this->token   = $token;
-        $this->api_url = ApiConstant::BASE_URL;
+        $this->token    = $token;
+        $this->api_url  = ApiConstant::BASE_URL;
+        $this->language = $language;
+
     }
 
     public function get_all_news()
     {
         try {
             $token    = $this->token->GetToken();
+            $lang     = $this->language->GetLanguage();
             $response = Http::withHeaders([
-                'Authorization' => "Bearer {$token}",
+                'Authorization'   => "Bearer {$token}",
+                'Accept-Language' => "{$lang}",
             ])->get("{$this->api_url}/news");
 
             $result = $response->json();
@@ -36,6 +41,52 @@ class NewsService
             });
 
             return NewsResource::collection($collection);
+
+        } catch (\Throwable $th) {
+            throw new \Exception($th->getMessage());
+        }
+    }
+
+    public function get_all_news_user()
+    {
+        try {
+            $lang     = $this->language->GetLanguage();
+            $response = Http::withHeaders([
+                'Accept-Language' => "{$lang}",
+            ])->get("{$this->api_url}/news-user");
+
+            $result = $response->json();
+
+            if ($response->failed()) {
+                return collect();
+            }
+
+            $collection = collect($result['data'])->map(function ($item) {
+                return (object) $item;
+            });
+
+            return NewsResource::collection($collection);
+
+        } catch (\Throwable $th) {
+            throw new \Exception($th->getMessage());
+        }
+    }
+
+    public function get_detail_news_user(int $id)
+    {
+        try {
+            $lang     = $this->language->GetLanguage();
+            $response = Http::withHeaders([
+                'Accept-Language' => "{$lang}",
+            ])->get("{$this->api_url}/news-user/$id");
+
+            $result = $response->json();
+
+            if ($response->failed()) {
+                throw new \Exception($result['message']);
+            }
+
+            return $result;
 
         } catch (\Throwable $th) {
             throw new \Exception($th->getMessage());

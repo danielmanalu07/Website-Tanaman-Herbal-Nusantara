@@ -50,4 +50,32 @@ class Plant extends Model
     {
         return $this->belongsToMany(Land::class, 'plant_lands');
     }
+
+    public function languages()
+    {
+        return $this->belongsToMany(Language::class, 'plant_languages')
+            ->withPivot('name', 'advantage', 'ecology', 'endemic_information')
+            ->withTimestamps();
+    }
+
+    public function translate($langCode)
+    {
+        $language = Language::where('code', $langCode)->first();
+        if (! $language) {
+            return [
+                'name'                => $this->name,
+                'advantage'           => $this->advantage,
+                'ecology'             => $this->ecology,
+                'endemic_information' => $this->endemic_information,
+            ];
+        }
+
+        $translation = $this->languages()->where('language_id', $language->id)->first();
+        return [
+            'name'                => $translation?->pivot->name ?? $this->name,
+            'advantage'           => $translation?->pivot->advantage ?? $this->advantage,
+            'ecology'             => $translation?->pivot->ecology ?? $this->ecology,
+            'endemic_information' => $translation?->pivot->endemic_information ?? $this->endemic_information,
+        ];
+    }
 }

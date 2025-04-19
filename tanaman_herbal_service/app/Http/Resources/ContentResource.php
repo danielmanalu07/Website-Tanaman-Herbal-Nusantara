@@ -18,11 +18,15 @@ class ContentResource extends JsonResource
             return [];
         }
 
+        $translation = $this->languages()
+            ->where('language_id', currentLanguageId())
+            ->first();
+
         return [
             'id'         => $this->id,
             'key'        => $this->key,
-            'title'      => $this->title,
-            'content'    => $this->content,
+            'title'      => $translation ? $translation->pivot->title : $this->title,
+            'content'    => $translation ? $translation->pivot->content : $this->content,
             'status'     => $this->status ? true : false,
             'created_by' => optional($this->createdBy)->username,
             'updated_by' => optional($this->createdBy)->username,

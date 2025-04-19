@@ -1,23 +1,27 @@
 <?php
 namespace App\Services\Admin;
 
+use App\Helpers\TranslateHtmlContent;
 use App\Http\Repositories\PlantRepository;
 use App\Models\Habitus;
 use App\Models\Image;
+use App\Models\Language;
 use App\Models\PlantImage;
 use App\Response\Response;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
+use Stichoza\GoogleTranslate\GoogleTranslate;
 
 class PlantService
 {
-    protected $plantRepo;
+    protected $plantRepo, $translate_html;
 
-    public function __construct(PlantRepository $plant_repository)
+    public function __construct(PlantRepository $plant_repository, TranslateHtmlContent $translateHtmlContent)
     {
-        $this->plantRepo = $plant_repository;
+        $this->plantRepo      = $plant_repository;
+        $this->translate_html = $translateHtmlContent;
     }
     public function create_plant(array $data)
     {
@@ -53,8 +57,45 @@ class PlantService
 
             PlantImage::insert($imageIds);
 
+            $languages  = Language::all();
+            $sourceLang = currentLanguage()->code;
+
+            $translator = new GoogleTranslate();
+            $translator->setSource($sourceLang);
+
+            foreach ($languages as $language) {
+                if ($language->code == $sourceLang) {
+                    $plant->languages()->attach($language->id, [
+                        'name'                => $plant->name,
+                        'advantage'           => $plant->advantage,
+                        'ecology'             => $plant->ecology,
+                        'endemic_information' => $plant->endemic_information,
+                    ]);
+                } else {
+                    try {
+                        $translator->setTarget($language->code);
+                        $translatedName               = $translator->translate($plant->name);
+                        $translatedAdvantage          = $this->translate_html->translateHtmlContent($plant->advantage, $translator, $sourceLang, $language->code);
+                        $translatedEcology            = $translator->translate($plant->ecology);
+                        $translatedEndemicInformation = $translator->translate($plant->endemic_information);
+                    } catch (\Exception $th) {
+                        $translatedName               = $plant->name;
+                        $translatedAdvantage          = $plant->advantage;
+                        $translatedEcology            = $plant->ecology;
+                        $translatedEndemicInformation = $plant->endemic_information;
+                    }
+
+                    $plant->languages()->attach($language->id, [
+                        'name'                => $translatedName,
+                        'advantage'           => $translatedAdvantage,
+                        'ecology'             => $translatedEcology,
+                        'endemic_information' => $translatedEndemicInformation,
+                    ]);
+                }
+            }
+
             if (! $plant->qrcode) {
-                $qrData = "https://f1d2-103-4-134-10.ngrok-free.app/login";
+                $qrData = "http://127.0.0.1:8001/our-garden/plant/$plant->id";
                 $qrCode = QrCode::format('png')->size(200)->generate($qrData);
 
                 $qrPath = "qrcodes/plants_{$plant->latin_name}.png";
@@ -149,7 +190,7 @@ class PlantService
                 }
             }
 
-            $qrData = "https://f1d2-103-4-134-10.ngrok-free.app/login";
+            $qrData = "http://127.0.0.1:8001/our-garden/plant/$plant->id";
             $qrCode = QrCode::format('png')->size(200)->generate($qrData);
 
             $qrPath = "qrcodes/plants_{$data['name']}.png";
@@ -160,7 +201,48 @@ class PlantService
                 'updated_by' => $admin->id,
             ]);
 
-            return $this->plantRepo->update_plant($updateData, $id);
+            $plantUpdate = $this->plantRepo->update_plant($updateData, $id);
+
+            if (! empty($data['name']) && ! empty($data['advantage']) && ! empty($data['ecology']) && ! empty($data['endemic_information'])) {
+                $languages  = Language::all();
+                $sourceLang = currentLanguage()->code;
+
+                $translator = new GoogleTranslate();
+                $translator->setSource($sourceLang);
+
+                foreach ($languages as $language) {
+                    if ($language->code == $sourceLang) {
+                        $plant->languages()->attach($language->id, [
+                            'name'                => $plant->name,
+                            'advantage'           => $plant->advantage,
+                            'ecology'             => $plant->ecology,
+                            'endemic_information' => $plant->endemic_information,
+                        ]);
+                    } else {
+                        try {
+                            $translator->setTarget($language->code);
+                            $translatedName               = $translator->translate($plant->name);
+                            $translatedAdvantage          = $this->translate_html->translateHtmlContent($plant->advantage, $translator, $sourceLang, $language->code);
+                            $translatedEcology            = $translator->translate($plant->ecology);
+                            $translatedEndemicInformation = $translator->translate($plant->endemic_information);
+                        } catch (\Exception $th) {
+                            $translatedName               = $plant->name;
+                            $translatedAdvantage          = $plant->advantage;
+                            $translatedEcology            = $plant->ecology;
+                            $translatedEndemicInformation = $plant->endemic_information;
+                        }
+
+                        $plant->languages()->attach($language->id, [
+                            'name'                => $translatedName,
+                            'advantage'           => $translatedAdvantage,
+                            'ecology'             => $translatedEcology,
+                            'endemic_information' => $translatedEndemicInformation,
+                        ]);
+                    }
+                }
+            }
+
+            return $plantUpdate;
         } catch (ModelNotFoundException $e) {
             return Response::error('Data not found', $e->getMessage(), 404);
         } catch (\Throwable $th) {

@@ -264,7 +264,7 @@
                                 <td>{{ $key + 1 }}</td>
                                 <td>{{ $content->key }}</td>
                                 <td>{{ $content->title }}</td>
-                                <td>{!! $content->content !!}</td>
+                                <td>{!! Str::limit(strip_tags(preg_replace('/<(img|iframe|video)[^>]*>/i', '', $content->content)), 100, '...') !!}</td>
                                 <td>
                                     <select
                                         class="form-select form-select-sm custom-select {{ $content->status ? 'bg-success text-white' : 'bg-danger text-white' }}"

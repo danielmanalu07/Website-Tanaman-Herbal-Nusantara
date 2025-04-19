@@ -7,11 +7,7 @@ class HabitusRepository
 {
     public function createHabitus(array $data)
     {
-        // return Cache::remember('habitus_create', 60, function () use ($data) {
-        //     return Habitus::create($data);
-        // });
         return Habitus::create($data);
-
     }
 
     public function get_all_habitus()

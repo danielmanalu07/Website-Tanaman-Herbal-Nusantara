@@ -19,7 +19,8 @@ class HabitusController extends Controller
     public function createHabitus(Request $request)
     {
         $request->validate([
-            'name' => 'required|string|unique:habituses,name',
+            'name'  => 'required|string',
+            'image' => 'required|image|mimes:jpeg,png,jpg',
         ]);
         try {
 
@@ -66,7 +67,8 @@ class HabitusController extends Controller
     public function updateHabitus(Request $request, int $id)
     {
         $request->validate([
-            'name' => 'required|string',
+            'name'  => 'required|string',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg',
         ]);
         try {
             $habitus = $this->habitus_service->update_habitus($request->all(), $id);
@@ -93,4 +95,5 @@ class HabitusController extends Controller
             return Response::error('internal server error', $th->getMessage(), 500);
         }
     }
+
 }

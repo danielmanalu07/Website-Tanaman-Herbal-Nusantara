@@ -23,6 +23,20 @@
                 "ordering": true,
                 "info": true
             });
+
+            @foreach ($habitus as $habitus_item)
+                FilePond.create(document.querySelector('#image-{{ $habitus_item->id }}'), {
+                    instantUpload: false,
+                    storeAsFile: true,
+                    acceptedFileTypes: ['image/png', 'image/jpeg', 'image/jpg']
+                });
+            @endforeach
+
+            FilePond.create(document.querySelector('.filepond'), {
+                instantUpload: false,
+                storeAsFile: true,
+                acceptedFileTypes: ['image/png', 'image/jpeg', 'image/jpg']
+            });
         });
     </script>
 @endpush
@@ -36,15 +50,17 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <form method="POST" action="{{ route('habitus.create') }}">
+                    <form method="POST" action="{{ route('habitus.create') }}" enctype="multipart/form-data">
                         @csrf
                         <div class="mb-3">
                             <label for="name" class="form-label">Name</label><span class="text-danger">*</span>
                             <input type="text" class="form-control @error('name') is-invalid @enderror" name="name"
                                 id="name" value="{{ old('name') }}" required>
-                            @error('name')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="image">Image</label><span class="text-danger">*</span>
+                            <input type="file" name="image" class="filepond form-control" accept="image/*">
                         </div>
                         <button type="submit" class="btn btn-success">Save</button>
                     </form>
@@ -65,6 +81,16 @@
                     </div>
                     <div class="modal-body">
                         <p><strong>Habitus Name:</strong> {{ $habitus_item->name }}</p>
+                        <p><strong>Habitus Image:</strong></p>
+                        <div class="row d-flex gap-2">
+                            <div class="col-md-3 text-center">
+                                <a href="{{ asset($habitus_item->image) }}"
+                                    data-lightbox="plant-gallery-{{ $habitus_item->id }}" data-title="Habitus Image">
+                                    <img src="{{ asset($habitus_item->image) }}" class="img-fluid rounded border p-2"
+                                        alt="Plant Image" style="width: 100%; height: 100%; cursor: pointer;" />
+                                </a>
+                            </div>
+                        </div>
                         <p><strong>Created By:</strong> {{ $habitus_item->created_by }}</p>
                         <p><strong>Created At:</strong> {{ $habitus_item->created_at }}</p>
                         <p><strong>Updated At:</strong> {{ $habitus_item->updated_at }}</p>
@@ -88,18 +114,38 @@
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
-                        <form method="POST" action="{{ route('habitus.update', ['id' => $habitus_item->id]) }}">
+                        <form action="{{ route('habitus.update', ['id' => $habitus_item->id]) }}" method="POST"
+                            enctype="multipart/form-data">
                             @csrf
                             @method('PUT')
                             <div class="mb-3">
                                 <label for="name{{ $habitus_item->id }}" class="form-label">Name</label><span
                                     class="text-danger">*</span>
-                                <input type="text" class="form-control @error('name') is-invalid @enderror"
-                                    name="name" id="name{{ $habitus_item->id }}" value="{{ $habitus_item->name }}"
-                                    required>
-                                @error('name')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
+                                <input type="text" class="form-control" name="name" id="name{{ $habitus_item->id }}"
+                                    value="{{ $habitus_item->name }}" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Current Images</label>
+                                <div class="row">
+                                    @if (!empty($habitus_item->image))
+                                        <div class="col-md-3 text-center">
+                                            <a href="{{ $habitus_item->image }}"
+                                                data-lightbox="habitus-gallery-{{ $habitus_item->id }}"
+                                                data-title="Habitus Image">
+                                                <img src="{{ $habitus_item->image }}" class="img-fluid rounded border p-2"
+                                                    alt="Hbaitus Image"
+                                                    style="width: 300px; height: 100px; cursor: pointer;">
+                                            </a>
+                                        </div>
+                                    @else
+                                        <p class="text-muted">No images uploaded</p>
+                                    @endif
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="image">Image</label>
+                                <input type="file" name="image" class="filepond form-control"
+                                    id="image-{{ $habitus_item->id }}" accept="image/*">
                             </div>
                             <button type="submit" class="btn btn-success">Update</button>
                         </form>
@@ -112,8 +158,8 @@
 
     {{-- Modal Delete --}}
     @foreach ($habitus as $habitus_item)
-        <div class="modal fade" id="formDeleteHabitus{{ $habitus_item->id }}" tabindex="1" aria-labelledby="modalTitle"
-            aria-hidden="true">
+        <div class="modal fade" id="formDeleteHabitus{{ $habitus_item->id }}" tabindex="1"
+            aria-labelledby="modalTitle" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered">
                 <div class="modal-content">
                     <div class="modal-header">

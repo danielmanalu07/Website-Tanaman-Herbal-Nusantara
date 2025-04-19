@@ -2,6 +2,7 @@
 namespace App\Service;
 
 use App\Http\Constant\ApiConstant;
+use App\Http\Constant\LanguageConstant;
 use App\Http\Constant\TokenConstant;
 use App\Http\Resources\VisitorResource;
 use Illuminate\Support\Facades\Http;
@@ -9,21 +10,46 @@ use Illuminate\Support\Facades\Http;
 class VisitorService
 {
     private $api_url;
-    private $token;
+    private $token, $language;
 
-    public function __construct(TokenConstant $token)
+    public function __construct(TokenConstant $token, LanguageConstant $language_constant)
     {
-        $this->api_url = ApiConstant::BASE_URL;
-        $this->token   = $token;
+        $this->api_url  = ApiConstant::BASE_URL;
+        $this->token    = $token;
+        $this->language = $language_constant;
     }
 
     public function get_all_visitor()
     {
         try {
+            $lang     = $this->language->GetLanguage();
             $token    = $this->token->GetToken();
             $response = Http::withHeaders([
-                'Authorization' => "Bearer {$token}",
+                'Authorization'   => "Bearer {$token}",
+                'Accept-Language' => "{$lang}",
             ])->get("{$this->api_url}/visitors");
+
+            $result = $response->json();
+            if ($response->failed()) {
+                return collect();
+            }
+            $collection = collect($result['data'])->map(function ($item) {
+                return (object) $item;
+            });
+
+            return VisitorResource::collection($collection);
+        } catch (\Throwable $th) {
+            throw new \Exception($th->getMessage());
+        }
+    }
+
+    public function get_all_visitor_user()
+    {
+        try {
+            $lang     = $this->language->GetLanguage();
+            $response = Http::withHeaders([
+                'Accept-Language' => "{$lang}",
+            ])->get("{$this->api_url}/visitor-user");
 
             $result = $response->json();
             if ($response->failed()) {

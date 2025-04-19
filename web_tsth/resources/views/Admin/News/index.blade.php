@@ -42,6 +42,81 @@
                 info: true
             });
 
+            // const {
+            //     ClassicEditor,
+            //     Essentials,
+            //     Bold,
+            //     Italic,
+            //     Paragraph,
+            //     Font,
+            //     FontColor,
+            //     FontBackgroundColor,
+            //     FontSize,
+            //     FontFamily,
+            //     Alignment,
+            //     Image,
+            //     ImageToolbar,
+            //     ImageCaption,
+            //     ImageStyle,
+            //     ImageResize,
+            //     ImageUpload,
+            //     MediaEmbed,
+            //     Table,
+            //     TableToolbar,
+            //     Link,
+            //     BlockQuote,
+            //     Heading,
+            //     List,
+            //     SimpleUploadAdapter,
+            // } = CKEDITOR;
+
+            // ClassicEditor.create(document.querySelector('#content'), {
+            //         licenseKey: 'eyJhbGciOiJFUzI1NiJ9.eyJleHAiOjE3NzYyOTc1OTksImp0aSI6IjcwNDMzMDI4LTljZGItNGE0NS04MmJhLTgxNmEyYWQzMzUyNSIsImxpY2Vuc2VkSG9zdHMiOlsiMTI3LjAuMC4xIiwibG9jYWxob3N0IiwiMTkyLjE2OC4qLioiLCIxMC4qLiouKiIsIjE3Mi4qLiouKiIsIioudGVzdCIsIioubG9jYWxob3N0IiwiKi5sb2NhbCJdLCJ1c2FnZUVuZHBvaW50IjoiaHR0cHM6Ly9wcm94eS1ldmVudC5ja2VkaXRvci5jb20iLCJkaXN0cmlidXRpb25DaGFubmVsIjpbImNsb3VkIiwiZHJ1cGFsIl0sImxpY2Vuc2VUeXBlIjoiZGV2ZWxvcG1lbnQiLCJmZWF0dXJlcyI6WyJEUlVQIl0sInZjIjoiOTc3NzVhYzAifQ.liBinbB_5Fjq0nGgi8D1gdLS91Fcrsv-N7flqCTstGR2p12jpAzyXc_Fs_Bci9Ywv3AHow__HcyEE08yWqmizg',
+            //         simpleUpload: {
+            //             uploadUrl: "{{ route('news.upload') }}?_token={{ csrf_token() }}"
+            //         },
+            //         mediaEmbed: {
+            //             previewsInData: true
+            //         },
+            //         plugins: [
+            //             Essentials, Bold, Italic, Font, FontColor, FontBackgroundColor, FontSize,
+            //             FontFamily,
+            //             Paragraph, Alignment,
+            //             Image, ImageToolbar, ImageCaption, ImageStyle, ImageResize, ImageUpload,
+            //             MediaEmbed, Table, TableToolbar, Link, BlockQuote, Heading, List,
+            //             SimpleUploadAdapter,
+            //         ],
+            //         toolbar: [
+            //             'heading', '|',
+            //             'bold', 'italic', 'blockQuote', '|',
+            //             'link', 'imageUpload', 'mediaEmbed', 'insertTable', '|',
+            //             'alignment', 'numberedList', 'bulletedList', '|',
+            //             'fontSize', 'fontFamily', 'fontColor', 'fontBackgroundColor', '|',
+            //             'undo', 'redo'
+            //         ],
+            //         image: {
+            //             toolbar: [
+            //                 'imageTextAlternative',
+            //                 'imageStyle:alignLeft',
+            //                 'imageStyle:full',
+            //                 'imageStyle:alignRight'
+            //             ],
+            //             styles: [
+            //                 'full',
+            //                 'alignLeft',
+            //                 'alignRight'
+            //             ]
+            //         },
+            //         table: {
+            //             contentToolbar: ['tableColumn', 'tableRow', 'mergeTableCells']
+            //         }
+            //     })
+            //     .then(editor => {
+            //         console.log('Editor was initialized', editor);
+            //     })
+            //     .catch(error => console.error(error));
+
+
             ClassicEditor.create(document.querySelector('#content'), {
                     ckfinder: {
                         uploadUrl: "{{ route('news.upload') }}?_token={{ csrf_token() }}",
@@ -70,6 +145,52 @@
             });
 
             @foreach ($news as $new)
+                // ClassicEditor.create(document.querySelector('#content-{{ $new->id }}'), {
+                //         licenseKey: 'eyJhbGciOiJFUzI1NiJ9.eyJleHAiOjE3NzYyOTc1OTksImp0aSI6IjcwNDMzMDI4LTljZGItNGE0NS04MmJhLTgxNmEyYWQzMzUyNSIsImxpY2Vuc2VkSG9zdHMiOlsiMTI3LjAuMC4xIiwibG9jYWxob3N0IiwiMTkyLjE2OC4qLioiLCIxMC4qLiouKiIsIjE3Mi4qLiouKiIsIioudGVzdCIsIioubG9jYWxob3N0IiwiKi5sb2NhbCJdLCJ1c2FnZUVuZHBvaW50IjoiaHR0cHM6Ly9wcm94eS1ldmVudC5ja2VkaXRvci5jb20iLCJkaXN0cmlidXRpb25DaGFubmVsIjpbImNsb3VkIiwiZHJ1cGFsIl0sImxpY2Vuc2VUeXBlIjoiZGV2ZWxvcG1lbnQiLCJmZWF0dXJlcyI6WyJEUlVQIl0sInZjIjoiOTc3NzVhYzAifQ.liBinbB_5Fjq0nGgi8D1gdLS91Fcrsv-N7flqCTstGR2p12jpAzyXc_Fs_Bci9Ywv3AHow__HcyEE08yWqmizg',
+                //         simpleUpload: {
+                //             uploadUrl: "{{ route('news.upload') }}?_token={{ csrf_token() }}"
+                //         },
+                //         mediaEmbed: {
+                //             previewsInData: true
+                //         },
+                //         plugins: [
+                //             Essentials, Bold, Italic, Font, FontColor, FontBackgroundColor, FontSize,
+                //             FontFamily,
+                //             Paragraph, Alignment,
+                //             Image, ImageToolbar, ImageCaption, ImageStyle, ImageResize, ImageUpload,
+                //             MediaEmbed, Table, TableToolbar, Link, BlockQuote, Heading, List,
+                //             SimpleUploadAdapter,
+                //         ],
+                //         toolbar: [
+                //             'heading', '|',
+                //             'bold', 'italic', 'blockQuote', '|',
+                //             'link', 'imageUpload', 'mediaEmbed', 'insertTable', '|',
+                //             'alignment', 'numberedList', 'bulletedList', '|',
+                //             'fontSize', 'fontFamily', 'fontColor', 'fontBackgroundColor', '|',
+                //             'undo', 'redo'
+                //         ],
+                //         image: {
+                //             toolbar: [
+                //                 'imageTextAlternative',
+                //                 'imageStyle:alignLeft',
+                //                 'imageStyle:full',
+                //                 'imageStyle:alignRight'
+                //             ],
+                //             styles: [
+                //                 'full',
+                //                 'alignLeft',
+                //                 'alignRight'
+                //             ]
+                //         },
+                //         table: {
+                //             contentToolbar: ['tableColumn', 'tableRow', 'mergeTableCells']
+                //         }
+                //     })
+                //     .then(editor => {
+                //         console.log('Editor was initialized', editor);
+                //     })
+                //     .catch(error => console.error(error));
+
                 ClassicEditor.create(document.querySelector('#content-{{ $new->id }}'), {
                         ckfinder: {
                             uploadUrl: "{{ route('news.upload') }}?_token={{ csrf_token() }}",
@@ -79,10 +200,9 @@
                         }
                     })
                     .then(editor => {
-                        console.log('Editor for plant {{ $new->id }} initialized', editor);
+                        console.log('Editor was initialized', editor);
                     })
                     .catch(error => console.error(error));
-
                 FilePond.create(document.querySelector('#new_images-{{ $new->id }}'), {
                     allowMultiple: true,
                     instantUpload: false,

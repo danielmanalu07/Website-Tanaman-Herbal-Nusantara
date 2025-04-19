@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
@@ -19,6 +18,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        app()->setLocale(session('app_language', config('app.locale')));
+        // app()->setLocale(LanguageConstant::GetLanguage());
     }
 }

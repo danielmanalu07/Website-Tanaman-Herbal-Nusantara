@@ -108,6 +108,21 @@
                 <ul class="nav-group-sub collapse">
                     <li class="nav-item"><a href="{{ route('content.index') }}" class="nav-link">List Content Data</a>
                     </li>
+                    <li class="nav-item"><a href="{{ route('contact.index') }}" class="nav-link">Contact Us
+                            Data</a>
+                    </li>
+                </ul>
+            </li>
+
+            <li class="nav-item nav-item-submenu">
+                <a href="#" class="nav-link">
+                    <i class="ph-globe"></i>
+                    <span>Language Manage</span>
+                </a>
+                <ul class="nav-group-sub collapse">
+                    <li class="nav-item"><a href="{{ route('language.index') }}" class="nav-link">List Language
+                            Data</a>
+                    </li>
                 </ul>
             </li>
         </div>

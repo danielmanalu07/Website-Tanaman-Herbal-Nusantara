@@ -1,3 +1,19 @@
+@push('resource')
+    <style>
+        .flag-icon {
+            width: 30px;
+            /* ukuran bisa kamu sesuaikan */
+            height: 30px;
+            /* supaya bulet */
+            object-fit: cover;
+            /* supaya gambar gak penyok */
+            border-radius: 50%;
+            /* ini yang bikin bulet */
+            border: 1px solid #ddd;
+            /* optional: kasih border tipis */
+        }
+    </style>
+@endpush
 <header class="header-wrap style2 bg-narvik">
     <div class="header-top">
         <div class="close-header-top xl-none">
@@ -43,29 +59,28 @@
                             </a></li>
                     </ul>
                 </div>
-                <div class="header-bottom-right xl-none">
-                    <div class="select_lang me-3">
-                        <div class="navbar-option-item navbar-language dropdown language-option">
-                            <button class="dropdown-toggle" type="button" data-bs-toggle="dropdown"
-                                aria-haspopup="true" aria-expanded="false">
-                                <i class="las la-globe"></i>
-                                <span class="lang-name"></span>
-                            </button>
-                            <div class="dropdown-menu language-dropdown-menu">
-                                <a class="dropdown-item" href="#">
-                                    <img src="{{ asset('hort/assets/img/uk.png') }}" alt="flag">
-                                    Eng
-                                </a>
-                                <a class="dropdown-item" href="#">
-                                    <img src="{{ asset('images/indonesia.jpg') }}" alt="flag">
-                                    ID
-                                </a>
-                            </div>
+                {{-- <div class="header-bottom-right xl-none">
+                    <div class="select_lang">
+                        <div class="navbar-option-item navbar-language language-option">
+                            <form action="{{ route('user.language') }}" method="POST" id="language-form">
+                                @csrf
+                                <div class="d-flex align-items-center">
+                                    <i class="las la-globe me-2"></i>
+                                    <select name="language" class="form-select border-0 bg-transparent p-0"
+                                        onchange="document.getElementById('language-form').submit()"
+                                        style="min-width: 120px; background: transparent; box-shadow: none;">
+                                        @foreach ($languages as $language)
+                                            <option value="{{ $language->code }}"
+                                                {{ session('app_language', 'id') == $language->code ? 'selected' : '' }}>
+                                                {{ $language->name }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </form>
                         </div>
                     </div>
-                    {{-- <a href="quote.html" class="btn style1"><i class="flaticon-right-arrow"></i> Request A
-                        Quote</a> --}}
-                </div>
+                </div> --}}
             </div>
         </div>
     </div>
@@ -86,125 +101,50 @@
                         <div id="menu">
                             <ul class="main-menu list-style">
                                 <li class="children">
-                                    <a class="active" href="#"><i class="flaticon-home"></i>Home</a>
-                                </li>
-                                <li class="children">
-                                    <a href="#"><i class="fi fi-rr-info"></i>About Us</a>
-                                </li>
-                                <li class="children">
-                                    <a href="#"><i class="fi fi-rr-hand-holding-seeding"></i>Our Garden</a>
-                                </li>
-                                <li class="children">
-                                    <a href="#"><i class="flaticon-pencil"></i>News</a>
+                                    <a href="{{ route('home') }}"
+                                        class="{{ request()->routeIs('home') ? 'active' : '' }}">
+                                        <i class="flaticon-home"></i>Beranda
+                                    </a>
                                 </li>
                                 <li class="has-children">
-                                    <a href="#"><i class="flaticon-book"></i>Profile</a>
+                                    <a href="#" class="{{ request()->is('profile*') ? 'active' : '' }}">
+                                        <i class="flaticon-book"></i>Profil
+                                    </a>
                                     <ul class="sub-menu list-style">
-                                        <li>
-                                            <a href="#">Visi Misi</a>
-                                        </li>
-                                        <li>
-                                            <a href="#">Sejarah</a>
-                                        </li>
+                                        @foreach ($contents as $content)
+                                            @if ($content->status === true)
+                                                <li>
+                                                    <a
+                                                        href="{{ route('user.profile.detail', $content->id) }}">{{ $content->title }}</a>
+                                                </li>
+                                            @endif
+                                        @endforeach
                                     </ul>
                                 </li>
                                 <li class="children">
-                                    <a href="#"><i class="flaticon-contact-book"></i>Contact Us</a>
+                                    <a href="{{ route('user.ourgarden') }}"
+                                        class="{{ request()->routeIs('user.ourgarden') || request()->routeIs('user.ourgarden.detail') || request()->routeIs('user.ourgarden.plant.detail') ? 'active' : '' }}">
+                                        <i class="fi fi-rr-hand-holding-seeding"></i>Taman Kami
+                                    </a>
                                 </li>
-                                {{-- <li class="has-children">
-                                    <a href="#"><i class="flaticon-image"></i>Projects</a>
-                                    <ul class="sub-menu list-style">
-                                        <li>
-                                            <a href="projects.html">Our Project</a>
-                                        </li>
-                                        <li>
-                                            <a href="project-details.html">Single Project</a>
-                                        </li>
-                                        <li><a href="gallery.html">Gallery</a></li>
-                                    </ul>
+                                <li class="children">
+                                    <a href="{{ route('news') }}"
+                                        class="{{ request()->routeIs('news') || request()->routeIs('user.news.detail') ? 'active' : '' }}">
+                                        <i class="flaticon-pencil"></i>Berita
+                                    </a>
                                 </li>
-                                <li class="has-children">
-                                    <a href="#"> <i class="flaticon-page"></i>Pages</a>
-                                    <ul class="sub-menu list-style">
-                                        <li><a href="about.html">About Us</a></li>
-                                        <li><a href="contact.html">Contact</a></li>
-                                        <li class="has-children">
-                                            <a href="#">Shop</a>
-                                            <ul class="sub-menu list-style">
-                                                <li>
-                                                    <a href="shop-left-sidebar.html">Shop Left Sidebar</a>
-                                                </li>
-                                                <li>
-                                                    <a href="shop-right-sidebar.html">Shop Right Sidebar</a>
-                                                </li>
-                                                <li>
-                                                    <a href="shop-No-sidebar.html">Shop No Sidebar</a>
-                                                </li>
-                                                <li>
-                                                    <a href="shop-details.html">Shop Single</a>
-                                                </li>
-                                                <li>
-                                                    <a href="cart.html">Cart</a>
-                                                </li>
-                                                <li>
-                                                    <a href="wishlist.html">Wishlist</a>
-                                                </li>
-                                                <li>
-                                                    <a href="checkout.html">Checkout</a>
-                                                </li>
-                                                <li><a href="login.html">Login</a></li>
-                                                <li><a href="register.html">Register</a></li>
-                                                <li><a href="my-account.html">My Account</a></li>
-                                                <li><a href="forgot-pwd.html">Forgot Password</a></li>
-                                            </ul>
-                                        </li>
-                                        <li><a href="quote.html">Request A Quote</a></li>
-                                        <li><a href="faq.html">FAQ</a></li>
-                                        <li>
-                                            <a href="privacy-policy.html">Privacy Policy</a>
-                                        </li>
-                                        <li>
-                                            <a href="terms-condition.html">Terms &AMP; Conditions</a>
-                                        </li>
-                                        <li><a href="404.html">404</a></li>
-                                    </ul>
+                                <li class="children">
+                                    <a href="#" class="{{ request()->is('#') ? 'active' : '' }}">
+                                        <i class="fi fi-rr-marker"></i>Peta Tanaman
+                                    </a>
                                 </li>
-                                <li class="has-children">
-                                    <a href="#"><i class="flaticon-pencil"></i>News</a>
-                                    <ul class="sub-menu list-style">
-                                        <li class="has-children">
-                                            <a href="#">Blog Layout</a>
-                                            <ul class="sub-menu list-style">
-                                                <li>
-                                                    <a href="blog-left-sidebar.html">Blog Left Sidebar</a>
-                                                </li>
-                                                <li>
-                                                    <a href="blog-right-sidebar.html">Blog Right Sidebar</a>
-                                                </li>
-                                                <li>
-                                                    <a href="blog-no-sidebar.html">Blog No Sidebar</a>
-                                                </li>
-                                            </ul>
-                                        </li>
-                                        <li class="has-children">
-                                            <a href="#">Single Blog</a>
-                                            <ul class="sub-menu list-style">
-                                                <li>
-                                                    <a href="blog-details-left-sidebar.html">Single Blog Left
-                                                        Sidebar</a>
-                                                </li>
-                                                <li>
-                                                    <a href="blog-details-right-sidebar.html">Single Blog Right
-                                                        Sidebar</a>
-                                                </li>
-                                                <li>
-                                                    <a href="blog-details-no-sidebar.html">Single Blog No
-                                                        Sidebar</a>
-                                                </li>
-                                            </ul>
-                                        </li>
-                                    </ul>
-                                </li> --}}
+                                <li class="children">
+                                    <a href="{{ route('user.contact') }}"
+                                        class="{{ request()->routeIs('user.contact') ? 'active' : '' }}">
+                                        <i class="flaticon-contact-book"></i>Kontak Kami
+                                    </a>
+                                </li>
+
                             </ul>
                         </div>
                     </div>
@@ -221,27 +161,26 @@
                 </div>
                 <div class="col-xl-4 lg-none">
                     <div class="header-bottom-right">
-                        <div class="select_lang me-3">
-                            <div class="navbar-option-item navbar-language dropdown language-option">
-                                <button class="dropdown-toggle" type="button" data-bs-toggle="dropdown"
-                                    aria-haspopup="true" aria-expanded="false">
-                                    <i class="las la-globe"></i>
-                                    <span class="lang-name"></span>
-                                </button>
-                                <div class="dropdown-menu language-dropdown-menu">
-                                    <a class="dropdown-item" href="#">
-                                        <img src="{{ asset('hort/assets/img/uk.png') }}" alt="flag">
-                                        Eng
-                                    </a>
-                                    <a class="dropdown-item" href="#">
-                                        <img src="{{ asset('images/indonesia.jpg') }}" alt="flag">
-                                        ID
-                                    </a>
-                                </div>
+                        <div class="select_lang">
+                            <div class="navbar-option-item navbar-language language-option">
+                                <form action="{{ route('user.language') }}" method="POST" id="language-form">
+                                    @csrf
+                                    <div class="d-flex align-items-center">
+                                        <i class="las la-globe me-2"></i>
+                                        <select name="language" class="form-select border-0 bg-transparent p-0"
+                                            onchange="document.getElementById('language-form').submit()"
+                                            style="min-width: 120px; background: transparent; box-shadow: none;">
+                                            @foreach ($languages as $language)
+                                                <option value="{{ $language->code }}"
+                                                    {{ session('app_language', 'id') == $language->code ? 'selected' : '' }}>
+                                                    {{ $language->name }}
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                </form>
                             </div>
                         </div>
-                        {{-- <a href="quote.html" class="btn style1"><i class="flaticon-right-arrow"></i> Request
-                            A Quote</a> --}}
                     </div>
                 </div>
             </div>

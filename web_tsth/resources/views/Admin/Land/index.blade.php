@@ -26,6 +26,21 @@
                 "ordering": true,
                 "info": true
             });
+
+            @foreach ($lands as $land)
+                FilePond.create(document.querySelector('#image-{{ $land->id }}'), {
+                    instantUpload: false,
+                    storeAsFile: true,
+                    acceptedFileTypes: ['image/png', 'image/jpeg', 'image/jpg']
+                });
+            @endforeach
+
+            FilePond.create(document.querySelector('.filepond'), {
+                instantUpload: false,
+                storeAsFile: true,
+                acceptedFileTypes: ['image/png', 'image/jpeg', 'image/jpg']
+            });
+
         });
     </script>
 @endpush
@@ -39,7 +54,7 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <form action="{{ route('land.create') }}" method="POST">
+                    <form action="{{ route('land.create') }}" method="POST" enctype="multipart/form-data">
                         @csrf
                         <div class="mb-3">
                             <label for="name" class="form-label">Name</label><span class="text-danger">*</span>
@@ -52,6 +67,10 @@
                                     <option value="{{ $plant->id }}">{{ $plant->name }}</option>
                                 @endforeach
                             </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="image">Image</label><span class="text-danger">*</span>
+                            <input type="file" name="image" class="filepond form-control" accept="image/*">
                         </div>
                         <button type="submit" class="btn btn-success">Save</button>
                     </form>
@@ -73,6 +92,16 @@
                     <div class="modal-body">
                         <p><strong>Land Name:</strong> {{ $land->name }}</p>
                         <p><strong>Plants:</strong> {{ collect($land->plants)->pluck('name')->implode(', ') }}</p>
+                        <p><strong>Land Image:</strong></p>
+                        <div class="row d-flex gap-2">
+                            <div class="col-md-3 text-center">
+                                <a href="{{ asset($land->image) }}" data-lightbox="plant-gallery-{{ $land->id }}"
+                                    data-title="Land Image">
+                                    <img src="{{ asset($land->image) }}" class="img-fluid rounded border p-2"
+                                        alt="Land Image" style="width: 100%; height: 100%; cursor: pointer;" />
+                                </a>
+                            </div>
+                        </div>
                         <p><strong>Created By:</strong> {{ $land->created_by }}</p>
                         <p><strong>Created At:</strong> {{ $land->created_at }}</p>
                         <p><strong>Updated At:</strong> {{ $land->updated_at }}</p>
@@ -96,7 +125,8 @@
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
-                        <form method="POST" action="{{ route('land.update', ['id' => $land->id]) }}">
+                        <form method="POST" action="{{ route('land.update', ['id' => $land->id]) }}"
+                            enctype="multipart/form-data">
                             @csrf
                             @method('PUT')
                             <div class="mb-3">
@@ -115,6 +145,28 @@
                                         </option>
                                     @endforeach
                                 </select>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Current Images</label>
+                                <div class="row">
+                                    @if (!empty($land->image))
+                                        <div class="col-md-3 text-center">
+                                            <a href="{{ $land->image }}"
+                                                data-lightbox="land-gallery-{{ $land->id }}" data-title="Land Image">
+                                                <img src="{{ $land->image }}" class="img-fluid rounded border p-2"
+                                                    alt="land Image"
+                                                    style="width: 300px; height: 100px; cursor: pointer;">
+                                            </a>
+                                        </div>
+                                    @else
+                                        <p class="text-muted">No images uploaded</p>
+                                    @endif
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="image">Image</label>
+                                <input type="file" name="image" class="filepond form-control"
+                                    id="image-{{ $land->id }}" accept="image/*">
                             </div>
                             <button type="submit" class="btn btn-success">Update</button>
                         </form>

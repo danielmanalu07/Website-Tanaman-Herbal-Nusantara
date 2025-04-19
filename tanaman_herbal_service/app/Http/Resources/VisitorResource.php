@@ -21,7 +21,7 @@ class VisitorResource extends JsonResource
         return [
             'id'               => $this->id,
             'visitor_total'    => $this->visitor_total,
-            'visitor_category' => $this->visitor_category,
+            'visitor_category' => new VisitorCategoryResource($this->visitor_category),
             'created_by'       => optional($this->createdBy)->username,
             'updated_by'       => optional($this->createdBy)->username,
             'created_at'       => Carbon::parse($this->created_at)->translatedFormat('d F Y h:i A'),

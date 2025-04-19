@@ -18,10 +18,14 @@ class NewsResource extends JsonResource
             return [];
         }
 
+        $translation = $this->languages()
+            ->where('language_id', currentLanguageId())
+            ->first();
+
         return [
             'id'         => $this->id,
-            'title'      => $this->title,
-            'content'    => $this->content,
+            'title'      => $translation ? $translation->pivot->title : $this->title,
+            'content'    => $translation ? $translation->pivot->content : $this->content,
             'status'     => $this->status ? true : false,
             'published'  => $this->published_at ? Carbon::parse($this->published_at)->translatedFormat('d F Y h:i A') : null,
             'images'     => ImageResource::collection($this->images),

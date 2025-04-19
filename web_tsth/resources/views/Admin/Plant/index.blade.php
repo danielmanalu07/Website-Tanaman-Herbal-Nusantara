@@ -208,7 +208,7 @@
                         <p><strong>Advantage: </strong> {!! $plant->advantage !!}</p>
                         <p><strong>Ecology: </strong> {{ $plant->ecology }}</p>
                         <p><strong>Endemic Information: </strong> {{ $plant->endemic_information }}</p>
-                        <p><strong>Habitus: </strong> {{ $plant->habitus['name'] }}</p>
+                        <p><strong>Habitus: </strong> {{ $plant->habitus['name'] ?? null }}</p>
                         <p><strong>Status: </strong> {{ $plant->status ? 'Active' : 'InActive' }}</p>
                         <p><strong>Created By: </strong> {{ $plant->created_by }}</p>
                         <p><strong>Created At: </strong> {{ $plant->created_at }}</p>
@@ -225,7 +225,7 @@
     @endforeach
 
     {{-- Modal view images --}}
-    @foreach ($plants as $plant)
+    {{-- @foreach ($plants as $plant)
         @foreach ($plant->images as $image)
             <div class="modal fade" id="imageModal-{{ $image['id'] }}" tabindex="-1" aria-hidden="true">
                 <div class="modal-dialog modal-dialog-centered">
@@ -237,7 +237,7 @@
                 </div>
             </div>
         @endforeach
-    @endforeach
+    @endforeach --}}
 
     {{-- Modal Edit --}}
     @foreach ($plants as $plant)
@@ -298,7 +298,7 @@
                                             <option value="">-- Select Habitus --</option>
                                             @foreach ($habitus as $habitus_item)
                                                 <option value="{{ $habitus_item->id }}"
-                                                    {{ $plant->habitus['id'] == $habitus_item->id ? 'selected' : '' }}>
+                                                    {{ $plant->habitus && $plant->habitus['id'] == $habitus_item->id ? 'selected' : '' }}>
                                                     {{ $habitus_item->name }}
                                                 </option>
                                             @endforeach
@@ -441,7 +441,11 @@
                                 <td>{{ $key + 1 }}</td>
                                 <td>{{ $plant->name }}</td>
                                 <td>{{ $plant->latin_name }}</td>
-                                <td>{!! $plant->advantage !!}</td>
+                                <td>{!! Str::limit(
+                                    strip_tags(preg_replace('/<(img|iframe|video)[^>]*>/i', '', $plant->advantage), '<b><strong><i><em><u><span>'),
+                                    100,
+                                    '...',
+                                ) !!}</td>
                                 <td>{{ $plant->ecology }}</td>
                                 <td>{{ $plant->endemic_information }}</td>
                                 <td>

@@ -23,6 +23,7 @@ class LandsController extends Controller
             'name'     => 'required|string',
             'plants'   => 'nullable|array',
             'plants.*' => 'integer|exists:plants,id',
+            'image'    => 'nullable|image|mimes:jpeg,png,jpg',
         ]);
 
         try {
@@ -72,6 +73,7 @@ class LandsController extends Controller
             'name'     => 'required|string',
             'plants'   => 'nullable|array',
             'plants.*' => 'integer|exists:plants,id',
+            'image'    => 'nullable|image|mimes:jpeg,png,jpg',
         ]);
 
         try {

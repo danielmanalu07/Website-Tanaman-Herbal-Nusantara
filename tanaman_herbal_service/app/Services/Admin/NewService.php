@@ -1,21 +1,26 @@
 <?php
 namespace App\Services\Admin;
 
+use App\Helpers\TranslateHtmlContent;
 use App\Http\Repositories\NewsRepository;
 use App\Models\Image;
+use App\Models\Language;
 use App\Models\NewsImage;
 use App\Response\Response;
+use function App\Helpers\translateHtmlContent;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+use Stichoza\GoogleTranslate\GoogleTranslate;
 
 class NewService
 {
-    protected $new_repo;
+    protected $new_repo, $translatedHtml;
 
-    public function __construct(NewsRepository $news_repository)
+    public function __construct(NewsRepository $news_repository, TranslateHtmlContent $translate_html_content)
     {
-        $this->new_repo = $news_repository;
+        $this->new_repo       = $news_repository;
+        $this->translatedHtml = $translate_html_content;
     }
 
     public function create_news(array $data)
@@ -23,35 +28,73 @@ class NewService
         try {
             $admin = Auth::user();
 
-            if (! isset($data['images']) || count($data['images']) < 1) {
+            if (empty($data['images']) || count($data['images']) < 1) {
                 return Response::error('At least one image is required', null, 422);
             }
 
-            $newData = array_merge($data, [
+            $news = $this->new_repo->create([
+                 ...$data,
                 'created_by' => $admin->id,
                 'updated_by' => $admin->id,
             ]);
 
-            $news = $this->new_repo->create($newData);
+            $this->saveNewsImages($news->id, $data['images'], $news->title);
 
-            $imageIds = [];
-            foreach ($data['images'] as $index => $image) {
-                $ext        = $image->getClientOriginalExtension();
-                $fileName   = "image_{$news->title}_{$index}" . '.' . $ext;
-                $path       = $image->storeAs('news', $fileName, 'public');
-                $imgModel   = Image::create(['image_path' => $path]);
-                $imageIds[] = [
-                    'news_id'  => $news->id,
-                    'image_id' => $imgModel->id,
-                ];
+            $languages  = Language::all();
+            $sourceLang = currentLanguage()->code;
+
+            $translator = new GoogleTranslate();
+            $translator->setSource($sourceLang);
+
+            foreach ($languages as $language) {
+                if ($language->code == $sourceLang) {
+                    $news->languages()->attach($language->id, [
+                        'title'   => $news->title,
+                        'content' => $news->content,
+                    ]);
+                } else {
+                    try {
+                        $translator->setTarget($language->code);
+                        $translatedTitle = $translator->translate($news->title);
+                        // $translatedContent = $translator->translate($news->content);
+                        $translatedContent = $this->translatedHtml->translateHtmlContent($news->content, $translator, $sourceLang, $language->code);
+                    } catch (\Exception $e) {
+                        $translatedTitle   = $news->title;
+                        $translatedContent = $news->content;
+                    }
+
+                    $news->languages()->attach($language->id, [
+                        'title'   => $translatedTitle,
+                        'content' => $translatedContent,
+                    ]);
+                }
             }
 
-            NewsImage::insert($imageIds);
-
             return $news;
+
         } catch (\Throwable $th) {
             return Response::error("Failed to create news data", $th->getMessage(), 500);
         }
+    }
+
+    private function saveNewsImages($newsId, $images, $newsTitle)
+    {
+        $imageRecords = [];
+
+        foreach ($images as $index => $image) {
+            $ext      = $image->getClientOriginalExtension();
+            $fileName = 'image_' . str_replace(' ', '_', strtolower($newsTitle)) . "_{$index}." . $ext;
+            $path     = $image->storeAs('news', $fileName, 'public');
+
+            $imgModel = Image::create(['image_path' => $path]);
+
+            $imageRecords[] = [
+                'news_id'  => $newsId,
+                'image_id' => $imgModel->id,
+            ];
+        }
+
+        NewsImage::insert($imageRecords);
     }
 
     public function get_all_news()
@@ -101,30 +144,49 @@ class NewService
             }
 
             if (! empty($data['new_images']) && is_array($data['new_images'])) {
-                $imageIds = [];
-                foreach ($data['new_images'] as $index => $image) {
-                    if ($image->isValid()) {
-                        $extension  = $image->getClientOriginalExtension();
-                        $file_name  = "image_{$news->title}_{$index}" . '.' . $extension;
-                        $path       = $image->storeAs('news', $file_name, 'public');
-                        $imageModel = Image::create(['image_path' => $path]);
-
-                        $imageIds[] = [
-                            'news_id'  => $news->id,
-                            'image_id' => $imageModel->id,
-                        ];
-                    }
-                }
-
-                if (! empty($imageIds)) {
-                    NewsImage::insert($imageIds);
-                }
+                $this->saveNewsImages($news->id, $data['new_images'], $news->title);
             }
 
             $updateData               = array_filter($data, fn($value) => ! is_null($value));
             $updateData['updated_by'] = $admin->id;
 
-            return $this->new_repo->update($updateData, $id);
+            $newsUpdate = $this->new_repo->update($updateData, $id);
+
+            if (! empty($data['title'] && ! empty($data['content']))) {
+                $languages  = Language::all();
+                $sourceLang = currentLanguage()->code;
+
+                $translator = new GoogleTranslate();
+                $translator->setSource($sourceLang);
+
+                $newsUpdate->languages()->detach();
+
+                foreach ($languages as $language) {
+                    if ($language->code == $sourceLang) {
+                        $news->languages()->attach($language->id, [
+                            'title'   => $news->title,
+                            'content' => $news->content,
+                        ]);
+                    } else {
+                        try {
+                            $translator->setTarget($language->code);
+                            $translatedTitle = $translator->translate($news->title);
+                            // $translatedContent = $translator->translate($news->content);
+                            $translatedContent = $this->translatedHtml->translateHtmlContent($news->content, $translator, $sourceLang, $language->code);
+                        } catch (\Exception $e) {
+                            $translatedTitle   = $news->title;
+                            $translatedContent = $news->content;
+                        }
+
+                        $news->languages()->attach($language->id, [
+                            'title'   => $translatedTitle,
+                            'content' => $translatedContent,
+                        ]);
+                    }
+                }
+            }
+
+            return $newsUpdate;
         } catch (\Throwable $th) {
             return Response::error("Failed to update news data", $th->getMessage(), 500);
         }

@@ -29,4 +29,26 @@ class VisitorCategory extends Model
     {
         return $this->belongsTo(User::class, 'updated_by');
     }
+
+    public function languages()
+    {
+        return $this->belongsToMany(Language::class, 'visitor_category_languages')
+            ->withPivot('name')
+            ->withTimestamps();
+    }
+
+    public function translate($langCode)
+    {
+        $language = Language::where('code', $langCode)->first();
+        if (! $language) {
+            return [
+                'name' => $this->name,
+            ];
+        }
+
+        $translation = $this->languages()->where('language_id', $language->id)->first();
+        return [
+            'name' => $translation?->pivot->name ?? $this->name,
+        ];
+    }
 }

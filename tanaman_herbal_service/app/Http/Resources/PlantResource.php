@@ -18,16 +18,21 @@ class PlantResource extends JsonResource
             return [];
         }
 
+        $translation = $this->languages()
+            ->where('language_id', currentLanguageId())
+            ->first();
+
         return [
             'id'                  => $this->id,
-            'name'                => $this->name,
+            'name'                => $translation ? $translation->pivot->name : $this->name,
             'latin_name'          => $this->latin_name,
-            'advantage'           => $this->advantage,
-            'ecology'             => $this->ecology,
-            'endemic_information' => $this->endemic_information,
+            'advantage'           => $translation ? $translation->pivot->advantage : $this->advantage,
+            'ecology'             => $translation ? $translation->pivot->ecology : $this->ecology,
+            'endemic_information' => $translation ? $translation->pivot->endemic_information : $this->endemic_information,
             'qrcode'              => $this->qrcode ? asset("storage/{$this->qrcode}") : null,
             'status'              => $this->status ? true : false,
-            'habitus'             => $this->habituses,
+            'habitus'             => new HabitusResource($this->habituses),
+            'lands'               => LandResource::collection($this->lands),
             'images'              => ImageResource::collection($this->images),
             'created_by'          => optional($this->createdBy)->username,
             'updated_by'          => optional($this->createdBy)->username,

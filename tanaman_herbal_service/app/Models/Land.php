@@ -12,6 +12,7 @@ class Land extends Model
 
     protected $fillable = [
         'name',
+        'image',
         'created_by',
         'updated_by',
     ];
@@ -31,5 +32,27 @@ class Land extends Model
     public function plants()
     {
         return $this->belongsToMany(Plant::class, 'plant_lands');
+    }
+
+    public function languages()
+    {
+        return $this->belongsToMany(Language::class, 'land_languages')
+            ->withPivot('name')
+            ->withTimestamps();
+    }
+
+    public function translate($langCode)
+    {
+        $language = Language::where('code', $langCode)->first();
+        if (! $language) {
+            return [
+                'name' => $this->name,
+            ];
+        }
+
+        $translation = $this->languages()->where('language_id', $language->id)->first();
+        return [
+            'name' => $translation?->pivot->name ?? $this->name,
+        ];
     }
 }

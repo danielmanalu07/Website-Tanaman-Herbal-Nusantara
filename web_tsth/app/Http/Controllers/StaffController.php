@@ -2,25 +2,28 @@
 namespace App\Http\Controllers;
 
 use App\Service\AuthService;
+use App\Service\LanguageService;
 use App\Service\StaffService;
 use Illuminate\Http\Request;
 
 class StaffController extends Controller
 {
-    private $auth_service, $staff_service;
+    private $auth_service, $staff_service, $language_service;
 
-    public function __construct(AuthService $authService, StaffService $staff_service)
+    public function __construct(AuthService $authService, StaffService $staff_service, LanguageService $languageService)
     {
-        $this->auth_service  = $authService;
-        $this->staff_service = $staff_service;
+        $this->auth_service     = $authService;
+        $this->staff_service    = $staff_service;
+        $this->language_service = $languageService;
     }
 
     public function index()
     {
         try {
-            $data   = $this->auth_service->dashboard();
-            $staffs = $this->staff_service->get_all_staff();
-            return view('Admin.Staff.index', compact('data', 'staffs'));
+            $data      = $this->auth_service->dashboard();
+            $staffs    = $this->staff_service->get_all_staff();
+            $languages = $this->language_service->get_all_lang();
+            return view('Admin.Staff.index', compact('data', 'staffs', 'languages'));
         } catch (\Throwable $th) {
             return redirect()->back()->with('error', 'Something went wrong.');
         }
