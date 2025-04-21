@@ -18,6 +18,7 @@ class Plant extends Model
         'ecology',
         'endemic_information',
         'qrcode',
+        'frontend_url',
         'status',
         'habitus_id',
         'created_by',

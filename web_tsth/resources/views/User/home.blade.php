@@ -76,8 +76,8 @@
                             <div class="hero-content style2">
                                 <span>Tanaman Herbal Nusantara</span>
                                 <h1>Taman Sains Teknologi Herbal & Hortikultura</h1>
-                                <p>Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod
-                                    tempor invidunt ut labore et dolore magna aliquyam erat, sed diam Voluptua.</p>
+                                <p>Temukan Tanaman Herbal dan Hortikultura Favoritmu Sekarang dan Cari Tahu Manfaat Tanaman
+                                    Lokal di Sekitarmu!</p>
                                 <div class="hero-btn">
                                     <a href="about.html" class="btn style1"><i class="flaticon-book"></i>Profil</a>
                                     <a href="about.html" class="btn style2"><i class="flaticon-contact-book"></i>Kontak
@@ -108,8 +108,10 @@
                             <i class="flaticon-gardening"></i>
                         </div>
                         <div class="promo-text">
-                            <h5><a href="services.html">Variation Gardening</a></h5>
-                            <p>Lorem ipsum dolor sit amet, consetetur sadip scing elitr, sed diam nonumy eirmod.</p>
+                            <h5><a href="services.html">Explore Herbal Plants
+                                </a></h5>
+                            <p>Complete access to herbal plants, their benefits, and cultivation tips.
+                            </p>
                         </div>
                     </div>
                 </div>
@@ -119,8 +121,10 @@
                             <i class="flaticon-agriculture"></i>
                         </div>
                         <div class="promo-text">
-                            <h5><a href="services.html">Get The Best Garden Designer</a></h5>
-                            <p>Lorem ipsum dolor sit amet, consetetur sadip scing elitr, sed diam nonumy eirmod.</p>
+                            <h5><a href="services.html">Tips & Panduan Hortikultura
+                                </a></h5>
+                            <p>emukan penggunaan tanaman herbal secara tradisional dan modern untuk kesehatan dan kebugaran.
+                            </p>
                         </div>
                     </div>
                 </div>
@@ -130,7 +134,8 @@
                             <i class="flaticon-growth"></i>
                         </div>
                         <div class="promo-text">
-                            <h5><a href="services.html">Design And 3D Model</a></h5>
+                            <h5><a href="services.html">Temukan Pengobatan Herbal
+                                </a></h5>
                             <p>Lorem ipsum dolor sit amet, consetetur sadip scing elitr, sed diam nonumy eirmod.</p>
                         </div>
                     </div>

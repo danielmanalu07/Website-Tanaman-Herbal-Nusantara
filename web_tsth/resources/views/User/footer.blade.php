@@ -7,9 +7,9 @@
                 <div class="col-xl-4 col-lg-4 col-md-6">
                     <div class="footer-widget">
                         <h5 class="footer-widget-title">
-                            Contact Details
+                            <img src="{{ asset('images/logoweb-removebg.png') }}" alt="">
                         </h5>
-                        <p class="comp-desc">Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam.
+                        <p class="comp-desc">Taman Sains Teknologi Herbal dan Hortikultura Pollung.
                         </p>
                         <div class="contact-item style1">
                             <div class="contact-icon">
@@ -41,42 +41,44 @@
                 <div class="col-xl-2 col-lg-2 col-md-6">
                     <div class="footer-widget">
                         <h5 class="footer-widget-title  sm-title">
-                            Profile
+                            Profil
                         </h5>
                         <ul class="footer-menu  list-style">
-                            <li><a href="about.html">About Us</a></li>
-                            <li><a href="about.html">Why Choose Us</a></li>
-                            <li><a href="contact.html">Help Desk</a></li>
-                            <li><a href="privacy-policy.html">Privacy Policy</a></li>
-                            <li><a href="terms-conditions.html">Terms &amp; Conditions</a></li>
+                            @foreach ($contents as $item_content)
+                                <li><a
+                                        href="{{ route('user.profile.detail', $item_content->id) }}">{{ $item_content->key }}</a>
+                                </li>
+                            @endforeach
                         </ul>
                     </div>
                 </div>
                 <div class="col-xl-2 offset-xl-1 col-lg-3 col-md-6">
                     <div class="footer-widget ">
                         <h5 class="footer-widget-title sm-title">
-                            Our Garden
+                            Taman Kami
                         </h5>
                         <ul class="footer-menu list-style">
-                            <li><a href="service-details.html">Family Garden</a></li>
-                            <li><a href="service-details.html">Contemporary Garden</a></li>
-                            <li><a href="service-details.html">Roof Garden</a></li>
-                            <li><a href="service-details.html">Commercial Garden</a></li>
-                            <li><a href="service-details.html">Planting Trees</a></li>
+                            @php
+                                $habitus = collect($habituses)->take(5);
+                            @endphp
+                            @foreach ($habitus as $item)
+                                <li><a href="{{ route('user.ourgarden.detail', $item->id) }}">{{ $item->name }}</a>
+                                </li>
+                            @endforeach
                         </ul>
                     </div>
                 </div>
                 <div class="col-xl-2 offset-xl-1 col-lg-3 col-md-6">
                     <div class="footer-widget ">
                         <h5 class="footer-widget-title sm-title">
-                            Timeline
+                            Jadwal Kerja
                         </h5>
                         <ul class="footer-menu list-style">
-                            <li><a href="blog-left-sidebar.html">News</a></li>
-                            <li><a href="gallery.html">Gallery</a></li>
-                            <li><a href="projects.html">Projects</a></li>
-                            <li><a href="about.html">Career</a></li>
-                            <li><a href="contact.html">Contact</a></li>
+                            <li><a href="blog-left-sidebar.html">Senin (08.00 - 17.00)</a></li>
+                            <li><a href="gallery.html">Selasa (08.00 - 17.00)</a></li>
+                            <li><a href="projects.html">Rabu (08.00 - 17.00)</a></li>
+                            <li><a href="about.html">Kamis (08.00 - 17.00)</a></li>
+                            <li><a href="contact.html">Jumat (08.00 - 17.00)</a></li>
                         </ul>
                     </div>
                 </div>

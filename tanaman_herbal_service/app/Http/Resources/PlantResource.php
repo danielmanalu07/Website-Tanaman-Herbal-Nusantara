@@ -30,6 +30,7 @@ class PlantResource extends JsonResource
             'ecology'             => $translation ? $translation->pivot->ecology : $this->ecology,
             'endemic_information' => $translation ? $translation->pivot->endemic_information : $this->endemic_information,
             'qrcode'              => $this->qrcode ? asset("storage/{$this->qrcode}") : null,
+            'frontend_url'        => $this->frontend_url,
             'status'              => $this->status ? true : false,
             'habitus'             => new HabitusResource($this->habituses),
             'lands'               => LandResource::collection($this->lands),

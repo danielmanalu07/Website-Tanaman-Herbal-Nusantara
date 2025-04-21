@@ -95,13 +95,13 @@ class PlantService
             }
 
             if (! $plant->qrcode) {
-                $qrData = "http://127.0.0.1:8001/our-garden/plant/$plant->id";
+                $qrData = env('PLANT_URL_PREFIX') . $plant->id;
                 $qrCode = QrCode::format('png')->size(200)->generate($qrData);
 
                 $qrPath = "qrcodes/plants_{$plant->latin_name}.png";
                 Storage::disk('public')->put($qrPath, $qrCode);
 
-                $plant->update(['qrcode' => $qrPath]);
+                $plant->update(['qrcode' => $qrPath, 'frontend_url' => $qrData]);
             }
 
             return $plant;
@@ -190,15 +190,16 @@ class PlantService
                 }
             }
 
-            $qrData = "http://127.0.0.1:8001/our-garden/plant/$plant->id";
+            $qrData = env('PLANT_URL_PREFIX') . $plant->id;
             $qrCode = QrCode::format('png')->size(200)->generate($qrData);
 
             $qrPath = "qrcodes/plants_{$data['name']}.png";
             Storage::disk('public')->put($qrPath, $qrCode);
 
             $updateData = array_merge($data, [
-                'qrcode'     => $qrPath,
-                'updated_by' => $admin->id,
+                'qrcode'       => $qrPath,
+                'frontend_url' => $qrData,
+                'updated_by'   => $admin->id,
             ]);
 
             $plantUpdate = $this->plantRepo->update_plant($updateData, $id);

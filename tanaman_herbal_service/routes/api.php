@@ -12,6 +12,7 @@ use App\Http\Controllers\Admin\PlantLandController;
 use App\Http\Controllers\Admin\VisitorCategoryController;
 use App\Http\Controllers\Admin\VisitorController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\Staff\PlantValidationController;
 use App\Http\Middleware\SetLanguage;
 use Illuminate\Support\Facades\Route;
 
@@ -141,6 +142,15 @@ Route::middleware(['auth:sanctum', 'auth.token_expiry'])->group(function () {
             Route::put('/{id}/edit', [AboutUsController::class, 'update_about_us']);
             Route::delete('/{id}/delete', [AboutUsController::class, 'delete_about_us']);
             Route::post('/upload', [AboutUsController::class, 'uploadCkeditor']);
+        });
+    });
+
+    //VALIDATION
+    Route::middleware('permission:koordinator,agronom')->group(function () {
+        Route::get('/validated', [PlantValidationController::class, 'get']);
+        Route::get('/validated/{id}', [PlantValidationController::class, 'get_detail']);
+        Route::prefix('/scanner')->group(function () {
+            Route::post('/validate', [PlantValidationController::class, 'store']);
         });
     });
 });
