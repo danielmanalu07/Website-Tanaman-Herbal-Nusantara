@@ -6,7 +6,7 @@ class Getplantbyidusecase {
 
   Getplantbyidusecase(this.plantRepository);
 
-  Future<Plant> call(String id) {
+  Future<Plant> call(int id) {
     return plantRepository.getPlantById(id);
   }
 }

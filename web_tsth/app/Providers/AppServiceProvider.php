@@ -18,7 +18,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        app()->setLocale(session('app_language', config('app.locale')));
-        // app()->setLocale(LanguageConstant::GetLanguage());
+        // Gunakan app_language_user jika tersedia, kalau tidak pakai app_language
+        $locale = session('app_language_user', session('app_language', config('app.locale')));
+        app()->setLocale($locale);
     }
+
 }

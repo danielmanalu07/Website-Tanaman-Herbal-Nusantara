@@ -45,7 +45,7 @@ class PlantService
     public function get_all_plant_user()
     {
         try {
-            $lang     = $this->language->GetLanguage();
+            $lang     = $this->language->GetLanguageUser();
             $response = Http::withHeaders([
                 'Accept-Language' => "{$lang}",
             ])->get("{$this->api_url}/plants-user");
@@ -66,7 +66,7 @@ class PlantService
     public function get_detail_plant_user(int $id)
     {
         try {
-            $lang     = $this->language->GetLanguage();
+            $lang     = $this->language->GetLanguageUser();
             $response = Http::withHeaders([
                 'Accept-Language' => "{$lang}",
             ])->get("{$this->api_url}/plants-user/$id");

@@ -12,8 +12,10 @@ import 'package:tsth_app/features/scanner/presentation/bloc/plant_bloc.dart';
 import 'package:tsth_app/features/validation/data/dataSource/validation_remote_dataSource.dart';
 import 'package:tsth_app/features/validation/data/repositories/validation_repository_impl.dart';
 import 'package:tsth_app/features/validation/domain/usecases/SaveValidationUseCase%20.dart';
+import 'package:tsth_app/features/validation/domain/usecases/export_validation_excel_UseCase.dart';
 import 'package:tsth_app/features/validation/domain/usecases/get_detail_validation.dart';
 import 'package:tsth_app/features/validation/domain/usecases/get_validations.dart';
+import 'package:tsth_app/features/validation/domain/usecases/updateValidationUseCase.dart';
 import 'package:tsth_app/features/validation/presentation/bloc/validation_bloc.dart';
 import 'package:tsth_app/features/validation/presentation/bloc/validation_event.dart';
 import 'package:tsth_app/routes/app_route.dart';
@@ -38,6 +40,12 @@ class MyApp extends StatelessWidget {
       validationRepository: validationRepository,
     );
     final saveValidationUseCase = Savevalidationusecase(validationRepository);
+    final updateValidationUseCase = Updatevalidationusecase(
+      validationRepository,
+    );
+    final exportValidationExcel = ExportValidationExcelUsecase(
+      validationRepository,
+    );
     final authRepository = AuthRepositoryImpl(AuthRemoteDataSource());
     final plantRepository = PlantRepositoryImpl(PlantRemoteDataSource());
     final getPlantByIdUseCase = Getplantbyidusecase(plantRepository);
@@ -50,6 +58,8 @@ class MyApp extends StatelessWidget {
                 getValidationUsecase,
                 getDetailValidationUsecase,
                 saveValidationUseCase,
+                updateValidationUseCase,
+                exportValidationExcel,
               )..add(LoadValidations()),
         ),
         BlocProvider(

@@ -12,6 +12,8 @@ class ValidationModel extends Validation {
     required super.condition,
     required super.validator,
     required super.images,
+    required super.createdAt,
+    required super.updateAt,
   });
 
   factory ValidationModel.fromJson(Map<String, dynamic> json) {
@@ -32,6 +34,8 @@ class ValidationModel extends Validation {
                   .map((img) => ValidationImageModel.fromJson(img))
                   .toList()
               : [],
+      createdAt: json['created_at'],
+      updateAt: json['updated_at'],
     );
   }
 }

@@ -17,7 +17,7 @@ final GoRouter appRouter = GoRouter(
 
     if (!isAuth && !loggingIn) {
       // Kalau belum login dan bukan di halaman login, arahkan ke login
-      return InitialRoute.loginScreen;
+      return InitialRoute.splashScreen;
     }
 
     if (isAuth && loggingIn) {

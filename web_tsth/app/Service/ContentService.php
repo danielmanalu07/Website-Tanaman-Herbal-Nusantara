@@ -48,7 +48,7 @@ class ContentService
     public function get_all_content_user()
     {
         try {
-            $lang     = $this->language->GetLanguage();
+            $lang     = $this->language->GetLanguageUser();
             $response = Http::withHeaders([
                 'Accept-Language' => "{$lang}",
             ])->get("{$this->api_url}/content-user");
@@ -72,7 +72,7 @@ class ContentService
     public function get_detail_content_user(int $id)
     {
         try {
-            $lang     = $this->language->GetLanguage();
+            $lang     = $this->language->GetLanguageUser();
             $response = Http::withHeaders([
                 'Accept-Language' => "{$lang}",
             ])->get("{$this->api_url}/content-user/$id");

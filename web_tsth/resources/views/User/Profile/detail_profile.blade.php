@@ -5,10 +5,10 @@
             class="breadcrumb-image position-absolute top-0 start-0 w-100 h-100 object-cover">
         <div class="overlay op-8 bg-racing-green"></div>
         <div class="container">
-            <h2 class="breadcrumb-title">Profil</h2>
+            <h2 class="breadcrumb-title">{{ __('messages.Profil') }}</h2>
             <ul class="breadcrumb-menu list-style">
-                <li><a href="{{ route('home') }}">Beranda</a></li>
-                <li>Profil</li>
+                <li><a href="{{ route('home') }}">{{ __('messages.Beranda') }}</a></li>
+                <li>{{ __('messages.Profil') }}</li>
             </ul>
         </div>
     </div>

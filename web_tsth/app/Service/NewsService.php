@@ -50,7 +50,7 @@ class NewsService
     public function get_all_news_user()
     {
         try {
-            $lang     = $this->language->GetLanguage();
+            $lang     = $this->language->GetLanguageUser();
             $response = Http::withHeaders([
                 'Accept-Language' => "{$lang}",
             ])->get("{$this->api_url}/news-user");
@@ -75,7 +75,7 @@ class NewsService
     public function get_detail_news_user(int $id)
     {
         try {
-            $lang     = $this->language->GetLanguage();
+            $lang     = $this->language->GetLanguageUser();
             $response = Http::withHeaders([
                 'Accept-Language' => "{$lang}",
             ])->get("{$this->api_url}/news-user/$id");

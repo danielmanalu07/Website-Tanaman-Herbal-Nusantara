@@ -1,11 +1,13 @@
 <?php
 namespace App\Http\Controllers;
 
+use App\Exports\PlantExport;
 use App\Service\AuthService;
 use App\Service\HabitusService;
 use App\Service\LanguageService;
 use App\Service\PlantService;
 use Illuminate\Http\Request;
+use Maatwebsite\Excel\Facades\Excel;
 
 class PlantController extends Controller
 {
@@ -140,4 +142,23 @@ class PlantController extends Controller
         }
     }
 
+    // public function excel(Request $request)
+    // {
+    //     try {
+    //         return Excel::download(new PlantExport($this->plant_service), 'plant.xlsx');
+    //     } catch (\Throwable $th) {
+    //         return redirect()->back()->with('error', $th->getMessage());
+    //     }
+    // }
+    public function excel(Request $request)
+    {
+        try {
+            $fromDate = $request->query('fromDate');
+            $toDate   = $request->query('toDate');
+
+            return Excel::download(new PlantExport($this->plant_service, $fromDate, $toDate), 'plant.xlsx');
+        } catch (\Throwable $th) {
+            return redirect()->back()->with('error', $th->getMessage());
+        }
+    }
 }

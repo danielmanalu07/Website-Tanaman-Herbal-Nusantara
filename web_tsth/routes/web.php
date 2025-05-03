@@ -9,12 +9,14 @@ use App\Http\Controllers\LanguageController;
 use App\Http\Controllers\NewsController;
 use App\Http\Controllers\OurGardenController;
 use App\Http\Controllers\PlantController;
+use App\Http\Controllers\PlantValidationController;
 use App\Http\Controllers\StaffController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\VisitorCategoryController;
 use App\Http\Controllers\VisitorController;
 use App\Http\Middleware\Authorization;
 use App\Http\Middleware\SetAcceptLanguage;
+use App\Http\Middleware\SetLocale;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -52,6 +54,7 @@ Route::prefix('/admin')->middleware(Authorization::class)->group(function () {
         Route::delete('/{id}/delete', [PlantController::class, 'delete'])->name('plant.delete');
         Route::put('/{id}/update-status', [PlantController::class, 'update_status'])->name('plant.update.status');
         Route::post('/upload', [PlantController::class, 'upload'])->name('plant.upload');
+        Route::get('/excel-plant', [PlantController::class, 'excel'])->name('plant.excel');
     });
 
     // CRUD Land
@@ -115,12 +118,19 @@ Route::prefix('/admin')->middleware(Authorization::class)->group(function () {
         Route::put('/{id}/edit', [ContactUsController::class, 'edit'])->name('contact.edit');
         Route::delete('/{id}/delete', [ContactUsController::class, 'delete'])->name('contact.delete');
     });
+
+    //View Plant Validation
+    Route::prefix('/validation')->group(function () {
+        Route::get('/', [PlantValidationController::class, 'index'])->name('validation.index');
+        Route::get('/excel-plant-validation', [PlantValidationController::class, 'excel'])->name('validation.excel');
+    });
 });
 
 //ROUTE USER
-Route::middleware(SetAcceptLanguage::class)->group(function () {
+Route::middleware([SetAcceptLanguage::class, SetLocale::class])->group(function () {
     Route::get('/', [UserController::class, 'home'])->name('home');
     Route::get('/news', [UserController::class, 'news'])->name('news');
+    Route::get('/news/search', [UserController::class, 'search'])->name('user.news.search');
     Route::post('/lang', [LanguageController::class, 'SetLanguageUser'])->name('user.language');
     Route::get('/our-garden', [OurGardenController::class, 'index'])->name('user.ourgarden');
     Route::get('/our-garden/{id}', [OurGardenController::class, 'detail'])->name('user.ourgarden.detail');

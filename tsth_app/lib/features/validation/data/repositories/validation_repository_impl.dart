@@ -8,11 +8,6 @@ class ValidationRepositoryImpl implements ValidationRepository {
 
   ValidationRepositoryImpl({required this.validationRemoteDatasource});
 
-  // @override
-  // Future<Validation> getDetailValidations(int id) {
-  //   // return localDatasource.getDetailValidations(id);
-  // }
-
   @override
   Future<void> saveValidation(ValidationEntity validation) async {
     return await validationRemoteDatasource.saveValidation(validation);
@@ -26,5 +21,15 @@ class ValidationRepositoryImpl implements ValidationRepository {
   @override
   Future<Validation> getDetailValidations(int id) async {
     return await validationRemoteDatasource.get_detail_validated(id);
+  }
+
+  @override
+  Future<void> updateValidation(int id, ValidationEntity validation) async {
+    return await validationRemoteDatasource.updateValidation(id, validation);
+  }
+
+  @override
+  Future<void> exportValidationExcel() async {
+    return await validationRemoteDatasource.exportValidationExcel();
   }
 }

@@ -1,7 +1,10 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
+import 'package:open_file/open_file.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:tsth_app/core/constant/api_constant.dart';
 import 'package:tsth_app/core/utils/auth_utils.dart';
 import 'package:tsth_app/features/validation/data/model/validation_model.dart';
@@ -46,7 +49,7 @@ class ValidationRemoteDatasource {
   }
 
   Future<List<Validation>> get_all_validated() async {
-    final uri = Uri.parse('${ApiConstant.api}/validated');
+    final uri = Uri.parse('${ApiConstant.api}/validated-staff');
     final token = await AuthUtils.getToken();
 
     try {
@@ -108,6 +111,84 @@ class ValidationRemoteDatasource {
     } catch (e) {
       print('Exception in get_all_validated: $e');
       throw Exception('Failed to fetch validations: $e');
+    }
+  }
+
+  Future<void> updateValidation(int id, ValidationEntity validation) async {
+    final uri = Uri.parse('${ApiConstant.api}/scanner/validate/$id');
+    final token = await AuthUtils.getToken();
+
+    print('Preparing update request for validation $id');
+
+    final request =
+        http.MultipartRequest('POST', uri)
+          ..fields['date_validation'] = validation.dateValidation
+          ..fields['condition'] = validation.condition
+          ..fields['description'] = validation.description
+          ..fields['plant_id'] = validation.plantId
+          ..fields['_method'] = 'PUT'
+          ..headers['Authorization'] = 'Bearer $token';
+
+    // Tambahkan gambar yang dihapus
+    if (validation.deletedImageIds != null &&
+        validation.deletedImageIds!.isNotEmpty) {
+      validation.deletedImageIds!.asMap().forEach((index, id) {
+        request.fields['delete_image[$index]'] = id.toString();
+      });
+    }
+
+    // Tambahkan gambar baru
+    if (validation.imagePaths.isNotEmpty) {
+      for (var path in validation.imagePaths) {
+        print('Adding new image: $path');
+        request.files.add(await http.MultipartFile.fromPath('images[]', path));
+      }
+    }
+
+    print('Sending update request...');
+    print('Fields: ${request.fields}');
+    print('Files: ${request.files.map((f) => f.filename)}');
+
+    try {
+      final response = await request.send();
+      final responseBody = await response.stream.bytesToString();
+
+      print('Response status: ${response.statusCode}');
+      print('Response body: $responseBody');
+
+      if (response.statusCode != 200) {
+        throw Exception('Failed to update validation: $responseBody');
+      }
+    } catch (e) {
+      print('Error in updateValidation: $e');
+      throw Exception('Failed to update validation: $e');
+    }
+  }
+
+  Future<void> exportValidationExcel() async {
+    final uri = Uri.parse('${ApiConstant.api}/scanner/export-validation');
+    final token = await AuthUtils.getToken();
+
+    try {
+      final response = await client.get(
+        uri,
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Accept': 'application/json',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final dir = await getTemporaryDirectory();
+        final filePath = '${dir.path}/plant_validation.xlsx';
+        final file = File(filePath);
+        await file.writeAsBytes(response.bodyBytes);
+        await OpenFile.open(filePath);
+      } else {
+        throw Exception('Export failed: ${response.statusCode}');
+      }
+    } catch (e) {
+      throw Exception('Export failed: ${e.toString()}');
     }
   }
 }

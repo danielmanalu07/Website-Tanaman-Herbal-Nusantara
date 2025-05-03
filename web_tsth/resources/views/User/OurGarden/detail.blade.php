@@ -29,11 +29,11 @@
             class="breadcrumb-image position-absolute top-0 start-0 w-100 h-100 object-cover">
         <div class="overlay op-8 bg-racing-green"></div>
         <div class="container">
-            <h2 class="breadcrumb-title">Tanaman</h2>
+            <h2 class="breadcrumb-title">{{ __('messages.Tanaman') }}</h2>
             <ul class="breadcrumb-menu list-style">
-                <li><a href="{{ route('home') }}">Beranda</a></li>
-                <li><a href="{{ route('user.ourgarden') }}">Taman</a></li>
-                <li>Tanaman</li>
+                <li><a href="{{ route('home') }}">{{ __('messages.Beranda') }}</a></li>
+                <li><a href="{{ route('user.ourgarden') }}">{{ __('messages.Taman') }}</a></li>
+                <li>{{ __('messages.Tanaman') }}</li>
             </ul>
         </div>
     </div>
@@ -42,19 +42,21 @@
         <div class="container">
             <div class="row">
                 @foreach ($plantHabitus as $item)
-                    <div class="col-xl-4 col-lg-6 col-md-6">
-                        <div class="project-card">
-                            <div class="project-img">
-                                <img src="{{ $item->images[0]['image_path'] }}" alt="Image">
-                                <a href="{{ route('user.ourgarden.plant.detail', $item->id) }}">
-                                    <div class="project-info">
-                                        <h4>{{ $item->name }}</h4>
-                                        <p>{{ $item->latin_name }}</p>
-                                    </div>
-                                </a>
+                    @if ($item->status == true)
+                        <div class="col-xl-4 col-lg-6 col-md-6">
+                            <div class="project-card">
+                                <div class="project-img">
+                                    <img src="{{ $item->images[0]['image_path'] }}" alt="Image">
+                                    <a href="{{ route('user.ourgarden.plant.detail', $item->id) }}">
+                                        <div class="project-info">
+                                            <h4>{{ $item->name }}</h4>
+                                            <p>{{ $item->latin_name }}</p>
+                                        </div>
+                                    </a>
+                                </div>
                             </div>
                         </div>
-                    </div>
+                    @endif
                 @endforeach
             </div>
         </div>

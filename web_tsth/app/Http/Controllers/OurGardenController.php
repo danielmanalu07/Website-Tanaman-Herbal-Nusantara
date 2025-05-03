@@ -36,13 +36,14 @@ class OurGardenController extends Controller
             $plants    = $this->plant_service->get_all_plant_user();
             $languages = $this->language_service->get_all_lang_user();
             $contents  = $this->content_service->get_all_content_user();
+            $habituses = $this->habitus_service->get_all_user();
 
             $plantHabitus = collect($plants)
                 ->filter(function ($plant) use ($id) {
                     return isset($plant->habitus['id']) && $plant->habitus['id'] == $id;
                 })
                 ->values();
-            return view('User.OurGarden.detail', compact('plantHabitus', 'languages', 'contents'));
+            return view('User.OurGarden.detail', compact('plantHabitus', 'languages', 'contents', 'habituses'));
         } catch (\Throwable $th) {
             return redirect()->back()->with('error', 'Something went wrong.');
         }
@@ -57,7 +58,6 @@ class OurGardenController extends Controller
             $habituses = $this->habitus_service->get_all_user();
             $allPlants = $this->plant_service->get_all_plant_user();
 
-            // Get the habitus ID of the current plant
             $currentPlantHabitusId = isset($plants['data']['habitus']['id']) ? $plants['data']['habitus']['id'] : null;
 
             $plantHabitus = collect($allPlants)
@@ -68,7 +68,6 @@ class OurGardenController extends Controller
                 })
                 ->values();
 
-            // dd($plants);
             return view('User.OurGarden.detail_plant', compact('plants', 'languages', 'contents', 'habituses', 'plantHabitus', 'currentPlantHabitusId'));
         } catch (\Throwable $th) {
             return redirect()->back()->with('error', 'Something went wrong.');

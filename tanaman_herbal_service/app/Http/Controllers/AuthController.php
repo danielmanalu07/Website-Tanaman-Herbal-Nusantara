@@ -43,7 +43,7 @@ class AuthController extends Controller
         $user->save();
 
         $user->tokens()->latest()->first()->update([
-            'expires_at' => Carbon::now()->addHours(1),
+            'expires_at' => Carbon::now()->addHours(24),
         ]);
 
         return response()->json([

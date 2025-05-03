@@ -146,11 +146,14 @@ Route::middleware(['auth:sanctum', 'auth.token_expiry'])->group(function () {
     });
 
     //VALIDATION
-    Route::middleware('permission:koordinator,agronom')->group(function () {
+    Route::middleware([SetLanguage::class])->group(function () {
         Route::get('/validated', [PlantValidationController::class, 'get']);
+        Route::get('/validated-staff', [PlantValidationController::class, 'getByStaff']);
         Route::get('/validated/{id}', [PlantValidationController::class, 'get_detail']);
-        Route::prefix('/scanner')->group(function () {
+        Route::prefix('/scanner')->middleware('permission:koordinator,agronom')->group(function () {
             Route::post('/validate', [PlantValidationController::class, 'store']);
+            Route::put('/validate/{id}', [PlantValidationController::class, 'update']);
+            Route::get('/export-validation', [PlantValidationController::class, 'export']);
         });
     });
 });
@@ -166,8 +169,8 @@ Route::middleware(SetLanguage::class)->group(function () {
     Route::get('/content-user/{id}', [ContentController::class, 'get_detail']);
     Route::get('/visitor-user', [VisitorController::class, 'getVisitors']);
     Route::get('/contact-us-user', [AboutUsController::class, 'get_all_about_us']);
+    Route::get('/land-user', [LandsController::class, 'getAllLands']);
 
 });
 
 Route::get('/lang-user', [LanguageController::class, 'get_all_lang']);
-Route::get('/land-user', [LandsController::class, 'getAllLands']);

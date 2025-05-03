@@ -21,9 +21,9 @@ class ValidationResource extends JsonResource
         return [
             'id'              => $this->id,
             'description'     => $this->description,
-            'date_validation' => $this->date_validation,
+            'date_validation' => Carbon::parse($this->date_validation)->translatedFormat('d F Y'),
             'condition'       => $this->condition,
-            'plant'           => $this->plants,
+            'plant'           => new PlantResource($this->plants),
             'validator'       => $this->users,
             'images'          => ImageResource::collection($this->images),
             "created_at"      => Carbon::parse($this->created_at)->translatedFormat('d F Y h:i A'),

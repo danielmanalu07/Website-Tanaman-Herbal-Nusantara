@@ -22,13 +22,16 @@ class ValidationCard extends StatelessWidget {
               height: 60,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(8.0),
-                image: DecorationImage(
-                  image: NetworkImage(validation.images.first.imagePath),
-                  fit: BoxFit.cover,
-                  onError: (exception, stackTrace) {
-                    print('Image load error: $exception');
-                  },
-                ),
+                image:
+                    (validation.images.isNotEmpty &&
+                            validation.images.first.imagePath.isNotEmpty)
+                        ? DecorationImage(
+                          image: NetworkImage(
+                            validation.images.first.imagePath,
+                          ),
+                          fit: BoxFit.cover,
+                        )
+                        : null,
               ),
             ),
             const SizedBox(width: 16.0),
@@ -58,7 +61,7 @@ class ValidationCard extends StatelessWidget {
                     children: [
                       InkWell(
                         onTap: () {
-                          context.go(
+                          context.push(
                             InitialRoute.detailValidationScreen.replaceFirst(
                               ':id',
                               validation.id.toString(),

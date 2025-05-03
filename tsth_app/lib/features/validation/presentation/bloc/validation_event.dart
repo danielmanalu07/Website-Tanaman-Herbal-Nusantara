@@ -23,3 +23,14 @@ class SaveValidationEvent extends ValidationEvent {
 
   SaveValidationEvent(this.validation);
 }
+
+class UpdateValidationEvent extends ValidationEvent {
+  final int id;
+  final ValidationEntity validation;
+
+  UpdateValidationEvent(this.id, this.validation);
+}
+
+class ExportValidationExcelEvent extends ValidationEvent {}
+
+class ClearExportMessageEvent extends ValidationEvent {}

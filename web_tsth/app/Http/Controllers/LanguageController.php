@@ -57,7 +57,7 @@ class LanguageController extends Controller
             // dd($Rowlanguage);
 
             // session(['app_language' => $Rowlanguage->code]);
-            LanguageConstant::SetLanguage($Rowlanguage->code);
+            LanguageConstant::SetLanguageUser($Rowlanguage->code);
 
             return redirect()->back();
         } catch (\Throwable $th) {

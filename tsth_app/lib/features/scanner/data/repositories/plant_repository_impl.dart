@@ -7,7 +7,7 @@ class PlantRepositoryImpl implements PlantRepository {
 
   PlantRepositoryImpl(this.plantRemoteDataSource);
   @override
-  Future<Plant> getPlantById(String id) async {
+  Future<Plant> getPlantById(int id) async {
     return plantRemoteDataSource.getPlantById(id);
   }
 }

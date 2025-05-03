@@ -42,7 +42,7 @@ class HabitusService
 
     public function get_all_user()
     {
-        $lang     = $this->language->GetLanguage();
+        $lang     = $this->language->GetLanguageUser();
         $response = Http::withHeaders([
             'Accept-Language' => "{$lang}",
         ])->get("{$this->api_url}/habitus-user");

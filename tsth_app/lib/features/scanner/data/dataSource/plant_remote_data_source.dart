@@ -5,7 +5,7 @@ import 'package:tsth_app/features/scanner/data/model/plant_model.dart';
 import 'package:http/http.dart' as http;
 
 class PlantRemoteDataSource {
-  Future<PlantModel> getPlantById(String id) async {
+  Future<PlantModel> getPlantById(int id) async {
     final response = await http.get(
       Uri.parse("${ApiConstant.api}/plants-user/$id"),
     );

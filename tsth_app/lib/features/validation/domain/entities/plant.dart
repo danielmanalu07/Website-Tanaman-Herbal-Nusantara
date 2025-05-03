@@ -8,7 +8,7 @@ class Plant {
   final String ecology;
   final String endemicInformation;
   final String qrcode;
-  final int status;
+  final bool status;
   final Habitus? habitus;
   final String? createdAt;
   final String? updatedAt;

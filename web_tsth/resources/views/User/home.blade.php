@@ -49,39 +49,20 @@
         <div class="container-fluid container-full">
             <img class="brick-shape-1" src="{{ asset('hort/assets/img/hero/brick-2.svg') }}" alt="Image">
             <img class="brick-shape-2" src="{{ asset('hort/assets/img/hero/brick-2.svg') }}" alt="Image">
-            {{-- <div class="gd-cat one">
-            <img src="{{ asset('hort/assets/img/hero/pin.svg') }}" alt="Image" class="pin">
-            <img class="gd-cat-img" src="{{ asset('hort/assets/img/hero/gloves.svg') }}" alt="Image">
-            <span>Garden Setup</span>
-        </div>
-        <div class="gd-cat two">
-            <img src="{{ asset('hort/assets/img/hero/pin.svg') }}" alt="Image" class="pin">
-            <img class="gd-cat-img" src="{{ asset('hort/assets/img/hero/flower-tub.svg') }}" alt="Image">
-            <span>Plants Planted</span>
-        </div>
-        <div class="gd-cat three">
-            <img src="{{ asset('hort/assets/img/hero/pin.svg') }}" alt="Image" class="pin">
-            <img class="gd-cat-img" src="{{ asset('hort/assets/img/hero/water-pot.svg') }}" alt="Image">
-            <span>Gardening</span>
-        </div>
-        <div class="gd-cat four">
-            <img src="{{ asset('hort/assets/img/hero/pin.svg') }}" alt="Image" class="pin">
-            <img class="gd-cat-img" src="{{ asset('hort/assets/img/hero/tools-1.svg') }}" alt="Image">
-            <span>Maintenance</span>
-        </div> --}}
             <div class="hero-slider-one">
                 <div class="hero-slide-one">
                     <div class="row align-items-center">
                         <div class="col-xl-7 col-lg-6 col-md-12 col-12 order-xl-1 order-lg-1 order-md-2 order-2">
                             <div class="hero-content style2">
-                                <span>Tanaman Herbal Nusantara</span>
-                                <h1>Taman Sains Teknologi Herbal & Hortikultura</h1>
-                                <p>Temukan Tanaman Herbal dan Hortikultura Favoritmu Sekarang dan Cari Tahu Manfaat Tanaman
-                                    Lokal di Sekitarmu!</p>
+                                <span>{{ __('messages.Tanaman Herbal Nusantara') }}</span>
+                                <h1>{{ __('messages.Taman Sains Teknologi Herbal & Hortikultura') }}</h1>
+                                <p>{{ __('messages.Temukan Tanaman Herbal dan Hortikultura Favoritmu Sekarang dan Cari Tahu Manfaat Tanaman Lokal di Sekitarmu!') }}
+                                </p>
                                 <div class="hero-btn">
-                                    <a href="about.html" class="btn style1"><i class="flaticon-book"></i>Profil</a>
-                                    <a href="about.html" class="btn style2"><i class="flaticon-contact-book"></i>Kontak
-                                        Kami</a>
+                                    <a href="#" class="btn style1"><i
+                                            class="flaticon-book"></i>{{ __('messages.Profil') }}</a>
+                                    <a href="{{ route('user.contact') }}" class="btn style2"><i
+                                            class="flaticon-contact-book"></i>{{ __('messages.Kontak Kami') }}</a>
                                 </div>
                             </div>
                         </div>
@@ -108,9 +89,8 @@
                             <i class="flaticon-gardening"></i>
                         </div>
                         <div class="promo-text">
-                            <h5><a href="services.html">Explore Herbal Plants
-                                </a></h5>
-                            <p>Complete access to herbal plants, their benefits, and cultivation tips.
+                            <h5>{{ __('messages.Jelajahi Tanaman Herbal') }}</h5>
+                            <p>{{ __('messages.Akses lengkap ke tanaman herbal, manfaatnya, dan tips budidaya.') }}
                             </p>
                         </div>
                     </div>
@@ -121,9 +101,8 @@
                             <i class="flaticon-agriculture"></i>
                         </div>
                         <div class="promo-text">
-                            <h5><a href="services.html">Tips & Panduan Hortikultura
-                                </a></h5>
-                            <p>emukan penggunaan tanaman herbal secara tradisional dan modern untuk kesehatan dan kebugaran.
+                            <h5>{{ __('messages.Tips & Panduan Hortikultura') }}</h5>
+                            <p>{{ __('messages.Pelajari praktik terbaik untuk menanam dan merawat kebun herbal.') }}
                             </p>
                         </div>
                     </div>
@@ -134,9 +113,9 @@
                             <i class="flaticon-growth"></i>
                         </div>
                         <div class="promo-text">
-                            <h5><a href="services.html">Temukan Pengobatan Herbal
-                                </a></h5>
-                            <p>Lorem ipsum dolor sit amet, consetetur sadip scing elitr, sed diam nonumy eirmod.</p>
+                            <h5>{{ __('messages.Temukan Pengobatan Herbal') }}</h5>
+                            <p>{{ __('messages.Temukan penggunaan tanaman herbal secara tradisional dan modern untuk kesehatan dan kebugaran.') }}
+                            </p>
                         </div>
                     </div>
                 </div>
@@ -152,13 +131,13 @@
                 <div class="col-xl-8 col-lg-10">
                     <div class="about-content text-center">
                         <div class="content-title">
-                            <h2 class="d-block mb-2 text-success fw-semibold">About Us</h2>
+                            <h2 class="d-block mb-2 text-success fw-semibold">{{ __('messages.Tentang Kami') }}</h2>
                             @foreach ($contents as $profile)
                                 @if (Str::lower($profile->key) == 'sejarah')
                                     <p class="mb-4">{!! Str::limit(strip_tags(preg_replace('/<(img|iframe|video)[^>]*>/i', '', $profile->content)), 400, '...') !!}</p>
 
                                     <a href="{{ route('user.profile.detail', $profile->id) }}" class="btn style1"><i
-                                            class="fi fi-rr-info"></i> Read More</a>
+                                            class="fi fi-rr-info"></i> {{ __('messages.Lihat Selengkapnya') }}</a>
                                 @endif
                             @endforeach
                         </div>
@@ -174,9 +153,9 @@
         <div class="container">
             <div class="row">
                 <div class="section-title text-center mb-50">
-                    <h2>Taman Kami</h2>
-                    <p>Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod
-                        tempor invidunt ut labore et dolore magna aliquyam erat, </p>
+                    <h2>{{ __('messages.Taman Kami') }}</h2>
+                    <p>{{ __('messages.Temukan Tanaman Herbal dan Hortikultura Favoritmu Sekarang dan Cari Tahu Manfaat Tanaman Lokal di Sekitarmu!') }}
+                    </p>
                 </div>
             </div>
             <div class="row justify-content-center">
@@ -196,7 +175,8 @@
                                     '...',
                                 ) !!}
                                 </p> --}}
-                                <a href="{{ route('user.ourgarden.detail', $habitus->id) }}" class="link style2">View Detail
+                                <a href="{{ route('user.ourgarden.detail', $habitus->id) }}"
+                                    class="link style2">{{ __('messages.Lihat Selengkapnya') }}
                                     <i class="flaticon-right-arrow"></i></a>
                             </div>
                         </div>
@@ -205,8 +185,9 @@
             </div>
             <div class="row mt-15">
                 <div class="col-md-12">
-                    <p class="subtitle">Explore Our Garden.<a class="link style1" href="{{ route('user.ourgarden') }}">View
-                            All Garden <i class="flaticon-right-arrow"></i></a></p>
+                    <p class="subtitle">{{ __('messages.Jelajahi Taman Kami.') }}<a class="link style1"
+                            href="{{ route('user.ourgarden') }}">{{ __('messages.Lihat Semua Taman') }}<i
+                                class="flaticon-right-arrow"></i></a></p>
                 </div>
             </div>
         </div>
@@ -222,7 +203,7 @@
                         <div class="counter-icon">
                             <i class="flaticon-rating-1"></i>
                         </div>
-                        <p>Visitors</p>
+                        <p>{{ __('messages.Pengunjung') }}</p>
                         <h2><span class="odometer" data-count="{{ $visitorCount }}"></span></h2>
                     </div>
                 </div>
@@ -231,7 +212,7 @@
                         <div class="counter-icon">
                             <i class="flaticon-growth-1"></i>
                         </div>
-                        <p>Plants</p>
+                        <p>{{ __('messages.Tanaman') }}</p>
                         <h2><span class="odometer" data-count="{{ $plantCount }}"></span></h2>
                     </div>
                 </div>
@@ -240,7 +221,7 @@
                         <div class="counter-icon">
                             <i class="fi fi-rr-map"></i>
                         </div>
-                        <p>Lands</p>
+                        <p>{{ __('messages.Lahan') }}</p>
                         <h2><span class="odometer" data-count="{{ $landCount }}"></span></h2>
                     </div>
                 </div>
@@ -249,7 +230,7 @@
                         <div class="counter-icon">
                             <i class="flaticon-pencil"></i>
                         </div>
-                        <p>Habitus</p>
+                        <p>{{ __('messages.Habitus') }}</p>
                         <h2><span class="odometer" data-count="{{ $habitusCount }}"></span></h2>
                     </div>
                 </div>
@@ -268,9 +249,8 @@
     <section class="blog-wrap pt-100 pb-75 bg-apple-green td-aztech">
         <div class="container">
             <div class="section-title style1 text-center mb-50">
-                <h2>Berita Terbaru</h2>
-                <p>Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod
-                    tempor invidunt ut labore et dolore magna aliquyam erat, </p>
+                <h2>{{ __('messages.Berita Terbaru') }}</h2>
+                <p>{{ __('messages.Ikuti terus kabar terbaru dari kami, informasi selengkapnya ada di sini!') }}</p>
             </div>
             <div class="row justify-content-center">
                 @foreach ($news as $new)
@@ -285,14 +265,15 @@
                                 <div class="blog-info">
                                     <ul class="blog-metainfo list-style">
                                         <li><a
-                                                href="blog-left-sidebar.html">{{ \Carbon\Carbon::parse($new->published)->format('d F Y') }}</a>
+                                                href="{{ route('user.news.detail', $new->id) }}">{{ \Carbon\Carbon::parse($new->published)->format('d F Y') }}</a>
                                         </li>
 
                                     </ul>
                                     <h3 class="blog-title"><a
-                                            href="blog-details-left-sidebar.html">{{ Str::limit($new->title, 70) }}</a>
+                                            href="{{ route('user.news.detail', $new->id) }}">{{ Str::limit($new->title, 70) }}</a>
                                     </h3>
-                                    <a href="#" class="link style2">Read More <i
+                                    <a href="{{ route('user.news.detail', $new->id) }}"
+                                        class="link style2">{{ __('messages.Lihat Selengkapnya') }} <i
                                             class="flaticon-right-arrow"></i></a>
                                 </div>
                             </div>
@@ -310,9 +291,10 @@
         <img class="nl-shape-2" src="{{ asset('hort/assets/img/brick.svg') }}" alt="Image">
         <div class="container">
             <div class="section-title style1 text-center mb-50">
-                <h2>Hubungi Kami</h2>
-                <p>Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod
-                    tempor invidunt ut labore et dolore magna aliquyam erat, </p>
+                <h2>{{ __('messages.Kontak Kami') }}</h2>
+                <p>{{ __('messages.Untuk informasi lebih lanjut, pertanyaan, atau kerja sama, silakan hubungi kami melalui platform media sosial berikut. Kami akan merespons secepat mungkin.') }}
+                </p>
+
             </div>
             <div class="row">
                 <div class="col-xl-8 offset-xl-2 col-lg-10 offset-lg-1">

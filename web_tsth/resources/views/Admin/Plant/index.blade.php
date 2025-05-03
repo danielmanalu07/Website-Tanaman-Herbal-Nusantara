@@ -32,14 +32,83 @@
     <!-- Scripts -->
     <script>
         $(document).ready(function() {
-            $('#plantTable').DataTable({
+            var table = $('#plantTable').DataTable({
                 responsive: true,
                 autoWidth: false,
                 paging: true,
                 lengthChange: true,
                 searching: true,
                 ordering: true,
-                info: true
+                info: true,
+                dom: '<"top"f>rt<"bottom"lip><"clear">'
+            });
+
+            function updateExportUrl() {
+                var fromDate = $('#fromDate').val();
+                var toDate = $('#toDate').val();
+                var url = "{{ route('plant.excel') }}";
+
+                // Append query parameters if filters are applied
+                if (fromDate || toDate) {
+                    url += "?fromDate=" + (fromDate || '') + "&toDate=" + (toDate || '');
+                }
+
+                $('#exportExcel').attr('href', url);
+            }
+
+            updateExportUrl();
+
+            // Apply date range filter
+            $('#filterBtn').click(function() {
+                var fromDate = $('#fromDate').val();
+                var toDate = $('#toDate').val();
+
+                if (fromDate || toDate) {
+                    // Custom filtering function for date range
+                    $.fn.dataTable.ext.search.push(
+                        function(settings, data, dataIndex) {
+                            var createdAt = new Date(data[8]); // Created At column
+                            var updatedAt = new Date(data[9]); // Updated At column
+
+                            if (!fromDate && !toDate) return true;
+
+                            if (fromDate && !toDate) {
+                                var minDate = new Date(fromDate);
+                                return (createdAt >= minDate) || (updatedAt >= minDate);
+                            }
+
+                            if (!fromDate && toDate) {
+                                var maxDate = new Date(toDate);
+                                maxDate.setDate(maxDate.getDate() + 1); // Include the entire day
+                                return (createdAt <= maxDate) || (updatedAt <= maxDate);
+                            }
+
+                            var minDate = new Date(fromDate);
+                            var maxDate = new Date(toDate);
+                            maxDate.setDate(maxDate.getDate() + 1); // Include the entire day
+
+                            return (
+                                (createdAt >= minDate && createdAt <= maxDate) ||
+                                (updatedAt >= minDate && updatedAt <= maxDate)
+                            );
+                        }
+                    );
+
+                    table.draw();
+                    $.fn.dataTable.ext.search
+                        .pop(); // Remove the filter so it doesn't interfere with other filters
+                } else {
+                    table.draw();
+                }
+                updateExportUrl()
+            });
+
+            // Reset date filter
+            $('#resetDateFilter').click(function() {
+                $('#fromDate').val('');
+                $('#toDate').val('');
+                table.draw();
+                updateExportUrl(); // Update export URL after reset
             });
 
             ClassicEditor.create(document.querySelector('#advantage'), {
@@ -224,21 +293,6 @@
         </div>
     @endforeach
 
-    {{-- Modal view images --}}
-    {{-- @foreach ($plants as $plant)
-        @foreach ($plant->images as $image)
-            <div class="modal fade" id="imageModal-{{ $image['id'] }}" tabindex="-1" aria-hidden="true">
-                <div class="modal-dialog modal-dialog-centered">
-                    <div class="modal-content">
-                        <div class="modal-body text-center">
-                            <img src="{{ $image['image_path'] }}" class="img-fluid rounded">
-                        </div>
-                    </div>
-                </div>
-            </div>
-        @endforeach
-    @endforeach --}}
-
     {{-- Modal Edit --}}
     @foreach ($plants as $plant)
         <div class="modal fade" id="updatePlant{{ $plant->id }}" tabindex="-1"
@@ -354,8 +408,6 @@
         </div>
     @endforeach
 
-
-
     {{-- Modal Delete --}}
     @foreach ($plants as $plant)
         <div class="modal fade" id="formDeletePlant{{ $plant->id }}" tabindex="1" aria-labelledby="modalTitle"
@@ -390,6 +442,7 @@
                 <div class="modal-header">
                     <h5 class="modal-title" id="confirmStatusModalLabel">Update Plant Status</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    v
                 </div>
                 <div class="modal-body">
                     Are you sure you want to update this data?
@@ -409,15 +462,42 @@
     </div>
 
 
-
     <div class="card">
         <div class="card-header d-flex justify-content-between align-items-center">
             <h1>Plants Data</h1>
-            <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal"
-                data-bs-target="#formAddPlant">Add
-                Plant</button>
+            <div class="d-flex gap-2">
+                <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal"
+                    data-bs-target="#formAddPlant">
+                    Add Plant
+                </button>
+            </div>
         </div>
         <div class="card-body">
+            <!-- Date Filter Controls -->
+            <div
+                class="d-flex flex-column flex-md-row align-items-start align-items-md-center justify-content-between gap-3">
+                <div class="date-filter-container">
+                    <div class="d-flex flex-wrap gap-2 align-items-center">
+                        <div class="d-flex align-items-center gap-1">
+                            <label for="fromDate" class="form-label mb-0">From:</label>
+                            <input type="date" id="fromDate" class="form-control">
+                        </div>
+                        <div class="d-flex align-items-center gap-1">
+                            <label for="toDate" class="form-label mb-0">To:</label>
+                            <input type="date" id="toDate" class="form-control">
+                        </div>
+                        <button id="filterBtn" class="btn btn-primary btn-sm">
+                            <i class="ph ph-funnel"></i> Filter
+                        </button>
+                        <button id="resetDateFilter" class="btn btn-secondary btn-sm">
+                            <i class="ph ph-arrows-counter-clockwise"></i> Reset
+                        </button>
+                    </div>
+                </div>
+                <a href="#" id="exportExcel" class="btn btn-success btn-sm mb-3">
+                    <i class="ph ph-download-simple"></i> Export to Excel
+                </a>
+            </div>
             <div class="table-responsive">
                 <table id="plantTable" class="display">
                     <thead>

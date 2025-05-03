@@ -3,7 +3,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:tsth_app/core/constant/color_constant.dart';
 import 'package:tsth_app/core/constant/path_constant.dart';
-import 'package:tsth_app/core/utils/auth_utils.dart';
 import 'package:tsth_app/core/widgets/custom_snackbar.dart';
 import 'package:tsth_app/features/authentication/presentation/bloc/auth_bloc.dart';
 import 'package:tsth_app/features/authentication/presentation/bloc/auth_event.dart';
@@ -19,17 +18,11 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  Future<void> _checkLoginStatus() async {
-    final isLoggedIn = await AuthUtils.isLoggedIn();
-    await Future.delayed(const Duration(seconds: 2));
-    if (!mounted) return;
-    context.go(isLoggedIn ? InitialRoute.homeScreen : InitialRoute.loginScreen);
-  }
+  DateTime? _lastBackPressed;
 
   @override
   void initState() {
     super.initState();
-    _checkLoginStatus();
   }
 
   void _showSettingDialog(BuildContext context) {
@@ -55,21 +48,21 @@ class _HomeScreenState extends State<HomeScreen> {
                   context.read<AuthBloc>().add(LogoutEvent());
                 },
               ),
-              ListTile(
-                leading: const Icon(
-                  Icons.person,
-                  color: ColorConstant.grayColor,
-                ),
-                title: const Text('Get Profile'),
-                onTap: () {
-                  context.pop(context);
-                  CustomSnackbar.alert(
-                    context,
-                    "Fitur Get Profile belum tersedia",
-                    true,
-                  );
-                },
-              ),
+              // ListTile(
+              //   leading: const Icon(
+              //     Icons.person,
+              //     color: ColorConstant.grayColor,
+              //   ),
+              //   title: const Text('Get Profile'),
+              //   onTap: () {
+              //     context.pop(context);
+              //     CustomSnackbar.alert(
+              //       context,
+              //       "Fitur Get Profile belum tersedia",
+              //       true,
+              //     );
+              //   },
+              // ),
             ],
           ),
         );
@@ -81,7 +74,10 @@ class _HomeScreenState extends State<HomeScreen> {
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (_) => const Center(child: CircularProgressIndicator()),
+      builder:
+          (_) => const Center(
+            child: CircularProgressIndicator(color: ColorConstant.whiteColor),
+          ),
     );
   }
 
@@ -113,92 +109,112 @@ class _HomeScreenState extends State<HomeScreen> {
           CustomSnackbar.alert(context, state.message, true);
         }
       },
-      child: Scaffold(
-        body: Container(
-          decoration: const BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-              colors: [ColorConstant.backgroundColor, ColorConstant.greenColor],
+      child: WillPopScope(
+        onWillPop: () async {
+          final now = DateTime.now();
+          if (_lastBackPressed == null ||
+              now.difference(_lastBackPressed!) > const Duration(seconds: 2)) {
+            _lastBackPressed = now;
+            // );
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text('Tekan sekali lagi untuk keluar')),
+            );
+
+            return false;
+          }
+          return true;
+        },
+        child: Scaffold(
+          body: Container(
+            decoration: const BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [
+                  ColorConstant.backgroundColor,
+                  ColorConstant.greenColor,
+                ],
+              ),
             ),
-          ),
-          child: SafeArea(
-            child: LayoutBuilder(
-              builder: (context, constraints) {
-                return SingleChildScrollView(
-                  physics: const BouncingScrollPhysics(),
-                  child: ConstrainedBox(
-                    constraints: BoxConstraints(
-                      minHeight: constraints.maxHeight,
-                    ),
-                    child: IntrinsicHeight(
-                      child: Column(
-                        children: [
-                          SizedBox(height: constraints.maxHeight * 0.05),
-                          Image.asset(
-                            PathConstant.logo,
-                            width: screenSize.width * 0.6,
-                            height: screenSize.height * 0.3,
-                          ),
-                          const Spacer(),
-                          Padding(
-                            padding: EdgeInsets.symmetric(
-                              horizontal: screenSize.width * 0.04,
+            child: SafeArea(
+              child: LayoutBuilder(
+                builder: (context, constraints) {
+                  return SingleChildScrollView(
+                    physics: const BouncingScrollPhysics(),
+                    child: ConstrainedBox(
+                      constraints: BoxConstraints(
+                        minHeight: constraints.maxHeight,
+                      ),
+                      child: IntrinsicHeight(
+                        child: Column(
+                          children: [
+                            SizedBox(height: constraints.maxHeight * 0.05),
+                            Image.asset(
+                              PathConstant.logo,
+                              width: screenSize.width * 0.6,
+                              height: screenSize.height * 0.3,
                             ),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                              children: [
-                                MenuButton(
-                                  icon: Icons.history,
-                                  onPressed: () {
-                                    context.go(
-                                      InitialRoute.listValidationScreen,
-                                    );
-                                  },
-                                  label: 'History',
-                                  angle: -0.3,
-                                  bottomPadding: 0,
-                                  size:
-                                      isSmallScreen
-                                          ? screenSize.width * 0.30
-                                          : screenSize.width * 0.3,
-                                ),
-                                MenuButton(
-                                  icon: Icons.qr_code_scanner,
-                                  onPressed: () {
-                                    context.go(InitialRoute.scanQrScreen);
-                                  },
-                                  label: 'Scan',
-                                  angle: 0,
-                                  bottomPadding: isSmallScreen ? 30 : 40,
-                                  size:
-                                      isSmallScreen
-                                          ? screenSize.width * 0.30
-                                          : screenSize.width * 0.3,
-                                ),
-                                MenuButton(
-                                  icon: Icons.settings,
-                                  onPressed: () {
-                                    _showSettingDialog(context);
-                                  },
-                                  label: 'Setting',
-                                  angle: 0.3,
-                                  bottomPadding: 0,
-                                  size:
-                                      isSmallScreen
-                                          ? screenSize.width * 0.30
-                                          : screenSize.width * 0.3,
-                                ),
-                              ],
+                            const Spacer(),
+                            Padding(
+                              padding: EdgeInsets.symmetric(
+                                horizontal: screenSize.width * 0.04,
+                              ),
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceEvenly,
+                                children: [
+                                  MenuButton(
+                                    icon: Icons.history,
+                                    onPressed: () {
+                                      context.push(
+                                        InitialRoute.listValidationScreen,
+                                      );
+                                    },
+                                    label: 'History',
+                                    angle: -0.3,
+                                    bottomPadding: 0,
+                                    size:
+                                        isSmallScreen
+                                            ? screenSize.width * 0.30
+                                            : screenSize.width * 0.3,
+                                  ),
+                                  MenuButton(
+                                    icon: Icons.qr_code_scanner,
+                                    onPressed: () {
+                                      context.push(InitialRoute.scanQrScreen);
+                                    },
+                                    label: 'Scan',
+                                    angle: 0,
+                                    bottomPadding: isSmallScreen ? 30 : 40,
+                                    size:
+                                        isSmallScreen
+                                            ? screenSize.width * 0.30
+                                            : screenSize.width * 0.3,
+                                  ),
+                                  MenuButton(
+                                    icon: Icons.settings,
+                                    onPressed: () {
+                                      _showSettingDialog(context);
+                                    },
+                                    label: 'Setting',
+                                    angle: 0.3,
+                                    bottomPadding: 0,
+                                    size:
+                                        isSmallScreen
+                                            ? screenSize.width * 0.30
+                                            : screenSize.width * 0.3,
+                                  ),
+                                ],
+                              ),
                             ),
-                          ),
-                          SizedBox(height: constraints.maxHeight * 0.15),
-                        ],
+                            SizedBox(height: constraints.maxHeight * 0.15),
+                          ],
+                        ),
                       ),
                     ),
-                  ),
-                );
-              },
+                  );
+                },
+              ),
             ),
           ),
         ),

@@ -67,7 +67,7 @@ class _ValidationPlantScreenState extends State<ValidationPlantScreen> {
   void _submitForm() {
     if (_selectedCondition == null ||
         _uploadedImages.isEmpty ||
-        _dateController.text.isEmpty) {
+        _suggestionController.text.isEmpty) {
       Flushbar(
         message:
             'Please select a condition, upload at least one image, and ensure date is filled',
@@ -75,7 +75,6 @@ class _ValidationPlantScreenState extends State<ValidationPlantScreen> {
         backgroundColor: Colors.red,
         flushbarPosition: FlushbarPosition.TOP,
       ).show(context);
-
       return;
     }
 
@@ -91,6 +90,7 @@ class _ValidationPlantScreenState extends State<ValidationPlantScreen> {
                 : _suggestionController.text,
         imagePaths: _uploadedImages.map((file) => file.path).toList(),
         plantId: plantState.plant.id.toString(),
+        images: [],
       );
 
       print('Submitting validation: $validation');
@@ -148,34 +148,37 @@ class _ValidationPlantScreenState extends State<ValidationPlantScreen> {
           padding: const EdgeInsets.all(16.0),
           child: BlocListener<ValidationBloc, ValidationState>(
             listener: (context, state) {
-              if (state is ValidationLoading) {
+              if (state is ValidationSuccess) {
                 showDialog(
                   context: context,
                   barrierDismissible: false,
                   builder:
-                      (context) =>
-                          const Center(child: CircularProgressIndicator()),
+                      (context) => const Center(
+                        child: CircularProgressIndicator(
+                          color: ColorConstant.whiteColor,
+                        ),
+                      ),
                 );
-              } else {
-                Navigator.of(context).pop();
-                if (state is ValidationSuccess) {
+                Future.delayed(const Duration(seconds: 1), () {
+                  Navigator.of(context).pop();
                   Flushbar(
                     message: 'Validation saved successfully',
                     duration: const Duration(seconds: 3),
                     backgroundColor: Colors.green,
                     flushbarPosition: FlushbarPosition.TOP,
                   ).show(context);
-                  Future.delayed(const Duration(seconds: 2), () {
-                    context.go(InitialRoute.listValidationScreen);
-                  });
-                } else if (state is ValidationError) {
-                  Flushbar(
-                    message: 'Error: ${state.message}',
-                    duration: const Duration(seconds: 3),
-                    backgroundColor: Colors.red,
-                    flushbarPosition: FlushbarPosition.TOP,
-                  ).show(context);
-                }
+                });
+
+                Future.delayed(const Duration(seconds: 2), () {
+                  context.go(InitialRoute.listValidationScreen);
+                });
+              } else if (state is ValidationError) {
+                Flushbar(
+                  message: 'Error: ${state.message}',
+                  duration: const Duration(seconds: 3),
+                  backgroundColor: Colors.red,
+                  flushbarPosition: FlushbarPosition.TOP,
+                ).show(context);
               }
             },
             child: BlocBuilder<PlantBloc, PlantState>(

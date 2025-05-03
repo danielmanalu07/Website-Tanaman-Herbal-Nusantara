@@ -103,12 +103,12 @@
                                 <li class="children">
                                     <a href="{{ route('home') }}"
                                         class="{{ request()->routeIs('home') ? 'active' : '' }}">
-                                        <i class="flaticon-home"></i>Beranda
+                                        <i class="flaticon-home"></i>{{ __('messages.Beranda') }}
                                     </a>
                                 </li>
                                 <li class="has-children">
                                     <a href="#" class="{{ request()->is('profile*') ? 'active' : '' }}">
-                                        <i class="flaticon-book"></i>Profil
+                                        <i class="flaticon-book"></i>{{ __('messages.Profil') }}
                                     </a>
                                     <ul class="sub-menu list-style">
                                         @foreach ($contents as $content)
@@ -124,24 +124,24 @@
                                 <li class="children">
                                     <a href="{{ route('user.ourgarden') }}"
                                         class="{{ request()->routeIs('user.ourgarden') || request()->routeIs('user.ourgarden.detail') || request()->routeIs('user.ourgarden.plant.detail') ? 'active' : '' }}">
-                                        <i class="fi fi-rr-hand-holding-seeding"></i>Taman Kami
+                                        <i class="fi fi-rr-hand-holding-seeding"></i>{{ __('messages.Taman Kami') }}
                                     </a>
                                 </li>
                                 <li class="children">
                                     <a href="{{ route('news') }}"
                                         class="{{ request()->routeIs('news') || request()->routeIs('user.news.detail') ? 'active' : '' }}">
-                                        <i class="flaticon-pencil"></i>Berita
+                                        <i class="flaticon-pencil"></i>{{ __('messages.Berita') }}
                                     </a>
                                 </li>
                                 <li class="children">
                                     <a href="#" class="{{ request()->is('#') ? 'active' : '' }}">
-                                        <i class="fi fi-rr-marker"></i>Peta Tanaman
+                                        <i class="fi fi-rr-marker"></i>{{ __('messages.Peta Tanaman') }}
                                     </a>
                                 </li>
                                 <li class="children">
                                     <a href="{{ route('user.contact') }}"
                                         class="{{ request()->routeIs('user.contact') ? 'active' : '' }}">
-                                        <i class="flaticon-contact-book"></i>Kontak Kami
+                                        <i class="flaticon-contact-book"></i>{{ __('messages.Kontak Kami') }}
                                     </a>
                                 </li>
 
@@ -172,7 +172,7 @@
                                             style="min-width: 120px; background: transparent; box-shadow: none;">
                                             @foreach ($languages as $language)
                                                 <option value="{{ $language->code }}"
-                                                    {{ session('app_language', 'id') == $language->code ? 'selected' : '' }}>
+                                                    {{ session('app_language_user', 'id') == $language->code ? 'selected' : '' }}>
                                                     {{ $language->name }}
                                                 </option>
                                             @endforeach

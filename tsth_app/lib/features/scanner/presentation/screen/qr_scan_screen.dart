@@ -9,6 +9,7 @@ import 'package:tsth_app/features/scanner/presentation/bloc/plant_bloc.dart';
 import 'package:tsth_app/features/scanner/presentation/bloc/plant_event.dart';
 import 'package:tsth_app/features/scanner/presentation/bloc/plant_state.dart';
 import 'package:tsth_app/features/scanner/presentation/widgets/scanner_border_painter.dart';
+import 'package:tsth_app/features/validation/presentation/widget/ScannerOverlayPainter.dart';
 import 'package:tsth_app/routes/initial_route.dart';
 
 class QrScanScreen extends StatefulWidget {
@@ -34,7 +35,9 @@ class _QrScanScreenState extends State<QrScanScreen>
   late AnimationController _animationController;
   late Animation<double> _animation;
   late MobileScannerController _mobileScannerController;
-  bool _isScanning = false;
+  bool _isProcessing = false;
+  String? _lastScannedCode;
+  DateTime? _lastScanTime;
 
   @override
   void initState() {
@@ -49,7 +52,6 @@ class _QrScanScreenState extends State<QrScanScreen>
       end: 1.0,
     ).animate(_animationController);
 
-    // Initialize scanner controller with proper settings
     _mobileScannerController = MobileScannerController(
       detectionSpeed: DetectionSpeed.normal,
       facing: CameraFacing.back,
@@ -61,80 +63,96 @@ class _QrScanScreenState extends State<QrScanScreen>
   @override
   void dispose() {
     _animationController.dispose();
-    _mobileScannerController.stop();
+    _mobileScannerController.dispose();
     super.dispose();
   }
 
-  void _processQRCode(String? barcodeValue) {
-    if (barcodeValue == null) {
+  Future<void> _processQRCode(String? barcodeValue) async {
+    if (barcodeValue == null || barcodeValue.isEmpty) {
       showErrorFlushbar(context, 'QR/Barcode tidak terbaca.');
-      setState(() => _isScanning = false);
       return;
     }
 
+    // Prevent processing the same code multiple times
+    if (_lastScannedCode == barcodeValue) {
+      final now = DateTime.now();
+      if (_lastScanTime != null &&
+          now.difference(_lastScanTime!) < const Duration(seconds: 2)) {
+        return;
+      }
+    }
+
+    _lastScannedCode = barcodeValue;
+    _lastScanTime = DateTime.now();
+
+    setState(() => _isProcessing = true);
+
     try {
       final uri = Uri.tryParse(barcodeValue);
+      int? id;
+
       if (uri != null && uri.pathSegments.isNotEmpty) {
-        final plantId = uri.pathSegments.last;
-        context.read<PlantBloc>().add(FetchPlantEvent(plantId));
+        // Handle URL format QR codes
+        final lastSegment = uri.pathSegments.last;
+        id = int.tryParse(lastSegment);
       } else {
-        // Fallback untuk QR yang hanya string ID
-        if (barcodeValue.trim().isNotEmpty) {
-          context.read<PlantBloc>().add(FetchPlantEvent(barcodeValue.trim()));
-        } else {
-          showErrorFlushbar(context, 'QR tidak valid: $barcodeValue');
-          setState(() => _isScanning = false);
-        }
+        // Handle plain number QR codes
+        id = int.tryParse(barcodeValue.trim());
+      }
+
+      debugPrint('Scan Result: $barcodeValue, Extracted ID: $id');
+
+      if (id != null) {
+        context.read<PlantBloc>().add(FetchPlantEvent(id));
+      } else {
+        showErrorFlushbar(context, 'Format QR tidak valid.');
+        setState(() => _isProcessing = false);
       }
     } catch (e) {
       debugPrint('Error processing QR: $e');
-      showErrorFlushbar(context, 'Error membaca QR code.');
-      setState(() => _isScanning = false);
+      showErrorFlushbar(context, 'Terjadi kesalahan saat membaca QR code.');
+      setState(() => _isProcessing = false);
     }
   }
 
   Future<void> _onGalleryButtonPressed() async {
+    if (_isProcessing) return;
+
     final ImagePicker picker = ImagePicker();
     final XFile? pickedFile = await picker.pickImage(
       source: ImageSource.gallery,
     );
 
     if (pickedFile != null) {
-      setState(() => _isScanning = true);
-      final String path = pickedFile.path;
+      setState(() => _isProcessing = true);
+
       try {
-        final result = await _mobileScannerController.analyzeImage(path);
+        final BarcodeCapture? result = await _mobileScannerController
+            .analyzeImage(pickedFile.path);
+
         if (result != null && result.barcodes.isNotEmpty) {
-          final barcode = result.barcodes.first;
-          _processQRCode(barcode.rawValue);
+          await _processQRCode(result.barcodes.first.rawValue);
         } else {
           showErrorFlushbar(context, 'QR/Barcode tidak ditemukan.');
-          setState(() => _isScanning = false);
+          setState(() => _isProcessing = false);
         }
       } catch (e) {
         debugPrint('Error scanning image: $e');
         showErrorFlushbar(context, 'Gagal memindai gambar.');
-        setState(() => _isScanning = false);
+        setState(() => _isProcessing = false);
       }
     }
   }
 
   void _onDetect(BarcodeCapture capture) {
-    final barcode = capture.barcodes.first;
-    final String? rawValue = barcode.rawValue;
+    debugPrint('Detected ${capture.barcodes.length} barcodes');
 
-    if (rawValue != null && Uri.tryParse(rawValue)?.hasAbsolutePath == true) {
-      debugPrint('Scanned QR URL: $rawValue');
+    if (_isProcessing) return;
 
-      // Trigger bloc to load plant by URL or ID (depending on backend API)
-      context.read<PlantBloc>().add(FetchPlantEvent(rawValue));
-
-      // Navigate to validation screen after triggering fetch
-      Future.delayed(const Duration(milliseconds: 500), () {
-        context.go(InitialRoute.validationScreen);
-      });
-    } else {
-      showErrorFlushbar(context, 'QR tidak valid');
+    if (capture.barcodes.isNotEmpty) {
+      final barcode = capture.barcodes.first;
+      debugPrint('Scanned QR code: ${barcode.rawValue}');
+      _processQRCode(barcode.rawValue);
     }
   }
 
@@ -142,11 +160,7 @@ class _QrScanScreenState extends State<QrScanScreen>
   Widget build(BuildContext context) {
     return WillPopScope(
       onWillPop: () async {
-        if (context.canPop()) {
-          context.pop();
-        } else {
-          context.go(InitialRoute.homeScreen);
-        }
+        context.pop();
         return false;
       },
       child: Scaffold(
@@ -155,29 +169,23 @@ class _QrScanScreenState extends State<QrScanScreen>
           backgroundColor: Colors.transparent,
           elevation: 0,
           leading: IconButton(
-            icon: const Icon(Icons.arrow_back, color: Colors.white),
+            icon: const Icon(Icons.arrow_back, color: ColorConstant.greenColor),
             onPressed: () {
-              if (context.canPop()) {
-                context.pop();
-              } else {
-                context.go(InitialRoute.homeScreen);
-              }
+              context.pop();
             },
           ),
           title: const Text(
             'Scan QR Tanaman',
-            style: TextStyle(color: Colors.white),
+            style: TextStyle(color: ColorConstant.greenColor),
           ),
         ),
         body: BlocListener<PlantBloc, PlantState>(
           listener: (context, state) {
-            if (state is PlantLoading) {
-              setState(() => _isScanning = true);
-            } else if (state is PlantLoaded) {
-              setState(() => _isScanning = false);
+            if (state is PlantLoaded) {
+              setState(() => _isProcessing = false);
               context.go(InitialRoute.validationScreen);
             } else if (state is PlantError) {
-              setState(() => _isScanning = false);
+              setState(() => _isProcessing = false);
               showErrorFlushbar(context, state.message);
             }
           },
@@ -199,45 +207,53 @@ class _QrScanScreenState extends State<QrScanScreen>
                           style: const TextStyle(color: Colors.white),
                           textAlign: TextAlign.center,
                         ),
+                        const SizedBox(height: 16),
+                        ElevatedButton(
+                          onPressed: () => setState(() {}), // Retry
+                          child: const Text('Coba Lagi'),
+                        ),
                       ],
                     ),
                   );
                 },
               ),
               // Scanner overlay with animation
-              Center(
-                child: SizedBox(
-                  width: 250,
-                  height: 250,
-                  child: Stack(
-                    children: [
-                      CustomPaint(
-                        painter: ScannerBorderPainter(),
-                        child: Container(),
-                      ),
-                      AnimatedBuilder(
-                        animation: _animationController,
-                        builder: (context, child) {
-                          return Positioned(
-                            top: 250 * _animation.value,
-                            left: 0,
-                            right: 0,
-                            child: Container(height: 2, color: Colors.white),
-                          );
-                        },
-                      ),
-                    ],
+              CustomPaint(
+                painter: ScannerOverlayPainter(boxSize: 250),
+                child: Center(
+                  child: SizedBox(
+                    width: 250,
+                    height: 250,
+                    child: Stack(
+                      children: [
+                        CustomPaint(
+                          painter: ScannerBorderPainter(),
+                          child: Container(),
+                        ),
+                        AnimatedBuilder(
+                          animation: _animationController,
+                          builder: (context, child) {
+                            return Positioned(
+                              top: 250 * _animation.value,
+                              left: 0,
+                              right: 0,
+                              child: Container(height: 2, color: Colors.white),
+                            );
+                          },
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),
-              if (_isScanning)
+              if (_isProcessing)
                 Container(
                   color: Colors.black.withOpacity(0.5),
                   child: const Center(
                     child: CircularProgressIndicator(color: Colors.white),
                   ),
                 ),
-              // Gallery button
+              // Gallery and Flash buttons
               Align(
                 alignment: Alignment.bottomCenter,
                 child: Padding(
@@ -245,30 +261,38 @@ class _QrScanScreenState extends State<QrScanScreen>
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      GestureDetector(
-                        onTap: _onGalleryButtonPressed,
-                        child: CircleAvatar(
+                      IconButton(
+                        onPressed:
+                            _isProcessing ? null : _onGalleryButtonPressed,
+                        icon: CircleAvatar(
                           radius: 30,
                           backgroundColor: ColorConstant.whiteColor,
                           child: Icon(
                             Icons.photo_library,
                             size: 30,
-                            color: ColorConstant.blackColor,
+                            color:
+                                _isProcessing
+                                    ? Colors.grey
+                                    : ColorConstant.blackColor,
                           ),
                         ),
                       ),
                       const SizedBox(width: 20),
-                      GestureDetector(
-                        onTap: () async {
-                          await _mobileScannerController.toggleTorch();
-                        },
-                        child: CircleAvatar(
+                      IconButton(
+                        onPressed:
+                            _isProcessing
+                                ? null
+                                : () => _mobileScannerController.toggleTorch(),
+                        icon: CircleAvatar(
                           radius: 30,
                           backgroundColor: ColorConstant.whiteColor,
                           child: Icon(
                             Icons.flashlight_on,
                             size: 30,
-                            color: ColorConstant.blackColor,
+                            color:
+                                _isProcessing
+                                    ? Colors.grey
+                                    : ColorConstant.blackColor,
                           ),
                         ),
                       ),

@@ -1,7 +1,7 @@
 abstract class PlantEvent {}
 
 class FetchPlantEvent extends PlantEvent {
-  final String id;
+  final int id;
 
   FetchPlantEvent(this.id);
 }

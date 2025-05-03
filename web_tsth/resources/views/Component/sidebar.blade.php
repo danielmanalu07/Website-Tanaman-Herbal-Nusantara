@@ -113,6 +113,17 @@
                     </li>
                 </ul>
             </li>
+            <li class="nav-item nav-item-submenu">
+                <a href="#" class="nav-link">
+                    <i class="ph-flower"></i>
+                    <span>Plant Validation</span>
+                </a>
+                <ul class="nav-group-sub collapse">
+                    <li class="nav-item"><a href="{{ route('validation.index') }}" class="nav-link">Plant Validation
+                            Data</a>
+                    </li>
+                </ul>
+            </li>
 
             <li class="nav-item nav-item-submenu">
                 <a href="#" class="nav-link">

@@ -9,6 +9,7 @@ use App\Service\LanguageService;
 use App\Service\NewsService;
 use App\Service\PlantService;
 use App\Service\VisitorService;
+use Illuminate\Http\Request;
 
 class UserController extends Controller
 {
@@ -49,15 +50,33 @@ class UserController extends Controller
 
             $contents  = $this->content_service->get_all_content_user();
             $languages = $this->language_service->get_all_lang_user();
+            $habituses = $this->habitus_service->get_all_user();
 
             return view('user.news', compact(
                 'news',
                 'contents',
                 'languages',
+                'habituses',
             ));
         } catch (\Throwable $th) {
             return redirect()->back()->with('error', 'Something went wrong.');
         }
+    }
+
+    public function search(Request $request)
+    {
+        $search = $request->get('search');
+
+        $news = $this->new_service->get_all_news_user();
+
+        $results = collect($news)
+            ->filter(function ($item) use ($search) {
+                return $item->status === true &&
+                    (stripos($item->title, $search) !== false || stripos($item->content, $search) !== false);
+            })
+            ->sortByDesc(fn($item) => \Carbon\Carbon::parse($item->published));
+
+        return view('user.news.search-result', compact('results'));
     }
 
     public function news_detail(int $id)
@@ -67,9 +86,10 @@ class UserController extends Controller
             $detailNews = $this->new_service->get_detail_news_user($id);
             $contents   = $this->content_service->get_all_content_user();
             $languages  = $this->language_service->get_all_lang_user();
+            $habituses  = $this->habitus_service->get_all_user();
 
             // dd($detailNews);
-            return view('user.news.detail_news', compact('news', 'contents', 'languages', 'detailNews'));
+            return view('user.news.detail_news', compact('news', 'contents', 'languages', 'detailNews', 'habituses'));
         } catch (\Throwable $th) {
             return redirect()->back()->with('error', 'Something went wrong.');
         }
@@ -81,7 +101,8 @@ class UserController extends Controller
             $contents      = $this->content_service->get_all_content_user();
             $languages     = $this->language_service->get_all_lang_user();
             $contentDetail = $this->content_service->get_detail_content_user($id);
-            return view('user.profile.detail_profile', compact('contents', 'languages', 'contentDetail'));
+            $habituses     = $this->habitus_service->get_all_user();
+            return view('user.profile.detail_profile', compact('contents', 'languages', 'contentDetail', 'habituses'));
         } catch (\Throwable $th) {
             return redirect()->back()->with('error', 'Something went wrong.');
         }
@@ -93,8 +114,9 @@ class UserController extends Controller
         $contents  = $this->content_service->get_all_content_user();
         $languages = $this->language_service->get_all_lang_user();
         $contacts  = $this->contact_service->get_all_contact_user();
+        $habituses = $this->habitus_service->get_all_user();
         // dd($contacts);
-        return view('user.contact_us', compact('contents', 'languages', 'contacts'));
+        return view('user.contact_us', compact('contents', 'languages', 'contacts', 'habituses'));
         // } catch (\Throwable $th) {
         //     return redirect()->back()->with('error', 'Something went wrong.');
         // }

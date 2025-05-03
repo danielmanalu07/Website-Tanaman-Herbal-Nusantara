@@ -14,6 +14,10 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       emit(AuthLoading());
       try {
         final user = await loginStaff(event.username, event.password);
+        if (user.active == false) {
+          emit(AuthError("your account has not been activated"));
+          return;
+        }
         emit(AuthSuccess(user));
       } catch (e) {
         if (event.username.toLowerCase() == 'admin') {

@@ -1,6 +1,6 @@
 @extends('component.main')
 @section('menu', 'Home')
-@section('title', 'News')
+@section('title', 'Language')
 @section('icon')
     <i class="ph-globe"></i>
 @endsection

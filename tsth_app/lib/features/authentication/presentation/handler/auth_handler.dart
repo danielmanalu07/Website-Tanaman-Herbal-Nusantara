@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:tsth_app/core/constant/color_constant.dart';
 import 'package:tsth_app/core/widgets/custom_snackbar.dart';
 import 'package:tsth_app/features/authentication/presentation/bloc/auth_bloc.dart';
 import 'package:tsth_app/features/authentication/presentation/bloc/auth_event.dart';
@@ -37,7 +38,7 @@ class AuthHandler {
                 content: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    CircularProgressIndicator(),
+                    CircularProgressIndicator(color: ColorConstant.greenColor),
                     SizedBox(width: 16),
                     Text("Logging in..."),
                   ],

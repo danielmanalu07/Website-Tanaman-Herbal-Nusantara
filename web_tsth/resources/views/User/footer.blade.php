@@ -9,7 +9,7 @@
                         <h5 class="footer-widget-title">
                             <img src="{{ asset('images/logoweb-removebg.png') }}" alt="">
                         </h5>
-                        <p class="comp-desc">Taman Sains Teknologi Herbal dan Hortikultura Pollung.
+                        <p class="comp-desc">{{ __('messages.Taman Sains Teknologi Herbal & Hortikultura') }}
                         </p>
                         <div class="contact-item style1">
                             <div class="contact-icon">
@@ -41,7 +41,7 @@
                 <div class="col-xl-2 col-lg-2 col-md-6">
                     <div class="footer-widget">
                         <h5 class="footer-widget-title  sm-title">
-                            Profil
+                            {{ __('messages.Profil') }}
                         </h5>
                         <ul class="footer-menu  list-style">
                             @foreach ($contents as $item_content)
@@ -55,7 +55,7 @@
                 <div class="col-xl-2 offset-xl-1 col-lg-3 col-md-6">
                     <div class="footer-widget ">
                         <h5 class="footer-widget-title sm-title">
-                            Taman Kami
+                            {{ __('messages.Taman Kami') }}
                         </h5>
                         <ul class="footer-menu list-style">
                             @php
@@ -71,14 +71,14 @@
                 <div class="col-xl-2 offset-xl-1 col-lg-3 col-md-6">
                     <div class="footer-widget ">
                         <h5 class="footer-widget-title sm-title">
-                            Jadwal Kerja
+                            {{ __('messages.Jadwal Kerja') }}
                         </h5>
                         <ul class="footer-menu list-style">
-                            <li><a href="blog-left-sidebar.html">Senin (08.00 - 17.00)</a></li>
-                            <li><a href="gallery.html">Selasa (08.00 - 17.00)</a></li>
-                            <li><a href="projects.html">Rabu (08.00 - 17.00)</a></li>
-                            <li><a href="about.html">Kamis (08.00 - 17.00)</a></li>
-                            <li><a href="contact.html">Jumat (08.00 - 17.00)</a></li>
+                            <li><a href="#">Senin (08.00 - 17.00)</a></li>
+                            <li><a href="#">Selasa (08.00 - 17.00)</a></li>
+                            <li><a href="#">Rabu (08.00 - 17.00)</a></li>
+                            <li><a href="#">Kamis (08.00 - 17.00)</a></li>
+                            <li><a href="#">Jumat (08.00 - 17.00)</a></li>
                         </ul>
                     </div>
                 </div>

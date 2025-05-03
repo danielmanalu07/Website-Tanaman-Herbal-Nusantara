@@ -10,6 +10,8 @@ class Validation {
   final Plant? plant;
   final User? validator;
   final List<ValidationImage> images;
+  final String createdAt;
+  final String updateAt;
 
   Validation({
     required this.id,
@@ -19,5 +21,7 @@ class Validation {
     required this.plant,
     required this.validator,
     required this.images,
+    required this.createdAt,
+    required this.updateAt,
   });
 }

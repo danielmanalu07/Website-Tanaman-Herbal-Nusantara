@@ -31,12 +31,13 @@
             class="breadcrumb-image position-absolute top-0 start-0 w-100 h-100 object-cover">
         <div class="overlay op-8 bg-racing-green"></div>
         <div class="container">
-            <h2 class="breadcrumb-title">Detail Tanaman</h2>
+            <h2 class="breadcrumb-title">{{ __('messages.Detail Tanaman') }}</h2>
             <ul class="breadcrumb-menu list-style">
-                <li><a href="{{ route('home') }}">Beranda</a></li>
-                <li><a href="{{ route('user.ourgarden') }}">Taman</a></li>
-                <li><a href="{{ route('user.ourgarden.detail', $currentPlantHabitusId) }}">Tanaman</a></li>
-                <li>Detail Tanaman</li>
+                <li><a href="{{ route('home') }}">{{ __('messages.Beranda') }}</a></li>
+                <li><a href="{{ route('user.ourgarden') }}">{{ __('messages.Taman') }}</a></li>
+                <li><a href="{{ route('user.ourgarden.detail', $currentPlantHabitusId) }}">{{ __('messages.Tanaman') }}</a>
+                </li>
+                <li>{{ __('messages.Detail Tanaman') }}</li>
             </ul>
         </div>
     </div>
@@ -51,7 +52,7 @@
                                     alt="">
                             </div>
                             <div class="project-desc" style="font-size: 1.1rem;">
-                                <h3 class="mb-3" style="font-size: 1.75rem;">Informasi Tanaman</h3>
+                                <h3 class="mb-3" style="font-size: 1.75rem;">{{ __('messages.Informasi Tanaman') }}</h3>
                                 <div class="d-flex flex-column flex-md-row justify-content-between">
                                     <!-- Left Column -->
                                     <ul class="list-style project-desc-list" style="flex: 1; margin-right: 15px;">
@@ -61,7 +62,8 @@
                                         </li>
                                         <li class="d-flex flex-column mb-2">
                                             <h6 class="fw-bold" style="font-size: 1.25rem;">Latin Name</h6>
-                                            <p class="mb-0" style="font-size: 1.1rem;">{{ $plants['data']['latin_name'] }}
+                                            <p class="mb-0" style="font-size: 1.1rem;">
+                                                {{ $plants['data']['latin_name'] }}
                                             </p>
                                         </li>
                                         <li class="d-flex flex-column mb-2">
@@ -96,7 +98,7 @@
                             <p>{!! $plants['data']['advantage'] !!}</p>
                         </div>
                         <div class="project-images-gallery mt-5">
-                            <h3 class="mb-4">Galeri Tanaman</h3>
+                            <h3 class="mb-4">{{ __('messages.Galeri Tanaman') }}</h3>
                             <div class="row">
                                 @foreach ($plants['data']['images'] as $image)
                                     <div class="col-lg-4 col-md-6 col-sm-12 mb-4">
@@ -113,7 +115,7 @@
                             </div>
                         </div>
                         <div class="project-card mt-5">
-                            <h3 class="mb-4">Galeri Lokasi</h3>
+                            <h3 class="mb-4">{{ __('messages.Galeri Lokasi') }}</h3>
                             <div class="row">
                                 @foreach ($plants['data']['lands'] as $land)
                                     <div class="col-lg-4 col-md-6 col-sm-12 mb-4">
@@ -141,7 +143,7 @@
                             <button type="submit"> <i class="las la-search"></i></button>
                         </div> --}}
                         <div class="sidebar-widget categories box">
-                            <h4>Habitus</h4>
+                            <h4>{{ __('messages.Habitus') }}</h4>
                             <div class="category-box">
                                 <ul class="list-style">
                                     @foreach ($habituses as $habitus)
@@ -153,7 +155,7 @@
                             </div>
                         </div>
                         <div class="sidebar-widget categories box">
-                            <h4>Tanaman Sejenis</h4>
+                            <h4>{{ __('messages.Tanaman Sejenis') }}</h4>
                             <div class="category-box">
                                 <ul class="list-style">
                                     @foreach ($plantHabitus as $item)

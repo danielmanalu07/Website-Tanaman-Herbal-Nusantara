@@ -16,7 +16,7 @@ class SetAcceptLanguage
      */
     public function handle(Request $request, Closure $next): Response
     {
-        $language = LanguageConstant::GetLanguage();
+        $language = LanguageConstant::GetLanguageUser();
 
         Http::macro('language', function () use ($language) {
             return Http::withHeaders([

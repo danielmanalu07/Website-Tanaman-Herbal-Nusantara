@@ -12,4 +12,14 @@ class LanguageConstant
     {
         return session(['app_language' => $language]);
     }
+
+    public static function GetLanguageUser()
+    {
+        return session('app_language_user', 'id');
+    }
+
+    public static function SetLanguageUser($language)
+    {
+        return session(['app_language_user' => $language]);
+    }
 }

@@ -43,7 +43,7 @@ class ContactUsService
     public function get_all_contact_user()
     {
         try {
-            $lang     = $this->language->GetLanguage();
+            $lang     = $this->language->GetLanguageUser();
             $response = Http::withHeaders([
                 'Accept-Language' => "{$lang}",
             ])->get("{$this->api_url}/contact-us-user");
