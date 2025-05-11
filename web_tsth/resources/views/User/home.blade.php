@@ -55,7 +55,7 @@
                         <div class="col-xl-7 col-lg-6 col-md-12 col-12 order-xl-1 order-lg-1 order-md-2 order-2">
                             <div class="hero-content style2">
                                 <span>{{ __('messages.Tanaman Herbal Nusantara') }}</span>
-                                <h1>{{ __('messages.Taman Sains Teknologi Herbal & Hortikultura') }}</h1>
+                                <h1>{{ __('messages.Taman Sains Teknologi Herbal dan Hortikultura Indonesia') }}</h1>
                                 <p>{{ __('messages.Temukan Tanaman Herbal dan Hortikultura Favoritmu Sekarang dan Cari Tahu Manfaat Tanaman Lokal di Sekitarmu!') }}
                                 </p>
                                 <div class="hero-btn">

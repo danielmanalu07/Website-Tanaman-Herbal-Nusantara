@@ -10,8 +10,421 @@
 @endsection
 @push('resource')
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        /* Pulse animation for icons */
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+                opacity: 1;
+            }
+
+            50% {
+                transform: scale(1.2);
+                opacity: 0.7;
+            }
+
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        .icon-pulse {
+            animation: pulse 1.5s infinite;
+        }
+
+        /* Icon styling */
+        .healthy-icon {
+            color: #10b981;
+            font-size: 3.8rem;
+        }
+
+        .unhealthy-icon {
+            color: #ef4444;
+            font-size: 3.8rem;
+        }
+
+        .needs-attention-icon {
+            color: #f59e0b;
+            font-size: 3.8rem;
+        }
+    </style>
+    @php
+        $labels = [];
+        $total = [];
+        $persentase = [];
+        $predefinedColors = [
+            '#3b82f6', // biru
+            '#10b981', // hijau
+            '#f59e0b', // kuning
+            '#ef4444', // merah
+            '#8b5cf6', // ungu
+            '#ec4899', // pink
+            '#14b8a6', // teal
+            '#a855f7', // violet
+            '#6366f1', // indigo
+            '#22c55e', // emerald
+        ];
+        $colors = [];
+        foreach ($visitor as $index => $item) {
+            $colors[] = $predefinedColors[$index % count($predefinedColors)];
+        }
+
+        $totalVisitor = 0;
+        foreach ($visitor as $item) {
+            $totalVisitor += $item->visitor_total;
+        }
+
+        foreach ($visitor as $item) {
+            $labels[] = $item->visitor_category['name'];
+            $total[] = $item->visitor_total;
+
+            $percent = $totalVisitor > 0 ? ($item->visitor_total / $totalVisitor) * 100 : 0;
+            $persentase[] = round($percent, 2);
+        }
+
+        // Aggregate validation conditions
+        $healthyCount = $validations->where('condition', 'Healthy')->count();
+        $unhealthyCount = $validations->where('condition', 'Unhealthy')->count();
+        $needsAttentionCount = $validations->where('condition', 'Needs Attention')->count();
+        $totalValidations = $healthyCount + $unhealthyCount + $needsAttentionCount;
+        $healthyPercent = $totalValidations > 0 ? round(($healthyCount / $totalValidations) * 100, 2) : 0;
+        $unhealthyPercent = $totalValidations > 0 ? round(($unhealthyCount / $totalValidations) * 100, 2) : 0;
+        $needsAttentionPercent = $totalValidations > 0 ? round(($needsAttentionCount / $totalValidations) * 100, 2) : 0;
+    @endphp
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            let barChart;
+
+            // Ambil data langsung dari PHP
+            const plantData = @json(
+                $plant->map(function ($item) {
+                    return [
+                        'created_at' => $item->created_at ?? ($item->date_created ?? $item->createdBy),
+                    ];
+                }));
+            console.log(plantData);
+
+            // Fungsi untuk memfilter data berdasarkan tanggal
+            function filterDataByDate(data, startDate, endDate) {
+                if (!startDate || !endDate) return data; // Return all data if no date filter
+                return data.filter(item => {
+                    if (!item.created_at) return false;
+                    const itemDate = new Date(item.created_at);
+                    const start = new Date(startDate);
+                    const end = new Date(endDate);
+                    return itemDate >= start && itemDate <= end;
+                });
+            }
+
+            // Fungsi untuk memuat chart
+            function loadChart(startDate, endDate) {
+                const chartCanvas = document.getElementById('barChart');
+                chartCanvas.style.opacity = '0.5';
+
+                // Filter data berdasarkan tanggal
+                const filteredData = filterDataByDate(plantData, startDate, endDate);
+
+                // Proses data untuk chart
+                processChartData(filteredData, startDate, endDate);
+                chartCanvas.style.opacity = '1';
+            }
+
+            // Fungsi untuk memproses data dan menampilkan chart
+            function processChartData(data, startDate, endDate) {
+                const monthCounts = {};
+                const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+                // Tentukan rentang tahun untuk inisialisasi label
+                let startYear, endYear;
+                if (startDate && endDate) {
+                    startYear = new Date(startDate).getFullYear();
+                    endYear = new Date(endDate).getFullYear();
+                } else {
+                    const years = data
+                        .filter(item => item.created_at)
+                        .map(item => new Date(item.created_at).getFullYear());
+                    startYear = years.length ? Math.min(...years) : new Date().getFullYear();
+                    endYear = years.length ? Math.max(...years) : new Date().getFullYear();
+                }
+
+                // Inisialisasi semua kombinasi bulan-tahun dengan nilai 0
+                const labels = [];
+                for (let year = startYear; year <= endYear; year++) {
+                    months.forEach(month => {
+                        const key = `${month}-${year}`;
+                        monthCounts[key] = 0;
+                        labels.push(key);
+                    });
+                }
+
+                // Hitung jumlah tanaman per bulan dan tahun
+                data.forEach(item => {
+                    if (item && item.created_at) {
+                        const date = new Date(item.created_at);
+                        const month = months[date.getMonth()];
+                        const year = date.getFullYear();
+                        const key = `${month}-${year}`;
+                        monthCounts[key] = (monthCounts[key] || 0) + 1;
+                    }
+                });
+
+                const counts = labels.map(key => monthCounts[key]);
+
+                if (barChart) {
+                    barChart.destroy();
+                }
+                const maxData = Math.min(100, Math.ceil(Math.max(...counts, 0) / 10) * 10);
+
+                const ctx = document.getElementById('barChart').getContext('2d');
+                barChart = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: 'Jumlah Tanaman',
+                            data: counts,
+                            backgroundColor: 'rgba(54, 162, 235, 0.6)',
+                            borderColor: 'rgba(54, 162, 235, 1)',
+                            borderWidth: 1,
+                            barPercentage: 0.8
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            legend: {
+                                position: 'top',
+                            },
+                            tooltip: {
+                                mode: 'index',
+                                intersect: false,
+                                callbacks: {
+                                    label: function(tooltipItem) {
+                                        return `Jumlah Tanaman: ${tooltipItem.raw}`;
+                                    }
+                                }
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                min: 0,
+                                max: maxData, // Tetap set max ke 100
+                                title: {
+                                    display: true,
+                                    text: 'Jumlah'
+                                }
+                            },
+                            x: {
+                                title: {
+                                    display: true,
+                                    text: 'Bulan-Tahun'
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+
+            function initProgressCharts() {
+                const healthyData = [{
+                    value: {{ $healthyPercent }},
+                    label: 'Healthy'
+                }];
+                if (healthyChart) healthyChart.destroy();
+                const healthyCtx = document.getElementById('healthy-progress').getContext('2d');
+                healthyChart = new Chart(healthyCtx, {
+                    type: 'doughnut',
+                    data: {
+                        datasets: [{
+                            data: healthyData.map(d => d.value),
+                            backgroundColor: ['#10b981', '#ebedef'],
+                            borderWidth: 0
+                        }],
+                        labels: ['']
+                    },
+                    options: {
+                        circumference: 180,
+                        rotation: 270,
+                        cutout: '80%',
+                        responsive: true,
+                        plugins: {
+                            legend: {
+                                display: false
+                            },
+                            tooltip: {
+                                enabled: false
+                            },
+                            beforeDraw: function(chart) {
+                                const ctx = chart.ctx;
+                                const width = chart.width;
+                                const height = chart.height;
+                                const fontSize = (height / 114).toFixed(2);
+                                ctx.font = fontSize + "em sans-serif";
+                                ctx.textBaseline = "middle";
+                                const text = {{ $healthyPercent }} + '%';
+                                const textX = Math.round((width - ctx.measureText(text).width) / 2);
+                                const textY = height / 2;
+                                ctx.fillStyle = '#000';
+                                ctx.fillText(text, textX, textY);
+                            }
+                        }
+                    }
+                });
+
+                const unhealthyData = [{
+                    value: {{ $unhealthyPercent }},
+                    label: 'Unhealthy'
+                }];
+                if (unhealthyChart) unhealthyChart.destroy();
+                const unhealthyCtx = document.getElementById('unhealthy-progress').getContext('2d');
+                unhealthyChart = new Chart(unhealthyCtx, {
+                    type: 'doughnut',
+                    data: {
+                        datasets: [{
+                            data: unhealthyData.map(d => d.value),
+                            backgroundColor: ['#ef4444', '#ebedef'],
+                            borderWidth: 0
+                        }],
+                        labels: ['']
+                    },
+                    options: {
+                        circumference: 180,
+                        rotation: 270,
+                        cutout: '80%',
+                        responsive: true,
+                        plugins: {
+                            legend: {
+                                display: false
+                            },
+                            tooltip: {
+                                enabled: false
+                            },
+                            beforeDraw: function(chart) {
+                                const ctx = chart.ctx;
+                                const width = chart.width;
+                                const height = chart.height;
+                                const fontSize = (height / 114).toFixed(2);
+                                ctx.font = fontSize + "em sans-serif";
+                                ctx.textBaseline = "middle";
+                                const text = {{ $unhealthyPercent }} + '%';
+                                const textX = Math.round((width - ctx.measureText(text).width) / 2);
+                                const textY = height / 2;
+                                ctx.fillStyle = '#000';
+                                ctx.fillText(text, textX, textY);
+                            }
+                        }
+                    }
+                });
+
+                const needsAttentionData = [{
+                    value: {{ $needsAttentionPercent }},
+                    label: 'Needs Attention'
+                }];
+                if (needsAttentionChart) needsAttentionChart.destroy();
+                const needsAttentionCtx = document.getElementById('needs-attention-progress').getContext('2d');
+                needsAttentionChart = new Chart(needsAttentionCtx, {
+                    type: 'doughnut',
+                    data: {
+                        datasets: [{
+                            data: needsAttentionData.map(d => d.value),
+                            backgroundColor: ['#f59e0b', '#ebedef'],
+                            borderWidth: 0
+                        }],
+                        labels: ['']
+                    },
+                    options: {
+                        circumference: 180,
+                        rotation: 270,
+                        cutout: '80%',
+                        responsive: true,
+                        plugins: {
+                            legend: {
+                                display: false
+                            },
+                            tooltip: {
+                                enabled: false
+                            },
+                            beforeDraw: function(chart) {
+                                const ctx = chart.ctx;
+                                const width = chart.width;
+                                const height = chart.height;
+                                const fontSize = (height / 114).toFixed(2);
+                                ctx.font = fontSize + "em sans-serif";
+                                ctx.textBaseline = "middle";
+                                const text = {{ $needsAttentionPercent }} + '%';
+                                const textX = Math.round((width - ctx.measureText(text).width) / 2);
+                                const textY = height / 2;
+                                ctx.fillStyle = '#000';
+                                ctx.fillText(text, textX, textY);
+                            }
+                        }
+                    }
+                });
+            }
+
+            // Event listener untuk perubahan tanggal
+            document.querySelectorAll('.date-filter').forEach(input => {
+                input.addEventListener('change', function() {
+                    const startDate = document.getElementById('start').value;
+                    const endDate = document.getElementById('end').value;
+                    loadChart(startDate, endDate);
+                });
+            });
+
+            // Load chart dengan semua data sebagai default
+            loadChart(null, null);
+            initProgressCharts();
+        });
+        $(document).ready(function() {
+            const habitatCtx = document.getElementById('habitat-chart').getContext('2d');
+            const visitorData = @json($total);
+            const visitorCategory = @json($labels);
+            const colors = @json($colors);
+            new Chart(habitatCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: visitorCategory,
+                    datasets: [{
+                        data: visitorData,
+                        backgroundColor: colors,
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'right'
+                        }
+                    }
+                }
+            });
+        });
+    </script>
 @endpush
 @section('content')
+    @php
+        $avgHabitus = round($habituses / (now()->hour ?: 1));
+        $countLanguage = $languages->count();
+        $avgLanguage = round($countLanguage / (now()->hour ?: 1));
+        $avgStaff = round($staff / (now()->hour ?: 1));
+        $avgPlants = round($plants / (now()->hour ?: 1));
+        $avgLands = round($lands / (now()->hour ?: 1));
+        $avgVisitorCategories = round($visitor_categories / (now()->hour ?: 1));
+        $avgVisitors = round($visitors / (now()->hour ?: 1));
+        $avgNews = round($news / (now()->hour ?: 1));
+        $avgPlantValidations = round($plant_validations / (now()->hour ?: 1));
+
+        $validation = collect($validations)
+            ->sortByDesc(fn($item) => \Carbon\Carbon::parse($item->date_validation))
+            ->take(5);
+        $berita = collect($berita)->sortByDesc(fn($item) => \Carbon\Carbon::parse($item->published))->take(4);
+    @endphp
     <!-- Quick stats boxes -->
     <div class="row">
         <div class="col-lg-4">
@@ -21,7 +434,6 @@
                 <div class="card-body">
                     <div class="d-flex">
                         <h3 class="mb-0">{{ $habituses }}</h3>
-                        <span class="badge bg-black bg-opacity-50 rounded-pill align-self-center ms-auto">+53,6%</span>
                     </div>
 
                     <div>
@@ -30,7 +442,7 @@
                     </div>
                 </div>
 
-                <div class="rounded-bottom overflow-hidden mx-3" id="members-online"></div>
+                {{-- <div class="rounded-bottom overflow-hidden mx-3" id="members-online"></div> --}}
             </div>
             <!-- /members online -->
 
@@ -42,41 +454,16 @@
             <div class="card bg-pink text-white">
                 <div class="card-body">
                     <div class="d-flex align-items-center">
-                        <h3 class="mb-0">49.4%</h3>
-                        <div class="dropdown d-inline-flex ms-auto">
-                            <a href="#" class="text-white d-inline-flex align-items-center dropdown-toggle"
-                                data-bs-toggle="dropdown">
-                                <i class="ph-gear"></i>
-                            </a>
-                            <div class="dropdown-menu dropdown-menu-end">
-                                <a href="#" class="dropdown-item">
-                                    <i class="ph-arrows-clockwise me-2"></i>
-                                    Update data
-                                </a>
-                                <a href="#" class="dropdown-item">
-                                    <i class="ph-list-dashes me-2"></i>
-                                    Detailed log
-                                </a>
-                                <a href="#" class="dropdown-item">
-                                    <i class="ph-chart-line me-2"></i>
-                                    Statistics
-                                </a>
-                                <div class="dropdown-divider"></div>
-                                <a href="#" class="dropdown-item">
-                                    <i class="ph-eraser me-2"></i>
-                                    Clear list
-                                </a>
-                            </div>
-                        </div>
+                        <h3 class="mb-0">{{ $staff }}</h3>
                     </div>
 
                     <div>
-                        Current server load
-                        <div class="fs-sm opacity-75">34.6% avg</div>
+                        Staff Total
+                        <div class="fs-sm opacity-75">{{ $avgStaff }}% avg</div>
                     </div>
                 </div>
 
-                <div class="rounded-bottom overflow-hidden" id="server-load"></div>
+                {{-- <div class="rounded-bottom overflow-hidden" id="server-load"></div> --}}
             </div>
             <!-- /current server load -->
 
@@ -88,21 +475,136 @@
             <div class="card bg-primary text-white">
                 <div class="card-body">
                     <div class="d-flex align-items-center">
-                        <h3 class="mb-0">$18,390</h3>
-                        <div class="ms-auto">
-                            <a class="text-white" data-card-action="reload">
-                                <i class="ph-arrows-clockwise"></i>
-                            </a>
-                        </div>
+                        <h3 class="mb-0">{{ $plants }}</h3>
                     </div>
 
                     <div>
-                        Today's revenue
-                        <div class="fs-sm opacity-75">$37,578 avg</div>
+                        Plant Total
+                        <div class="fs-sm opacity-75">{{ $avgPlants }}% avg</div>
                     </div>
                 </div>
 
-                <div class="rounded-bottom overflow-hidden" id="today-revenue"></div>
+                {{-- <div class="rounded-bottom overflow-hidden" id="today-revenue"></div> --}}
+            </div>
+            <!-- /today's revenue -->
+
+        </div>
+
+        <div class="col-lg-4">
+
+            <!-- Today's revenue -->
+            <div class="card bg-secondary text-white">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <h3 class="mb-0">{{ $lands }}</h3>
+                    </div>
+
+                    <div>
+                        Land Total
+                        <div class="fs-sm opacity-75">{{ $avgLands }}% avg</div>
+                    </div>
+                </div>
+
+                {{-- <div class="rounded-bottom overflow-hidden" id="today-revenue"></div> --}}
+            </div>
+            <!-- /today's revenue -->
+
+        </div>
+
+        <div class="col-lg-4">
+
+            <!-- Today's revenue -->
+            <div class="card bg-warning text-white">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <h3 class="mb-0">{{ $visitor_categories }}</h3>
+                    </div>
+
+                    <div>
+                        Visitor Category Total
+                        <div class="fs-sm opacity-75">{{ $visitor_categories }}% avg</div>
+                    </div>
+                </div>
+
+            </div>
+            <!-- /today's revenue -->
+
+        </div>
+
+        <div class="col-lg-4">
+
+            <!-- Today's revenue -->
+            <div class="card bg-warning text-white">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <h3 class="mb-0">{{ $visitors }}</h3>
+                    </div>
+
+                    <div>
+                        Visitor Total
+                        <div class="fs-sm opacity-75">{{ $visitors }}% avg</div>
+                    </div>
+                </div>
+
+            </div>
+            <!-- /today's revenue -->
+
+        </div>
+
+        <div class="col-lg-4">
+
+            <!-- Today's revenue -->
+            <div class="card bg-success text-white">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <h3 class="mb-0">{{ $news }}</h3>
+                    </div>
+
+                    <div>
+                        News Total
+                        <div class="fs-sm opacity-75">{{ $avgNews }}% avg</div>
+                    </div>
+                </div>
+
+                {{-- <div class="rounded-bottom overflow-hidden" id="today-revenue"></div> --}}
+            </div>
+            <!-- /today's revenue -->
+
+        </div>
+
+        <div class="col-lg-4">
+
+            <!-- Today's revenue -->
+            <div class="card bg-danger text-white">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <h3 class="mb-0">{{ $plant_validations }}</h3>
+                    </div>
+
+                    <div>
+                        Plant Validation Total
+                        <div class="fs-sm opacity-75">{{ $avgPlantValidations }}% avg</div>
+                    </div>
+                </div>
+            </div>
+            <!-- /today's revenue -->
+
+        </div>
+
+        <div class="col-lg-4">
+
+            <!-- Today's revenue -->
+            <div class="card bg-dark text-white">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <h3 class="mb-0">{{ $countLanguage }}</h3>
+                    </div>
+
+                    <div>
+                        Language Total
+                        <div class="fs-sm opacity-75">{{ $avgLanguage }}% avg</div>
+                    </div>
+                </div>
             </div>
             <!-- /today's revenue -->
 
@@ -113,64 +615,88 @@
     <div class="row">
         <div class="col-xl-7">
 
-            <!-- Traffic sources -->
+            <!-- Ganti bagian Marketing campaigns dengan ini -->
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Visitor Statistics</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="chart-container" style="height: 350px;">
+                                <canvas id="habitat-chart"></canvas>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="table-responsive">
+                                <table class="table table-sm">
+                                    <thead>
+                                        <tr>
+                                            <th>Visitor</th>
+                                            <th>Visitor Total</th>
+                                            <th>Persentase</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach ($visitor as $index => $item)
+                                            <tr>
+                                                <td>{{ $labels[$index] }}</td>
+                                                <td>{{ $total[$index] }}</td>
+                                                <td>
+                                                    <div class="progress progress-xs" style="height: 10px;">
+                                                        <div class="progress-bar"
+                                                            style="width: {{ $persentase[$index] }}%; background-color: {{ $colors[$index] }};">
+                                                        </div>
+                                                    </div>
+                                                    <span>{{ $persentase[$index] }}%</span>
+                                                </td>
+                                            </tr>
+                                        @endforeach
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <div class="card">
                 <div class="card-header d-flex align-items-center">
-                    <h5 class="mb-0">Traffic sources</h5>
-                    <div class="ms-auto">
-                        <label class="form-check form-switch form-check-reverse">
-                            <input type="checkbox" class="form-check-input" checked>
-                            <span class="form-check-label">Live update</span>
-                        </label>
-                    </div>
+                    <h5 class="mb-0">Latest Plant Validations</h5>
                 </div>
 
-                <div class="card-body pb-0">
-                    <div class="row">
-                        <div class="col-sm-4">
-                            <div class="d-flex align-items-center justify-content-center mb-2">
-                                <a href="#" class="bg-success bg-opacity-10 text-success lh-1 rounded-pill p-2 me-3">
-                                    <i class="ph-plus"></i>
-                                </a>
-                                <div>
-                                    <div class="fw-semibold">New visitors</div>
-                                    <span class="text-muted">2,349 avg</span>
-                                </div>
-                            </div>
-                            <div class="w-75 mx-auto mb-3" id="new-visitors"></div>
-                        </div>
-
-                        <div class="col-sm-4">
-                            <div class="d-flex align-items-center justify-content-center mb-2">
-                                <a href="#" class="bg-warning bg-opacity-10 text-warning lh-1 rounded-pill p-2 me-3">
-                                    <i class="ph-clock"></i>
-                                </a>
-                                <div>
-                                    <div class="fw-semibold">New sessions</div>
-                                    <span class="text-muted">08:20 avg</span>
-                                </div>
-                            </div>
-                            <div class="w-75 mx-auto mb-3" id="new-sessions"></div>
-                        </div>
-
-                        <div class="col-sm-4">
-                            <div class="d-flex align-items-center justify-content-center mb-2">
-                                <a href="#" class="bg-indigo bg-opacity-10 text-indigo lh-1 rounded-pill p-2 me-3">
-                                    <i class="ph-users-three"></i>
-                                </a>
-                                <div>
-                                    <div class="fw-semibold">Total online</div>
-                                    <span class="text-muted">5,378 avg</span>
-                                </div>
-                            </div>
-                            <div class="w-75 mx-auto mb-3" id="total-online"></div>
-                        </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Date Validation</th>
+                                    <th>Plant</th>
+                                    <th>Description Validation</th>
+                                    <th>Condition</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach ($validation as $item)
+                                    <tr>
+                                        <td>{{ $item->date_validation }}</td>
+                                        <td>{{ $item->plant['name'] }}</td>
+                                        <td>{{ $item->description }}</td>
+                                        @if ($item->condition == 'Healthy')
+                                            <td><span class="badge bg-success">{{ $item->condition }}</span></td>
+                                        @elseif ($item->condition == 'Unhealthy')
+                                            <td><span class="badge bg-danger">{{ $item->condition }}</span></td>
+                                        @else
+                                            <td><span class="badge bg-warning">{{ $item->condition }}</span></td>
+                                        @endif
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
                     </div>
                 </div>
-
-                <div class="chart position-relative" id="traffic-sources"></div>
             </div>
-            <!-- /traffic sources -->
+
 
         </div>
 
@@ -179,46 +705,62 @@
             <!-- Sales stats -->
             <div class="card">
                 <div class="card-header d-sm-flex align-items-sm-center py-sm-0">
-                    <h5 class="py-sm-2 my-sm-1">Sales statistics</h5>
+                    <h5 class="py-sm-2 my-sm-1">Plant statistics</h5>
                     <div class="mt-2 mt-sm-0 ms-sm-auto">
-                        <select class="form-select" id="select_date">
-                            <option value="val1">June, 29 - July, 5</option>
-                            <option value="val2">June, 22 - June 28</option>
-                            <option value="val3" selected>June, 15 - June, 21</option>
-                            <option value="val4">June, 8 - June, 14</option>
-                        </select>
+                        <input type="date" id="start" class="date-filter">
+                        <span>to</span>
+                        <input type="date" id="end" class="date-filter">
                     </div>
                 </div>
 
                 <div class="card-body pb-0">
                     <div class="row text-center">
-                        <div class="col-4">
-                            <div class="mb-3">
-                                <h5 class="mb-0">5,689</h5>
-                                <div class="text-muted fs-sm">new orders</div>
-                            </div>
-                        </div>
+                        <canvas id="barChart" height="100"></canvas>
+                    </div>
+                </div>
+            </div>
+            <!-- /sales stats -->
 
-                        <div class="col-4">
-                            <div class="mb-3">
-                                <h5 class="mb-0">32,568</h5>
-                                <div class="text-muted fs-sm">this month</div>
+            <!-- Progress counters -->
+            <div class="row">
+                <div class="col-sm-6">
+                    <!-- Healthy Progress -->
+                    <div class="card text-center">
+                        <div class="card-body">
+                            <div>
+                                <i class="bi bi-check-circle-fill healthy-icon icon-pulse"></i>
                             </div>
-                        </div>
-
-                        <div class="col-4">
-                            <div class="mb-3">
-                                <h5 class="mb-0">$23,464</h5>
-                                <div class="text-muted fs-sm">expected profit</div>
-                            </div>
+                            <h3 class="mt-2">{{ $healthyPercent }}%</h3>
+                            <p>Healthy Plants<br><small>{{ $healthyCount }} total</small></p>
                         </div>
                     </div>
                 </div>
-
-                <div class="chart mb-2" id="app_sales"></div>
-                <div class="chart" id="monthly-sales-stats"></div>
+                <div class="col-sm-6">
+                    <!-- Unhealthy Progress -->
+                    <div class="card text-center">
+                        <div class="card-body">
+                            <div>
+                                <i class="bi bi-x-circle-fill unhealthy-icon icon-pulse"></i>
+                            </div>
+                            <h3 class="mt-2">{{ $unhealthyPercent }}%</h3>
+                            <p>Unhealthy Plants<br><small>{{ $unhealthyCount }} total</small></p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-6">
+                    <!-- Needs Attention Progress -->
+                    <div class="card text-center">
+                        <div class="card-body">
+                            <div>
+                                <i class="bi bi-exclamation-circle-fill needs-attention-icon icon-pulse"></i>
+                            </div>
+                            <h3 class="mt-2">{{ $needsAttentionPercent }}%</h3>
+                            <p>Needs Attention<br><small>{{ $needsAttentionCount }} total</small></p>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <!-- /sales stats -->
+            <!-- /progress counters -->
 
         </div>
     </div>
@@ -227,1814 +769,42 @@
 
     <!-- Dashboard content -->
     <div class="row">
-        <div class="col-xl-8">
-
-            <!-- Marketing campaigns -->
-            <div class="card">
-                <div class="card-header d-flex align-items-center">
-                    <h5 class="mb-0">Marketing campaigns</h5>
-                    <div class="d-inline-flex ms-auto">
-                        <span class="badge bg-success rounded-pill">28 active</span>
-                        <div class="dropdown d-inline-flex ms-3">
-                            <a href="#" class="text-body d-inline-flex align-items-center dropdown-toggle"
-                                data-bs-toggle="dropdown">
-                                <i class="ph-gear"></i>
-                            </a>
-                            <div class="dropdown-menu dropdown-menu-end">
-                                <a href="#" class="dropdown-item">
-                                    <i class="ph-arrows-clockwise me-2"></i>
-                                    Update data
-                                </a>
-                                <a href="#" class="dropdown-item">
-                                    <i class="ph-list-dashes me-2"></i>
-                                    Detailed log
-                                </a>
-                                <a href="#" class="dropdown-item">
-                                    <i class="ph-chart-line me-2"></i>
-                                    Statistics
-                                </a>
-                                <div class="dropdown-divider"></div>
-                                <a href="#" class="dropdown-item">
-                                    <i class="ph-eraser me-2"></i>
-                                    Clear list
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="card-body d-sm-flex align-items-sm-center justify-content-sm-between flex-sm-wrap">
-                    <div class="d-flex align-items-center mb-3 mb-sm-0">
-                        <div id="campaigns-donut"></div>
-                        <div class="ms-3">
-                            <div class="d-flex align-items-center">
-                                <h5 class="mb-0">38,289</h5>
-                                <span class="text-success ms-2">
-                                    <i class="ph-arrow-up fs-base lh-base align-top"></i>
-                                    (+16.2%)
-                                </span>
-                            </div>
-                            <span class="d-inline-block bg-success rounded-pill p-1 me-1"></span>
-                            <span class="text-muted">May 12, 12:30 am</span>
-                        </div>
-                    </div>
-
-                    <div class="d-flex align-items-center mb-3 mb-sm-0">
-                        <div id="campaign-status-pie"></div>
-                        <div class="ms-3">
-                            <div class="d-flex align-items-center">
-                                <h5 class="mb-0">2,458</h5>
-                                <span class="text-danger ms-2">
-                                    <i class="ph-arrow-down fs-base lh-base align-top"></i>
-                                    (-4.9%)
-                                </span>
-                            </div>
-                            <span class="d-inline-block bg-danger rounded-pill p-1 me-1"></span>
-                            <span class="text-muted">Jun 4, 4:00 am</span>
-                        </div>
-                    </div>
-
-                    <div>
-                        <a href="#" class="btn btn-indigo">
-                            <i class="ph-file-pdf me-2"></i>
-                            View report
-                        </a>
-                    </div>
-                </div>
-
-                <div class="table-responsive">
-                    <table class="table text-nowrap">
-                        <thead>
-                            <tr>
-                                <th>Campaign</th>
-                                <th>Client</th>
-                                <th>Changes</th>
-                                <th>Budget</th>
-                                <th>Status</th>
-                                <th class="text-center" style="width: 20px;">
-                                    <i class="ph-dots-three"></i>
-                                </th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr class="table-light">
-                                <td colspan="5">Today</td>
-                                <td class="text-end">
-                                    <span class="progress-meter" id="today-progress" data-progress="30"></span>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    <div class="d-flex align-items-center">
-                                        <a href="#" class="d-block me-3">
-                                            <img src="{{ asset('/admin/assets/images/brands/facebook.svg') }}"
-                                                class="rounded-circle" width="36" height="36" alt="">
-                                        </a>
-                                        <div>
-                                            <a href="#" class="text-body fw-semibold">Facebook</a>
-                                            <div class="text-muted fs-sm">
-                                                <span class="d-inline-block bg-primary rounded-pill p-1 me-1"></span>
-                                                02:00 - 03:00
-                                            </div>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td><span class="text-muted">Mintlime</span></td>
-                                <td><span class="text-success"><i class="ph-trend-up me-2"></i>
-                                        2.43%</span></td>
-                                <td>
-                                    <h6 class="mb-0">$5,489</h6>
-                                </td>
-                                <td><span class="badge bg-primary bg-opacity-10 text-primary">Active</span>
-                                </td>
-                                <td class="text-center">
-                                    <div class="dropdown">
-                                        <a href="#" class="text-body" data-bs-toggle="dropdown">
-                                            <i class="ph-list"></i>
-                                        </a>
-                                        <div class="dropdown-menu dropdown-menu-end">
-                                            <a href="#" class="dropdown-item">
-                                                <i class="ph-chart-line me-2"></i>
-                                                View statement
-                                            </a>
-                                            <a href="#" class="dropdown-item">
-                                                <i class="ph-pencil me-2"></i>
-                                                Edit campaign
-                                            </a>
-                                            <a href="#" class="dropdown-item">
-                                                <i class="ph-lock-key me-2"></i>
-                                                Disable campaign
-                                            </a>
-                                            <div class="dropdown-divider"></div>
-                                            <a href="#" class="dropdown-item">
-                                                <i class="ph-gear me-2"></i>
-                                                Settings
-                                            </a>
-                                        </div>
-                                    </div>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    <div class="d-flex align-items-center">
-                                        <a href="#" class="d-block me-3">
-                                            <img src="{{ asset('/admin/assets/images/brands/youtube.svg') }}"
-                                                class="rounded-circle" width="36" height="36" alt="">
-                                        </a>
-                                        <div>
-                                            <a href="#" class="text-body fw-semibold">Youtube videos</a>
-                                            <div class="text-muted fs-sm">
-                                                <span class="d-inline-block bg-danger rounded-pill p-1 me-1"></span>
-                                                13:00 - 14:00
-                                            </div>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td><span class="text-muted">CDsoft</span></td>
-                                <td><span class="text-success"><i class="ph-trend-up me-2"></i>
-                                        3.12%</span></td>
-                                <td>
-                                    <h6 class="mb-0">$2,592</h6>
-                                </td>
-                                <td><span class="badge bg-danger bg-opacity-10 text-danger">Closed</span>
-                                </td>
-                                <td class="text-center">
-                                    <div class="dropdown">
-                                        <a href="#" class="text-body" data-bs-toggle="dropdown">
-                                            <i class="ph-list"></i>
-                                        </a>
-                                        <div class="dropdown-menu dropdown-menu-end">
-                                            <a href="#" class="dropdown-item">
-                                                <i class="ph-chart-line me-2"></i>
-                                                View statement
-                                            </a>
-                                            <a href="#" class="dropdown-item">
-                                                <i class="ph-pencil me-2"></i>
-                                                Edit campaign
-                                            </a>
-                                            <a href="#" class="dropdown-item">
-                                                <i class="ph-lock-key me-2"></i>
-                                                Disable campaign
-                                            </a>
-                                            <div class="dropdown-divider"></div>
-                                            <a href="#" class="dropdown-item">
-                                                <i class="ph-gear me-2"></i>
-                                                Settings
-                                            </a>
-                                        </div>
-                                    </div>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    <div class="d-flex align-items-center">
-                                        <a href="#" class="d-block me-3">
-                                            <img src="{{ asset('/admin/assets/images/brands/spotify.svg') }}"
-                                                class="rounded-circle" width="36" height="36" alt="">
-                                        </a>
-                                        <div>
-                                            <a href="#" class="text-body fw-semibold">Spotify ads</a>
-                                            <div class="text-muted fs-sm">
-                                                <span class="d-inline-block bg-secondary rounded-pill p-1 me-1"></span>
-                                                10:00 - 11:00
-                                            </div>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td><span class="text-muted">Diligence</span></td>
-                                <td><span class="text-danger"><i class="ph-trend-down me-2"></i>
-                                        8.02%</span></td>
-                                <td>
-                                    <h6 class="mb-0">$1,268</h6>
-                                </td>
-                                <td><span class="badge bg-secondary bg-opacity-10 text-secondary">On
-                                        hold</span></td>
-                                <td class="text-center">
-                                    <div class="dropdown">
-                                        <a href="#" class="text-body" data-bs-toggle="dropdown">
-                                            <i class="ph-list"></i>
-                                        </a>
-                                        <div class="dropdown-menu dropdown-menu-end">
-                                            <a href="#" class="dropdown-item">
-                                                <i class="ph-chart-line me-2"></i>
-                                                View statement
-                                            </a>
-                                            <a href="#" class="dropdown-item">
-                                                <i class="ph-pencil me-2"></i>
-                                                Edit campaign
-                                            </a>
-                                            <a href="#" class="dropdown-item">
-                                                <i class="ph-lock-key me-2"></i>
-                                                Disable campaign
-                                            </a>
-                                            <div class="dropdown-divider"></div>
-                                            <a href="#" class="dropdown-item">
-                                                <i class="ph-gear me-2"></i>
-                                                Settings
-                                            </a>
-                                        </div>
-                                    </div>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    <div class="d-flex align-items-center">
-                                        <a href="#" class="d-block me-3">
-                                            <img src="{{ asset('/admin/assets/images/brands/twitter.svg') }}"
-                                                class="rounded-circle" width="36" height="36" alt="">
-                                        </a>
-                                        <div>
-                                            <a href="#" class="text-body fw-semibold">Twitter ads</a>
-                                            <div class="text-muted fs-sm">
-                                                <span class="d-inline-block bg-secondary rounded-pill p-1 me-1"></span>
-                                                04:00 - 05:00
-                                            </div>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td><span class="text-muted">Deluxe</span></td>
-                                <td><span class="text-success"><i class="ph-trend-up me-2"></i>
-                                        2.78%</span></td>
-                                <td>
-                                    <h6 class="mb-0">$7,467</h6>
-                                </td>
-                                <td><span class="badge bg-secondary bg-opacity-10 text-secondary">On
-                                        hold</span></td>
-                                <td class="text-center">
-                                    <div class="dropdown">
-                                        <a href="#" class="text-body" data-bs-toggle="dropdown">
-                                            <i class="ph-list"></i>
-                                        </a>
-                                        <div class="dropdown-menu dropdown-menu-end">
-                                            <a href="#" class="dropdown-item">
-                                                <i class="ph-chart-line me-2"></i>
-                                                View statement
-                                            </a>
-                                            <a href="#" class="dropdown-item">
-                                                <i class="ph-pencil me-2"></i>
-                                                Edit campaign
-                                            </a>
-                                            <a href="#" class="dropdown-item">
-                                                <i class="ph-lock-key me-2"></i>
-                                                Disable campaign
-                                            </a>
-                                            <div class="dropdown-divider"></div>
-                                            <a href="#" class="dropdown-item">
-                                                <i class="ph-gear me-2"></i>
-                                                Settings
-                                            </a>
-                                        </div>
-                                    </div>
-                                </td>
-                            </tr>
-
-                            <tr class="table-light">
-                                <td colspan="5">Yesterday</td>
-                                <td class="text-end">
-                                    <span class="progress-meter" id="yesterday-progress" data-progress="65"></span>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    <div class="d-flex align-items-center">
-                                        <a href="#" class="d-block me-3">
-                                            <img src="{{ asset('/admin/assets/images/brands/bing.svg') }}"
-                                                class="rounded-circle" width="36" height="36" alt="">
-                                        </a>
-                                        <div>
-                                            <a href="#" class="text-body fw-semibold">Bing campaign</a>
-                                            <div class="text-muted fs-sm">
-                                                <span class="d-inline-block bg-success rounded-pill p-1 me-1"></span>
-                                                15:00 - 16:00
-                                            </div>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td><span class="text-muted">Metrics</span></td>
-                                <td><span class="text-danger"><i class="ph-trend-down me-2"></i>
-                                        5.78%</span></td>
-                                <td>
-                                    <h6 class="mb-0">$970</h6>
-                                </td>
-                                <td><span class="badge bg-success bg-opacity-10 text-success">Pending</span>
-                                </td>
-                                <td class="text-center">
-                                    <div class="dropdown">
-                                        <a href="#" class="text-body" data-bs-toggle="dropdown">
-                                            <i class="ph-list"></i>
-                                        </a>
-                                        <div class="dropdown-menu dropdown-menu-end">
-                                            <a href="#" class="dropdown-item">
-                                                <i class="ph-chart-line me-2"></i>
-                                                View statement
-                                            </a>
-                                            <a href="#" class="dropdown-item">
-                                                <i class="ph-pencil me-2"></i>
-                                                Edit campaign
-                                            </a>
-                                            <a href="#" class="dropdown-item">
-                                                <i class="ph-lock-key me-2"></i>
-                                                Disable campaign
-                                            </a>
-                                            <div class="dropdown-divider"></div>
-                                            <a href="#" class="dropdown-item">
-                                                <i class="ph-gear me-2"></i>
-                                                Settings
-                                            </a>
-                                        </div>
-                                    </div>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    <div class="d-flex align-items-center">
-                                        <a href="#" class="d-block me-3">
-                                            <img src="{{ asset('/admin/assets/images/brands/amazon.svg') }}"
-                                                class="rounded-circle" width="36" height="36" alt="">
-                                        </a>
-                                        <div>
-                                            <a href="#" class="text-body fw-semibold">Amazon ads</a>
-                                            <div class="text-muted fs-sm">
-                                                <span class="d-inline-block bg-danger rounded-pill p-1 me-1"></span>
-                                                18:00 - 19:00
-                                            </div>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td><span class="text-muted">Blueish</span></td>
-                                <td><span class="text-success"><i class="ph-trend-up me-2"></i>
-                                        6.79%</span></td>
-                                <td>
-                                    <h6 class="mb-0">$1,540</h6>
-                                </td>
-                                <td><span class="badge bg-primary bg-opacity-10 text-primary">Active</span>
-                                </td>
-                                <td class="text-center">
-                                    <div class="dropdown">
-                                        <a href="#" class="text-body" data-bs-toggle="dropdown">
-                                            <i class="ph-list"></i>
-                                        </a>
-                                        <div class="dropdown-menu dropdown-menu-end">
-                                            <a href="#" class="dropdown-item">
-                                                <i class="ph-chart-line me-2"></i>
-                                                View statement
-                                            </a>
-                                            <a href="#" class="dropdown-item">
-                                                <i class="ph-pencil me-2"></i>
-                                                Edit campaign
-                                            </a>
-                                            <a href="#" class="dropdown-item">
-                                                <i class="ph-lock-key me-2"></i>
-                                                Disable campaign
-                                            </a>
-                                            <div class="dropdown-divider"></div>
-                                            <a href="#" class="dropdown-item">
-                                                <i class="ph-gear me-2"></i>
-                                                Settings
-                                            </a>
-                                        </div>
-                                    </div>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    <div class="d-flex align-items-center">
-                                        <a href="#" class="d-block me-3">
-                                            <img src="{{ asset('/admin/assets/images/brands/dribbble.svg') }}"
-                                                class="rounded-circle" width="36" height="36" alt="">
-                                        </a>
-                                        <div>
-                                            <a href="#" class="text-body fw-semibold">Dribbble ads</a>
-                                            <div class="text-muted fs-sm">
-                                                <span class="d-inline-block bg-primary rounded-pill p-1 me-1"></span>
-                                                20:00 - 21:00
-                                            </div>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td><span class="text-muted">Teamable</span></td>
-                                <td><span class="text-danger"><i class="ph-trend-down me-2"></i>
-                                        9.83%</span></td>
-                                <td>
-                                    <h6 class="mb-0">$8,350</h6>
-                                </td>
-                                <td><span class="badge bg-danger bg-opacity-10 text-danger">Closed</span>
-                                </td>
-                                <td class="text-center">
-                                    <div class="dropdown">
-                                        <a href="#" class="text-body" data-bs-toggle="dropdown">
-                                            <i class="ph-list"></i>
-                                        </a>
-                                        <div class="dropdown-menu dropdown-menu-end">
-                                            <a href="#" class="dropdown-item">
-                                                <i class="ph-chart-line me-2"></i>
-                                                View statement
-                                            </a>
-                                            <a href="#" class="dropdown-item">
-                                                <i class="ph-pencil me-2"></i>
-                                                Edit campaign
-                                            </a>
-                                            <a href="#" class="dropdown-item">
-                                                <i class="ph-lock-key me-2"></i>
-                                                Disable campaign
-                                            </a>
-                                            <div class="dropdown-divider"></div>
-                                            <a href="#" class="dropdown-item">
-                                                <i class="ph-gear me-2"></i>
-                                                Settings
-                                            </a>
-                                        </div>
-                                    </div>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-            <!-- /marketing campaigns -->
-
-
-
-
-
-            <!-- Support tickets -->
-            <div class="card">
-                <div class="card-header d-sm-flex align-items-sm-center py-sm-0">
-                    <h5 class="py-sm-2 my-sm-1">Support tickets</h5>
-                    <div class="mt-2 mt-sm-0 ms-sm-auto">
-                        <select class="form-select">
-                            <option value="val1" selected>June, 29 - July, 5</option>
-                            <option value="val2">June, 22 - June 28</option>
-                            <option value="val3">June, 15 - June, 21</option>
-                            <option value="val4">June, 8 - June, 14</option>
-                        </select>
-                    </div>
-                </div>
-
-                <div class="card-body d-lg-flex align-items-lg-center justify-content-lg-between flex-lg-wrap">
-                    <div class="d-flex align-items-center mb-3 mb-lg-0">
-                        <div id="tickets-status"></div>
-                        <div class="ms-3">
-                            <div class="d-flex align-items-center">
-                                <h5 class="mb-0">14,327</h5>
-                                <span class="text-success ms-2">
-                                    <i class="ph-arrow-up fs-base lh-base align-top"></i>
-                                    (+2.9%)
-                                </span>
-                            </div>
-                            <span class="d-inline-block bg-success rounded-pill p-1 me-1"></span>
-                            <span class="text-muted">Jun 16, 10:00 am</span>
-                        </div>
-                    </div>
-
-                    <div class="d-flex align-items-center mb-3 mb-lg-0">
-                        <a href="#" class="bg-primary bg-opacity-10 text-primary lh-1 rounded-pill p-2">
-                            <i class="ph-folders"></i>
-                        </a>
-                        <div class="ms-3">
-                            <h5 class="mb-0">1,132</h5>
-                            <span class="text-muted">total tickets</span>
-                        </div>
-                    </div>
-
-                    <div class="d-flex align-items-center mb-3 mb-lg-0">
-                        <a href="#" class="bg-primary bg-opacity-10 text-primary lh-1 rounded-pill p-2">
-                            <i class="ph-arrow-arc-left"></i>
-                        </a>
-                        <div class="ms-3">
-                            <h5 class="mb-0">06:25:00</h5>
-                            <span class="text-muted">response time</span>
-                        </div>
-                    </div>
-
-                    <button type="button" class="btn btn-light">
-                        <i class="ph-file-pdf me-2"></i>
-                        Report
-                    </button>
-                </div>
-
-                <div class="table-responsive">
-                    <table class="table text-nowrap">
-                        <thead>
-                            <tr>
-                                <th style="width: 50px">Due</th>
-                                <th style="width: 300px;">User</th>
-                                <th>Description</th>
-                                <th class="text-center" style="width: 20px;">
-                                    <i class="ph-dots-three"></i>
-                                </th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr class="table-light">
-                                <td colspan="3">Active tickets</td>
-                                <td class="text-end">
-                                    <span class="badge bg-primary rounded-pill">24</span>
-                                </td>
-                            </tr>
-
-                            <tr>
-                                <td class="text-center">
-                                    <h6 class="mb-0">12</h6>
-                                    <div class="fs-sm text-muted lh-1">hours</div>
-                                </td>
-                                <td>
-                                    <div class="d-flex align-items-center">
-                                        <a href="#"
-                                            class="d-inline-flex align-items-center justify-content-center bg-teal text-white lh-1 rounded-pill w-40px h-40px me-3">
-                                            <span class="letter-icon"></span>
-                                        </a>
-                                        <div>
-                                            <a href="#" class="text-body fw-semibold letter-icon-title">Annabelle
-                                                Doney</a>
-                                            <div class="d-flex align-items-center text-muted fs-sm">
-                                                <span class="bg-danger rounded-pill p-1 me-2"></span>
-                                                Blocker
-                                            </div>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td>
-                                    <a href="#" class="text-body">
-                                        <div class="fw-semibold">[#1183] Workaround for OS X selects
-                                            printing bug</div>
-                                        <span class="text-muted">Chrome fixed the bug several versions
-                                            ago, thus rendering this...</span>
-                                    </a>
-                                </td>
-                                <td class="text-center">
-                                    <div class="dropdown">
-                                        <a href="#" class="text-body" data-bs-toggle="dropdown">
-                                            <i class="ph-list"></i>
-                                        </a>
-                                        <div class="dropdown-menu dropdown-menu-end">
-                                            <a href="#" class="dropdown-item">
-                                                <i class="ph-arrow-bend-up-left me-2"></i>
-                                                Quick reply
-                                            </a>
-                                            <a href="#" class="dropdown-item">
-                                                <i class="ph-clock-counter-clockwise me-2"></i>
-                                                Full history
-                                            </a>
-                                            <div class="dropdown-divider"></div>
-                                            <a href="#" class="dropdown-item">
-                                                <i class="ph-checks text-success me-2"></i>
-                                                Resolve issue
-                                            </a>
-                                            <a href="#" class="dropdown-item">
-                                                <i class="ph-x text-danger me-2"></i>
-                                                Close issue
-                                            </a>
-                                        </div>
-                                    </div>
-                                </td>
-                            </tr>
-
-                            <tr>
-                                <td class="text-center">
-                                    <h6 class="mb-0">16</h6>
-                                    <div class="fs-sm text-muted lh-1">hours</div>
-                                </td>
-                                <td>
-                                    <div class="d-flex align-items-center">
-                                        <a href="#" class="d-inline-block me-3">
-                                            <img src="{{ asset('/admin/assets/images/demo/users/face15.jpg') }}"
-                                                class="rounded-circle" width="40" height="40" alt="">
-                                        </a>
-                                        <div>
-                                            <a href="#" class="text-body fw-semibold">Chris
-                                                Macintyre</a>
-                                            <div class="d-flex align-items-center text-muted fs-sm">
-                                                <span class="bg-primary rounded-pill p-1 me-2"></span>
-                                                Medium
-                                            </div>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td>
-                                    <a href="#" class="text-body">
-                                        <div class="fw-semibold">[#1249] Vertically center carousel
-                                            controls</div>
-                                        <span class="text-muted">Try any carousel control and reduce the
-                                            screen width below...</span>
-                                    </a>
-                                </td>
-                                <td class="text-center">
-                                    <div class="dropdown">
-                                        <a href="#" class="text-body" data-bs-toggle="dropdown">
-                                            <i class="ph-list"></i>
-                                        </a>
-                                        <div class="dropdown-menu dropdown-menu-end">
-                                            <a href="#" class="dropdown-item">
-                                                <i class="ph-arrow-bend-up-left me-2"></i>
-                                                Quick reply
-                                            </a>
-                                            <a href="#" class="dropdown-item">
-                                                <i class="ph-clock-counter-clockwise me-2"></i>
-                                                Full history
-                                            </a>
-                                            <div class="dropdown-divider"></div>
-                                            <a href="#" class="dropdown-item">
-                                                <i class="ph-checks text-success me-2"></i>
-                                                Resolve issue
-                                            </a>
-                                            <a href="#" class="dropdown-item">
-                                                <i class="ph-x text-danger me-2"></i>
-                                                Close issue
-                                            </a>
-                                        </div>
-                                    </div>
-                                </td>
-                            </tr>
-
-                            <tr>
-                                <td class="text-center">
-                                    <h6 class="mb-0">20</h6>
-                                    <div class="fs-sm text-muted lh-1">hours</div>
-                                </td>
-                                <td>
-                                    <div class="d-flex align-items-center">
-                                        <a href="#"
-                                            class="d-inline-flex align-items-center justify-content-center bg-primary text-white lh-1 rounded-pill w-40px h-40px me-3">
-                                            <span class="letter-icon"></span>
-                                        </a>
-                                        <div>
-                                            <a href="#" class="text-body fw-semibold letter-icon-title">Robert
-                                                Hauber</a>
-                                            <div class="d-flex align-items-center text-muted fs-sm">
-                                                <span class="bg-primary rounded-pill p-1 me-2"></span>
-                                                Medium
-                                            </div>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td>
-                                    <a href="#" class="text-body">
-                                        <div class="fw-semibold">[#1254] Inaccurate small pagination
-                                            height</div>
-                                        <span class="text-muted">The height of pagination elements is
-                                            not consistent with...</span>
-                                    </a>
-                                </td>
-                                <td class="text-center">
-                                    <div class="dropdown">
-                                        <a href="#" class="text-body" data-bs-toggle="dropdown">
-                                            <i class="ph-list"></i>
-                                        </a>
-                                        <div class="dropdown-menu dropdown-menu-end">
-                                            <a href="#" class="dropdown-item">
-                                                <i class="ph-arrow-bend-up-left me-2"></i>
-                                                Quick reply
-                                            </a>
-                                            <a href="#" class="dropdown-item">
-                                                <i class="ph-clock-counter-clockwise me-2"></i>
-                                                Full history
-                                            </a>
-                                            <div class="dropdown-divider"></div>
-                                            <a href="#" class="dropdown-item">
-                                                <i class="ph-checks text-success me-2"></i>
-                                                Resolve issue
-                                            </a>
-                                            <a href="#" class="dropdown-item">
-                                                <i class="ph-x text-danger me-2"></i>
-                                                Close issue
-                                            </a>
-                                        </div>
-                                    </div>
-                                </td>
-                            </tr>
-
-                            <tr>
-                                <td class="text-center">
-                                    <h6 class="mb-0">40</h6>
-                                    <div class="fs-sm text-muted lh-1">hours</div>
-                                </td>
-                                <td>
-                                    <div class="d-flex align-items-center">
-                                        <a href="#"
-                                            class="d-inline-flex align-items-center justify-content-center bg-warning text-white lh-1 rounded-pill w-40px h-40px me-3">
-                                            <span class="letter-icon"></span>
-                                        </a>
-                                        <div>
-                                            <a href="#" class="text-body fw-semibold letter-icon-title">Robert
-                                                Hauber</a>
-                                            <div class="d-flex align-items-center text-muted fs-sm">
-                                                <span class="bg-warning rounded-pill p-1 me-2"></span>
-                                                High
-                                            </div>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td>
-                                    <a href="#" class="text-body">
-                                        <div class="fw-semibold">[#1184] Round grid column gutter
-                                            operations</div>
-                                        <span class="text-muted">Left rounds up, right rounds down.
-                                            should keep everything...</span>
-                                    </a>
-                                </td>
-                                <td class="text-center">
-                                    <div class="dropdown">
-                                        <a href="#" class="text-body" data-bs-toggle="dropdown">
-                                            <i class="ph-list"></i>
-                                        </a>
-                                        <div class="dropdown-menu dropdown-menu-end">
-                                            <a href="#" class="dropdown-item">
-                                                <i class="ph-arrow-bend-up-left me-2"></i>
-                                                Quick reply
-                                            </a>
-                                            <a href="#" class="dropdown-item">
-                                                <i class="ph-clock-counter-clockwise me-2"></i>
-                                                Full history
-                                            </a>
-                                            <div class="dropdown-divider"></div>
-                                            <a href="#" class="dropdown-item">
-                                                <i class="ph-checks text-success me-2"></i>
-                                                Resolve issue
-                                            </a>
-                                            <a href="#" class="dropdown-item">
-                                                <i class="ph-x text-danger me-2"></i>
-                                                Close issue
-                                            </a>
-                                        </div>
-                                    </div>
-                                </td>
-                            </tr>
-
-                            <tr class="table-light">
-                                <td colspan="3">Resolved tickets</td>
-                                <td class="text-end">
-                                    <span class="badge bg-success rounded-pill">42</span>
-                                </td>
-                            </tr>
-
-                            <tr>
-                                <td class="text-center">
-                                    <i class="ph-check text-success"></i>
-                                </td>
-                                <td>
-                                    <div class="d-flex align-items-center">
-                                        <a href="#"
-                                            class="d-inline-flex align-items-center justify-content-center bg-success text-white lh-1 rounded-pill w-40px h-40px me-3">
-                                            <span class="letter-icon"></span>
-                                        </a>
-                                        <div>
-                                            <a href="#" class="text-body fw-semibold letter-icon-title">Alan
-                                                Macedo</a>
-                                            <div class="d-flex align-items-center text-muted fs-sm">
-                                                <span class="bg-danger rounded-pill p-1 me-2"></span>
-                                                Blocker
-                                            </div>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td>
-                                    <a href="#" class="text-body">
-                                        <div>[#1046] Avoid some unnecessary HTML string</div>
-                                        <span class="text-muted">Rather than building a string of HTML
-                                            and then parsing it...</span>
-                                    </a>
-                                </td>
-                                <td class="text-center">
-                                    <div class="dropdown">
-                                        <a href="#" class="text-body" data-bs-toggle="dropdown">
-                                            <i class="ph-list"></i>
-                                        </a>
-                                        <div class="dropdown-menu dropdown-menu-end">
-                                            <a href="#" class="dropdown-item">
-                                                <i class="ph-arrow-bend-up-left me-2"></i>
-                                                Quick reply
-                                            </a>
-                                            <a href="#" class="dropdown-item">
-                                                <i class="ph-clock-counter-clockwise me-2"></i>
-                                                Full history
-                                            </a>
-                                            <div class="dropdown-divider"></div>
-                                            <a href="#" class="dropdown-item">
-                                                <i class="ph-checks text-success me-2"></i>
-                                                Resolve issue
-                                            </a>
-                                            <a href="#" class="dropdown-item">
-                                                <i class="ph-x text-danger me-2"></i>
-                                                Close issue
-                                            </a>
-                                        </div>
-                                    </div>
-                                </td>
-                            </tr>
-
-                            <tr>
-                                <td class="text-center">
-                                    <i class="ph-check text-success"></i>
-                                </td>
-                                <td>
-                                    <div class="d-flex align-items-center">
-                                        <a href="#"
-                                            class="d-inline-flex align-items-center justify-content-center bg-pink text-white lh-1 rounded-pill w-40px h-40px me-3">
-                                            <span class="letter-icon"></span>
-                                        </a>
-                                        <div>
-                                            <a href="#" class="text-body fw-semibold letter-icon-title">Brett
-                                                Castellano</a>
-                                            <div class="d-flex align-items-center text-muted fs-sm">
-                                                <span class="bg-success rounded-pill p-1 me-2"></span>
-                                                Low
-                                            </div>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td>
-                                    <a href="#" class="text-body">
-                                        <div>[#1038] Update json configuration</div>
-                                        <span class="text-muted">The <code>files</code> property is
-                                            necessary to override the files property...</span>
-                                    </a>
-                                </td>
-                                <td class="text-center">
-                                    <div class="dropdown">
-                                        <a href="#" class="text-body" data-bs-toggle="dropdown">
-                                            <i class="ph-list"></i>
-                                        </a>
-                                        <div class="dropdown-menu dropdown-menu-end">
-                                            <a href="#" class="dropdown-item">
-                                                <i class="ph-arrow-bend-up-left me-2"></i>
-                                                Quick reply
-                                            </a>
-                                            <a href="#" class="dropdown-item">
-                                                <i class="ph-clock-counter-clockwise me-2"></i>
-                                                Full history
-                                            </a>
-                                            <div class="dropdown-divider"></div>
-                                            <a href="#" class="dropdown-item">
-                                                <i class="ph-checks text-success me-2"></i>
-                                                Resolve issue
-                                            </a>
-                                            <a href="#" class="dropdown-item">
-                                                <i class="ph-x text-danger me-2"></i>
-                                                Close issue
-                                            </a>
-                                        </div>
-                                    </div>
-                                </td>
-                            </tr>
-
-                            <tr>
-                                <td class="text-center">
-                                    <i class="ph-check text-success"></i>
-                                </td>
-                                <td>
-                                    <div class="d-flex align-items-center">
-                                        <a href="#" class="d-inline-block me-3">
-                                            <img src="{{ asset('/admin/assets/images/demo/users/face3.jpg') }}"
-                                                class="rounded-circle" width="40" height="40" alt="">
-                                        </a>
-                                        <div>
-                                            <a href="#" class="text-body fw-semibold">Roxanne Forbes</a>
-                                            <div class="d-flex align-items-center text-muted fs-sm">
-                                                <span class="bg-success rounded-pill p-1 me-2"></span>
-                                                Low
-                                            </div>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td>
-                                    <a href="#" class="text-body">
-                                        <div>[#1034] Tooltip multiple event</div>
-                                        <span class="text-muted">Fix behavior when using tooltips and
-                                            popovers that are...</span>
-                                    </a>
-                                </td>
-                                <td class="text-center">
-                                    <div class="dropdown">
-                                        <a href="#" class="text-body" data-bs-toggle="dropdown">
-                                            <i class="ph-list"></i>
-                                        </a>
-                                        <div class="dropdown-menu dropdown-menu-end">
-                                            <a href="#" class="dropdown-item">
-                                                <i class="ph-arrow-bend-up-left me-2"></i>
-                                                Quick reply
-                                            </a>
-                                            <a href="#" class="dropdown-item">
-                                                <i class="ph-clock-counter-clockwise me-2"></i>
-                                                Full history
-                                            </a>
-                                            <div class="dropdown-divider"></div>
-                                            <a href="#" class="dropdown-item">
-                                                <i class="ph-checks text-success me-2"></i>
-                                                Resolve issue
-                                            </a>
-                                            <a href="#" class="dropdown-item">
-                                                <i class="ph-x text-danger me-2"></i>
-                                                Close issue
-                                            </a>
-                                        </div>
-                                    </div>
-                                </td>
-                            </tr>
-
-                            <tr class="table-light">
-                                <td colspan="3">Closed tickets</td>
-                                <td class="text-end">
-                                    <span class="badge bg-danger rounded-pill">37</span>
-                                </td>
-                            </tr>
-
-                            <tr>
-                                <td class="text-center">
-                                    <i class="ph-checks text-danger"></i>
-                                </td>
-                                <td>
-                                    <div class="d-flex align-items-center">
-                                        <a href="#" class="d-inline-block me-3">
-                                            <img src="{{ asset('/admin/assets/images/demo/users/face8.jpg') }}"
-                                                class="rounded-circle" width="40" height="40" alt="">
-                                        </a>
-                                        <div>
-                                            <a href="#" class="text-body fw-semibold">Mitchell
-                                                Sitkin</a>
-                                            <div class="d-flex align-items-center text-muted fs-sm">
-                                                <span class="bg-warning rounded-pill p-1 me-2"></span>
-                                                High
-                                            </div>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td>
-                                    <a href="#" class="text-body">
-                                        <div>[#1040] Account for static form controls in form group
-                                        </div>
-                                        <span class="text-muted">Resizes control label's font-size and
-                                            account for the standard...</span>
-                                    </a>
-                                </td>
-                                <td class="text-center">
-                                    <div class="dropdown">
-                                        <a href="#" class="text-body" data-bs-toggle="dropdown">
-                                            <i class="ph-list"></i>
-                                        </a>
-                                        <div class="dropdown-menu dropdown-menu-end">
-                                            <a href="#" class="dropdown-item">
-                                                <i class="ph-arrow-bend-up-left me-2"></i>
-                                                Quick reply
-                                            </a>
-                                            <a href="#" class="dropdown-item">
-                                                <i class="ph-clock-counter-clockwise me-2"></i>
-                                                Full history
-                                            </a>
-                                            <div class="dropdown-divider"></div>
-                                            <a href="#" class="dropdown-item">
-                                                <i class="ph-checks text-success me-2"></i>
-                                                Resolve issue
-                                            </a>
-                                            <a href="#" class="dropdown-item">
-                                                <i class="ph-x text-danger me-2"></i>
-                                                Close issue
-                                            </a>
-                                        </div>
-                                    </div>
-                                </td>
-                            </tr>
-
-                            <tr>
-                                <td class="text-center">
-                                    <i class="ph-checks text-danger"></i>
-                                </td>
-                                <td>
-                                    <div class="d-flex align-items-center">
-                                        <a href="#"
-                                            class="d-inline-flex align-items-center justify-content-center bg-indigo text-white lh-1 rounded-pill w-40px h-40px me-3">
-                                            <span class="letter-icon"></span>
-                                        </a>
-                                        <div>
-                                            <a href="#" class="text-body fw-semibold letter-icon-title">Katleen
-                                                Jensen</a>
-                                            <div class="d-flex align-items-center text-muted fs-sm">
-                                                <span class="bg-primary rounded-pill p-1 me-2"></span>
-                                                Medium
-                                            </div>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td>
-                                    <a href="#" class="text-body">
-                                        <div>[#1038] Proper sizing of form control feedback</div>
-                                        <span class="text-muted">Feedback icon sizing inside a
-                                            larger/smaller form-group...</span>
-                                    </a>
-                                </td>
-                                <td class="text-center">
-                                    <div class="dropdown">
-                                        <a href="#" class="text-body" data-bs-toggle="dropdown">
-                                            <i class="ph-list"></i>
-                                        </a>
-                                        <div class="dropdown-menu dropdown-menu-end">
-                                            <a href="#" class="dropdown-item">
-                                                <i class="ph-arrow-bend-up-left me-2"></i>
-                                                Quick reply
-                                            </a>
-                                            <a href="#" class="dropdown-item">
-                                                <i class="ph-clock-counter-clockwise me-2"></i>
-                                                Full history
-                                            </a>
-                                            <div class="dropdown-divider"></div>
-                                            <a href="#" class="dropdown-item">
-                                                <i class="ph-checks text-success me-2"></i>
-                                                Resolve issue
-                                            </a>
-                                            <a href="#" class="dropdown-item">
-                                                <i class="ph-x text-danger me-2"></i>
-                                                Close issue
-                                            </a>
-                                        </div>
-                                    </div>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-            <!-- /support tickets -->
-
+        <div class="col-xl">
 
             <!-- Latest posts -->
             <div class="card">
                 <div class="card-header">
-                    <h5 class="mb-0">Latest posts</h5>
+                    <h5 class="mb-0">Latest News</h5>
                 </div>
 
                 <div class="card-body pb-0">
                     <div class="row">
-                        <div class="col-xl-6">
-                            <div class="d-sm-flex align-items-sm-start mb-3">
-                                <a href="#" class="d-inline-block position-relative me-sm-3 mb-3 mb-sm-0">
-                                    <img src="{{ asset('/admin/assets/images/demo/flat/1.png') }}"
-                                        class="flex-shrink-0 rounded" height="100" alt="">
-                                    <div
-                                        class="d-inline-flex bg-dark bg-opacity-50 text-white position-absolute start-50 top-50 translate-middle rounded-pill p-2">
-                                        <i class="ph-play"></i>
-                                    </div>
-                                    <span
-                                        class="bg-dark bg-opacity-50 text-white fs-xs lh-1 rounded-1 position-absolute bottom-0 start-0 p-1 ms-2 mb-2">12:25</span>
-                                </a>
+                        @foreach ($berita as $item)
+                            <div class="col-xl-6">
+                                <div class="d-sm-flex align-items-sm-start mb-3">
+                                    <a href="{{ route('news.index') }}"
+                                        class="d-inline-block position-relative me-sm-3 mb-3 mb-sm-0">
+                                        <img src="{{ $item->images[0]['image_path'] }}" width="100"
+                                            class="flex-shrink-0 rounded" height="100" alt="">
+                                    </a>
 
-                                <div class="flex-fill">
-                                    <h6 class="mb-1"><a href="#">Up unpacked friendly</a></h6>
-                                    <ul class="list-inline list-inline-bullet text-muted mb-2">
-                                        <li class="list-inline-item"><a href="#" class="text-body">Video
-                                                tutorials</a></li>
-                                    </ul>
-                                    The him father parish looked has sooner. Attachment frequently
-                                    terminated son hello...
+                                    <div class="flex-fill">
+                                        <h6 class="mb-1"><a href="{{ route('news.index') }}">{{ $item->title }}</a>
+                                        </h6>
+                                        <ul class="list-inline list-inline-bullet text-muted mb-2">
+                                            <li class="list-inline-item"><a href="#"
+                                                    class="text-body">{{ \Carbon\Carbon::parse($item->published)->format('d F Y') }}</a>
+                                            </li>
+                                        </ul>
+                                        {!! Str::limit($item->title, 70) !!}
+                                    </div>
                                 </div>
                             </div>
-
-                            <div class="d-sm-flex align-items-sm-start mb-3">
-                                <a href="#" class="d-inline-block position-relative me-sm-3 mb-3 mb-sm-0">
-                                    <img src="{{ asset('/admin/assets/images/demo/flat/21.png') }}"
-                                        class="flex-shrink-0 rounded" height="100" alt="">
-                                    <div
-                                        class="d-inline-flex bg-dark bg-opacity-50 text-white position-absolute start-50 top-50 translate-middle rounded-pill p-2">
-                                        <i class="ph-play"></i>
-                                    </div>
-                                    <span
-                                        class="bg-dark bg-opacity-50 text-white fs-xs lh-1 rounded-1 position-absolute bottom-0 start-0 p-1 ms-2 mb-2">47:25</span>
-                                </a>
-
-                                <div class="flex-fill">
-                                    <h6 class="mb-1"><a href="#">It allowance prevailed</a></h6>
-                                    <ul class="list-inline list-inline-bullet text-muted mb-2">
-                                        <li class="list-inline-item"><a href="#" class="text-body">Video
-                                                tutorials</a></li>
-                                    </ul>
-                                    Alteration literature to or an sympathize mr imprudence. Of is
-                                    ferrars subject enjoyed...
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="col-xl-6">
-                            <div class="d-sm-flex align-items-sm-start mb-3">
-                                <a href="#" class="d-inline-block position-relative me-sm-3 mb-3 mb-sm-0">
-                                    <img src="{{ asset('/admin/assets/images/demo/flat/12.png') }}"
-                                        class="flex-shrink-0 rounded" height="100" alt="">
-                                    <div
-                                        class="d-inline-flex bg-dark bg-opacity-50 text-white position-absolute start-50 top-50 translate-middle rounded-pill p-2">
-                                        <i class="ph-play"></i>
-                                    </div>
-                                    <span
-                                        class="bg-dark bg-opacity-50 text-white fs-xs lh-1 rounded-1 position-absolute bottom-0 start-0 p-1 ms-2 mb-2">48:40</span>
-                                </a>
-
-                                <div class="flex-fill">
-                                    <h6 class="mb-1"><a href="#">Case read they must</a></h6>
-                                    <ul class="list-inline list-inline-bullet text-muted mb-2">
-                                        <li class="list-inline-item"><a href="#" class="text-body">Video
-                                                tutorials</a></li>
-                                    </ul>
-                                    On it differed repeated wandered required in. Then girl neat why yet
-                                    knew rose spot...
-                                </div>
-                            </div>
-
-                            <div class="d-sm-flex align-items-sm-start mb-3">
-                                <a href="#" class="d-inline-block position-relative me-sm-3 mb-3 mb-sm-0">
-                                    <img src="{{ asset('/admin/assets/images/demo/flat/18.png') }}"
-                                        class="flex-shrink-0 rounded" height="100" alt="">
-                                    <div
-                                        class="d-inline-flex bg-dark bg-opacity-50 text-white position-absolute start-50 top-50 translate-middle rounded-pill p-2">
-                                        <i class="ph-play"></i>
-                                    </div>
-                                    <span
-                                        class="bg-dark bg-opacity-50 text-white fs-xs lh-1 rounded-1 position-absolute bottom-0 start-0 p-1 ms-2 mb-2">22:14</span>
-                                </a>
-
-                                <div class="flex-fill">
-                                    <h6 class="mb-1"><a href="#">Consider now provided</a></h6>
-                                    <ul class="list-inline list-inline-bullet text-muted mb-2">
-                                        <li class="list-inline-item"><a href="#" class="text-body">Video
-                                                tutorials</a></li>
-                                    </ul>
-                                    Marianne or husbands if at stronger ye. Considered is as middletons
-                                    uncommonly...
-                                </div>
-                            </div>
-                        </div>
+                        @endforeach
                     </div>
                 </div>
             </div>
             <!-- /latest posts -->
-
-        </div>
-
-        <div class="col-xl-4">
-
-            <!-- Progress counters -->
-            <div class="row">
-                <div class="col-sm-6">
-
-                    <!-- Available hours -->
-                    <div class="card text-center">
-                        <div class="card-body">
-
-                            <!-- Progress counter -->
-                            <div class="svg-center" id="hours-available-progress"></div>
-                            <!-- /progress counter -->
-
-
-                            <!-- Bars -->
-                            <div id="hours-available-bars"></div>
-                            <!-- /bars -->
-
-                        </div>
-                    </div>
-                    <!-- /available hours -->
-
-                </div>
-
-                <div class="col-sm-6">
-
-                    <!-- Productivity goal -->
-                    <div class="card text-center">
-                        <div class="card-body">
-
-                            <!-- Progress counter -->
-                            <div class="svg-center" id="goal-progress"></div>
-                            <!-- /progress counter -->
-
-                            <!-- Bars -->
-                            <div id="goal-bars"></div>
-                            <!-- /bars -->
-
-                        </div>
-                    </div>
-                    <!-- /productivity goal -->
-
-                </div>
-            </div>
-            <!-- /progress counters -->
-
-
-            <!-- Daily sales -->
-            <div class="card">
-                <div class="card-header d-flex align-items-center">
-                    <h5 class="mb-0">Daily sales stats</h5>
-                    <div class="d-flex align-items-center ms-auto">
-                        <span class="fw-bold text-success">$4,378</span>
-                        <div class="dropdown d-inline-flex ms-3">
-                            <a href="#" class="text-body d-inline-flex align-items-center dropdown-toggle"
-                                data-bs-toggle="dropdown">
-                                <i class="ph-gear"></i>
-                            </a>
-                            <div class="dropdown-menu dropdown-menu-end">
-                                <a href="#" class="dropdown-item">
-                                    <i class="ph-arrows-clockwise me-2"></i>
-                                    Update data
-                                </a>
-                                <a href="#" class="dropdown-item">
-                                    <i class="ph-list-dashes me-2"></i>
-                                    Detailed log
-                                </a>
-                                <a href="#" class="dropdown-item">
-                                    <i class="ph-chart-line me-2"></i>
-                                    Statistics
-                                </a>
-                                <div class="dropdown-divider"></div>
-                                <a href="#" class="dropdown-item">
-                                    <i class="ph-eraser me-2"></i>
-                                    Clear list
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="card-body">
-                    <div class="chart" id="sales-heatmap"></div>
-                </div>
-
-                <div class="table-responsive">
-                    <table class="table text-nowrap">
-                        <thead>
-                            <tr>
-                                <th class="w-100">Application</th>
-                                <th>Time</th>
-                                <th>Price</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>
-                                    <div class="d-flex align-items-center">
-                                        <a href="#" class="d-inline-block me-3">
-                                            <img src="{{ asset('/admin/assets/images/demo/logos/1.svg') }}"
-                                                alt="" height="36">
-                                        </a>
-                                        <div>
-                                            <a href="#" class="text-body fw-semibold letter-icon-title">Sigma
-                                                application</a>
-                                            <div class="text-muted fs-sm">New order</div>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td>
-                                    <span class="text-muted">06:28 pm</span>
-                                </td>
-                                <td>
-                                    <strong>$49.90</strong>
-                                </td>
-                            </tr>
-
-                            <tr>
-                                <td>
-                                    <div class="d-flex align-items-center">
-                                        <a href="#" class="d-inline-block me-3">
-                                            <img src="{{ asset('/admin/assets/images/demo/logos/2.svg') }}"
-                                                alt="" height="36">
-                                        </a>
-                                        <div>
-                                            <a href="#" class="text-body fw-semibold letter-icon-title">Alpha
-                                                application</a>
-                                            <div class="text-muted fs-sm">Renewal</div>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td>
-                                    <span class="text-muted">04:52 pm</span>
-                                </td>
-                                <td>
-                                    <strong>$90.50</strong>
-                                </td>
-                            </tr>
-
-                            <tr>
-                                <td>
-                                    <div class="d-flex align-items-center">
-                                        <a href="#" class="d-inline-block me-3">
-                                            <img src="{{ asset('/admin/assets/images/demo/logos/3.svg') }}"
-                                                alt="" height="36">
-                                        </a>
-                                        <div>
-                                            <a href="#" class="text-body fw-semibold letter-icon-title">Delta
-                                                application</a>
-                                            <div class="text-muted fs-sm">Support</div>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td>
-                                    <span class="text-muted">01:26 pm</span>
-                                </td>
-                                <td>
-                                    <strong>$60.00</strong>
-                                </td>
-                            </tr>
-
-                            <tr>
-                                <td>
-                                    <div class="d-flex align-items-center">
-                                        <a href="#" class="d-inline-block me-3">
-                                            <img src="{{ asset('/admin/assets/images/demo/logos/4.svg') }}"
-                                                alt="" height="36">
-                                        </a>
-                                        <div>
-                                            <a href="#" class="text-body fw-semibold letter-icon-title">Omega
-                                                application</a>
-                                            <div class="text-muted fs-sm">Support</div>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td>
-                                    <span class="text-muted">11:46 am</span>
-                                </td>
-                                <td>
-                                    <strong>$55.00</strong>
-                                </td>
-                            </tr>
-
-                            <tr>
-                                <td>
-                                    <div class="d-flex align-items-center">
-                                        <a href="#" class="d-inline-block me-3">
-                                            <img src="{{ asset('/admin/assets/images/demo/logos/2.svg') }}"
-                                                alt="" height="36">
-                                        </a>
-                                        <div>
-                                            <a href="#" class="text-body fw-semibold letter-icon-title">Alpha
-                                                application</a>
-                                            <div class="text-muted fs-sm">Renewal</div>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td>
-                                    <span class="text-muted">10:29 am</span>
-                                </td>
-                                <td>
-                                    <strong>$90.50</strong>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-            <!-- /daily sales -->
-
-
-            <!-- My messages -->
-            <div class="card">
-                <div class="card-header d-flex align-items-center">
-                    <h5 class="mb-0">My messages</h5>
-                    <div class="ms-auto">
-                        <span><i class="ph-clock-counter-clockwise me-1"></i> Jul 7, 10:30</span>
-                        <span class="badge bg-success ms-3">Online</span>
-                    </div>
-                </div>
-
-                <!-- Numbers -->
-                <div class="card-body pb-0">
-                    <div class="row text-center">
-                        <div class="col-4">
-                            <div class="mb-3">
-                                <h5 class="mb-0">2,345</h5>
-                                <span class="text-muted fs-sm">this week</span>
-                            </div>
-                        </div>
-
-                        <div class="col-4">
-                            <div class="mb-3">
-                                <h5 class="mb-0">3,568</h5>
-                                <span class="text-muted fs-sm">this month</span>
-                            </div>
-                        </div>
-
-                        <div class="col-4">
-                            <div class="mb-3">
-                                <h5 class="mb-0">32,693</h5>
-                                <span class="text-muted fs-sm">all messages</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <!-- /numbers -->
-
-
-                <!-- Area chart -->
-                <div id="messages-stats"></div>
-                <!-- /area chart -->
-
-
-                <!-- Tabs -->
-                <ul class="nav nav-tabs nav-tabs-underline nav-justified">
-                    <li class="nav-item">
-                        <a href="#messages-tue" class="nav-link active" data-bs-toggle="tab">
-                            Tuesday
-                        </a>
-                    </li>
-
-                    <li class="nav-item">
-                        <a href="#messages-mon" class="nav-link" data-bs-toggle="tab">
-                            Monday
-                        </a>
-                    </li>
-
-                    <li class="nav-item">
-                        <a href="#messages-fri" class="nav-link" data-bs-toggle="tab">
-                            Friday
-                        </a>
-                    </li>
-                </ul>
-                <!-- /tabs -->
-
-
-                <!-- Tabs content -->
-                <div class="tab-content card-body">
-                    <div class="tab-pane active fade show" id="messages-tue">
-                        <div class="d-flex align-items-start mb-3">
-                            <div class="status-indicator-container me-3">
-                                <img src="{{ asset('/admin/assets/images/demo/users/face10.jpg') }}"
-                                    class="rounded-circle" width="40" jeight="40" alt="">
-                                <span class="status-indicator bg-success"></span>
-                                <span
-                                    class="badge bg-yellow text-black position-absolute top-0 start-100 translate-middle rounded-pill">5</span>
-                            </div>
-
-                            <div class="flex-fill">
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <div class="fw-semibold"><a href="#">James Alexander</a></div>
-                                    <span class="fs-sm text-muted">14:58</span>
-                                </div>
-
-                                Who knows, maybe that would be the best thing for me...
-                            </div>
-                        </div>
-
-                        <div class="d-flex align-items-start mb-3">
-                            <div class="status-indicator-container me-3">
-                                <img src="{{ asset('/admin/assets/images/demo/users/face3.jpg') }}"
-                                    class="rounded-circle" width="40" jeight="40" alt="">
-                                <span class="status-indicator bg-danger"></span>
-                                <span
-                                    class="badge bg-yellow text-black position-absolute top-0 start-100 translate-middle rounded-pill">4</span>
-                            </div>
-
-                            <div class="flex-fill">
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <div class="fw-semibold"><a href="#">Margo Baker</a></div>
-                                    <span class="fs-sm text-muted">12:16</span>
-                                </div>
-
-                                That was something he was unable to do because...
-                            </div>
-                        </div>
-
-                        <div class="d-flex align-items-start mb-3">
-                            <div class="status-indicator-container me-3">
-                                <img src="{{ asset('/admin/assets/images/demo/users/face24.jpg') }}"
-                                    class="rounded-circle" width="40" jeight="40" alt="">
-                                <span class="status-indicator bg-danger"></span>
-                            </div>
-
-                            <div class="flex-fill">
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <div class="fw-semibold"><a href="#">Jeremy Victorino</a></div>
-                                    <span class="fs-sm text-muted">22:48</span>
-                                </div>
-
-                                But that would be extremely strained and suspicious...
-                            </div>
-                        </div>
-
-                        <div class="d-flex align-items-start mb-3">
-                            <div class="status-indicator-container me-3">
-                                <img src="{{ asset('/admin/assets/images/demo/users/face4.jpg') }}"
-                                    class="rounded-circle" width="40" jeight="40" alt="">
-                                <span class="status-indicator bg-danger"></span>
-                            </div>
-
-                            <div class="flex-fill">
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <div class="fw-semibold"><a href="#">Beatrix Diaz</a></div>
-                                    <span class="fs-sm text-muted">Tue</span>
-                                </div>
-
-                                What a strenuous career it is that I've chosen...
-                            </div>
-                        </div>
-
-                        <div class="d-flex align-items-start">
-                            <div class="status-indicator-container me-3">
-                                <img src="{{ asset('/admin/assets/images/demo/users/face25.jpg') }}"
-                                    class="rounded-circle" width="40" jeight="40" alt="">
-                                <span class="status-indicator bg-success"></span>
-                            </div>
-
-                            <div class="flex-fill">
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <div class="fw-semibold"><a href="#">Beatrix Diaz</a></div>
-                                    <span class="fs-sm text-muted">Tue</span>
-                                </div>
-
-                                Amidst roadrunner distantly pompously where...
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="tab-pane fade" id="messages-mon">
-                        <div class="d-flex align-items-start mb-3">
-                            <div class="status-indicator-container me-3">
-                                <img src="{{ asset('/admin/assets/images/demo/users/face2.jpg') }}"
-                                    class="rounded-circle" width="40" jeight="40" alt="">
-                                <span class="status-indicator bg-success"></span>
-                            </div>
-
-                            <div class="flex-fill">
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <div class="fw-semibold"><a href="#">Isak Temes</a></div>
-                                    <span class="fs-sm text-muted">Tue, 19:58</span>
-                                </div>
-
-                                Reasonable palpably rankly expressly grimy...
-                            </div>
-                        </div>
-
-                        <div class="d-flex align-items-start mb-3">
-                            <div class="status-indicator-container me-3">
-                                <img src="{{ asset('/admin/assets/images/demo/users/face7.jpg') }}"
-                                    class="rounded-circle" width="40" jeight="40" alt="">
-                                <span class="status-indicator bg-warning"></span>
-                            </div>
-
-                            <div class="flex-fill">
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <div class="fw-semibold"><a href="#">Vittorio Cosgrove</a></div>
-                                    <span class="fs-sm text-muted">Tue, 16:35</span>
-                                </div>
-
-                                Arguably therefore more unexplainable fumed...
-                            </div>
-                        </div>
-
-                        <div class="d-flex align-items-start mb-3">
-                            <div class="status-indicator-container me-3">
-                                <img src="{{ asset('/admin/assets/images/demo/users/face18.jpg') }}"
-                                    class="rounded-circle" width="40" jeight="40" alt="">
-                                <span class="status-indicator bg-warning"></span>
-                            </div>
-
-                            <div class="flex-fill">
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <div class="fw-semibold"><a href="#">Hilary Talaugon</a></div>
-                                    <span class="fs-sm text-muted">Tue, 12:16</span>
-                                </div>
-
-                                Nicely unlike porpoise a kookaburra past more...
-                            </div>
-                        </div>
-
-                        <div class="d-flex align-items-start mb-3">
-                            <div class="status-indicator-container me-3">
-                                <img src="{{ asset('/admin/assets/images/demo/users/face14.jpg') }}"
-                                    class="rounded-circle" width="40" jeight="40" alt="">
-                                <span class="status-indicator bg-success"></span>
-                            </div>
-
-                            <div class="flex-fill">
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <div class="fw-semibold"><a href="#">Bobbie Seber</a></div>
-                                    <span class="fs-sm text-muted">Tue, 09:20</span>
-                                </div>
-
-                                Before visual vigilantly fortuitous tortoise...
-                            </div>
-                        </div>
-
-                        <div class="d-flex align-items-start">
-                            <div class="status-indicator-container me-3">
-                                <img src="{{ asset('/admin/assets/images/demo/users/face8.jpg') }}"
-                                    class="rounded-circle" width="40" jeight="40" alt="">
-                                <span class="status-indicator bg-success"></span>
-                            </div>
-
-                            <div class="flex-fill">
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <div class="fw-semibold"><a href="#">Walther Laws</a></div>
-                                    <span class="fs-sm text-muted">Tue, 03:29</span>
-                                </div>
-
-                                Far affecting more leered unerringly dishonest...
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="tab-pane fade" id="messages-fri">
-                        <div class="d-flex align-items-start mb-3">
-                            <div class="status-indicator-container me-3">
-                                <img src="{{ asset('/admin/assets/images/demo/users/face15.jpg') }}"
-                                    class="rounded-circle" width="40" jeight="40" alt="">
-                                <span class="status-indicator bg-danger"></span>
-                            </div>
-
-                            <div class="flex-fill">
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <div class="fw-semibold"><a href="#">Owen Stretch</a></div>
-                                    <span class="fs-sm text-muted">Fri, 18:12</span>
-                                </div>
-
-                                Tardy rattlesnake seal raptly earthworm...
-                            </div>
-                        </div>
-
-                        <div class="d-flex align-items-start mb-3">
-                            <div class="status-indicator-container me-3">
-                                <img src="{{ asset('/admin/assets/images/demo/users/face12.jpg') }}"
-                                    class="rounded-circle" width="40" jeight="40" alt="">
-                                <span class="status-indicator bg-warning"></span>
-                            </div>
-
-                            <div class="flex-fill">
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <div class="fw-semibold"><a href="#">Jenilee Mcnair</a></div>
-                                    <span class="fs-sm text-muted">Fri, 14:03</span>
-                                </div>
-
-                                Since hello dear pushed amid darn trite...
-                            </div>
-                        </div>
-
-                        <div class="d-flex align-items-start mb-3">
-                            <div class="status-indicator-container me-3">
-                                <img src="{{ asset('/admin/assets/images/demo/users/face22.jpg') }}"
-                                    class="rounded-circle" width="40" jeight="40" alt="">
-                                <span class="status-indicator bg-danger"></span>
-                            </div>
-
-                            <div class="flex-fill">
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <div class="fw-semibold"><a href="#">Alaster Jain</a></div>
-                                    <span class="fs-sm text-muted">Fri, 13:59</span>
-                                </div>
-
-                                Dachshund cardinal dear next jeepers well...
-                            </div>
-                        </div>
-
-                        <div class="d-flex align-items-start mb-3">
-                            <div class="status-indicator-container me-3">
-                                <img src="{{ asset('/admin/assets/images/demo/users/face24.jpg') }}"
-                                    class="rounded-circle" width="40" jeight="40" alt="">
-                                <span class="status-indicator bg-secondary"></span>
-                            </div>
-
-                            <div class="flex-fill">
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <div class="fw-semibold"><a href="#">Sigfrid Thisted</a></div>
-                                    <span class="fs-sm text-muted">Fri, 09:26</span>
-                                </div>
-
-                                Lighted wolf yikes less lemur crud grunted...
-                            </div>
-                        </div>
-
-                        <div class="d-flex align-items-start">
-                            <div class="status-indicator-container me-3">
-                                <img src="{{ asset('/admin/assets/images/demo/users/face17.jpg') }}"
-                                    class="rounded-circle" width="40" jeight="40" alt="">
-                                <span class="status-indicator bg-secondary"></span>
-                            </div>
-
-                            <div class="flex-fill">
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <div class="fw-semibold"><a href="#">Sherilyn Mckee</a></div>
-                                    <span class="fs-sm text-muted">Fri, 06:38</span>
-                                </div>
-
-                                Less unicorn a however careless husky...
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <!-- /tabs content -->
-
-            </div>
-            <!-- /my messages -->
-
-
-            <!-- Daily financials -->
-            <div class="card">
-                <div class="card-header d-flex align-items-center">
-                    <h5 class="mb-0">Daily financials</h5>
-                    <div class="ms-auto">
-                        <label class="form-check form-switch form-check-reverse">
-                            <input type="checkbox" class="form-check-input" id="realtime" checked>
-                            <span class="form-check-label">Realtime</span>
-                        </label>
-                    </div>
-                </div>
-
-                <div class="card-body">
-                    <div class="chart mb-3" id="bullets"></div>
-
-                    <div class="d-flex mb-3">
-                        <div class="me-3">
-                            <div class="bg-pink bg-opacity-10 text-pink lh-1 rounded-pill p-2">
-                                <i class="ph-chart-line"></i>
-                            </div>
-                        </div>
-                        <div class="flex-fill">
-                            Stats for July, 6: <span class="fw-semibold">1938</span> orders, $4220
-                            revenue
-                            <div class="text-muted fs-sm">2 hours ago</div>
-                        </div>
-                    </div>
-
-                    <div class="d-flex mb-3">
-                        <div class="me-3">
-                            <div class="bg-success bg-opacity-10 text-success lh-1 rounded-pill p-2">
-                                <i class="ph-check"></i>
-                            </div>
-                        </div>
-                        <div class="flex-fill">
-                            Invoices <a href="#">#4732</a> and <a href="#">#4734</a> have been paid
-                            <div class="text-muted fs-sm">Dec 18, 18:36</div>
-                        </div>
-                    </div>
-
-                    <div class="d-flex mb-3">
-                        <div class="me-3">
-                            <div class="bg-primary bg-opacity-10 text-primary lh-1 rounded-pill p-2">
-                                <i class="ph-users"></i>
-                            </div>
-                        </div>
-                        <div class="flex-fill">
-                            Affiliate commission for June has been paid
-                            <div class="text-muted fs-sm">36 minutes ago</div>
-                        </div>
-                    </div>
-
-                    <div class="d-flex mb-3">
-                        <div class="me-3">
-                            <div class="bg-warning bg-opacity-10 text-warning lh-1 rounded-pill p-2">
-                                <i class="ph-arrow-counter-clockwise"></i>
-                            </div>
-                        </div>
-                        <div class="flex-fill">
-                            Order <a href="#">#37745</a> from July, 1st has been refunded
-                            <div class="text-muted fs-sm">4 minutes ago</div>
-                        </div>
-                    </div>
-
-                    <div class="d-flex">
-                        <div class="me-3">
-                            <div class="bg-teal bg-opacity-10 text-teal lh-1 rounded-pill p-2">
-                                <i class="ph-arrow-bend-double-up-right"></i>
-                            </div>
-                        </div>
-                        <div class="flex-fill">
-                            Invoice <a href="#">#4769</a> has been sent to <a href="#">Robert Smith</a>
-                            <div class="text-muted fs-sm">Dec 12, 05:46</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <!-- /daily financials -->
 
         </div>
     </div>

@@ -74,7 +74,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                     const SizedBox(height: 50),
                     CustomForm(
-                      label: "Email",
+                      label: "Username",
                       controller: _authHandler.usernameController,
                       isPassword: false,
                       keyboardType: TextInputType.name,

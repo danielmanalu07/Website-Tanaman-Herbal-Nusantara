@@ -139,4 +139,5 @@ Route::middleware([SetAcceptLanguage::class, SetLocale::class])->group(function 
 
     Route::get('/profile/{id}', [UserController::class, 'profile_detail'])->name('user.profile.detail');
     Route::get('/contact-us-user', [UserController::class, 'contact_us'])->name('user.contact');
+
 });

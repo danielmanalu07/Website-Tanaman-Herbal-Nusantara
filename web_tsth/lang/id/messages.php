@@ -8,7 +8,7 @@ return [
     "Peta Tanaman"                                                                                                                                                => "Peta Tanaman",
     "Kontak Kami"                                                                                                                                                 => "Kontak Kami",
     "Tanaman Herbal Nusantara"                                                                                                                                    => "Tanaman Herbal Nusantara",
-    "Taman Sains Teknologi Herbal & Hortikultura"                                                                                                                 => "Taman Sains Teknologi Herbal & Hortikultura",
+    "Taman Sains Teknologi Herbal dan Hortikultura Indonesia"                                                                                                     => "Taman Sains Teknologi Herbal dan Hortikultura Indonesia",
     "Temukan Tanaman Herbal dan Hortikultura Favoritmu Sekarang dan Cari Tahu Manfaat Tanaman Lokal di Sekitarmu!"                                                => "Temukan Tanaman Herbal dan Hortikultura Favoritmu Sekarang dan Cari Tahu Manfaat Tanaman Lokal di Sekitarmu!",
     "Lihat Selengkapnya"                                                                                                                                          => "Lihat Selengkapnya",
     "Tentang Kami"                                                                                                                                                => "Tentang Kami",

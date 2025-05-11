@@ -8,7 +8,7 @@ return [
     "Peta Tanaman"                                                                                                                                                => "Plant Maps",
     "Kontak Kami"                                                                                                                                                 => "Contact Us",
     "Tanaman Herbal Nusantara"                                                                                                                                    => "Indonesian Herbal Plants",
-    "Taman Sains Teknologi Herbal & Hortikultura"                                                                                                                 => "Herbal & Horticulture Technology Science Park",
+    "Taman Sains Teknologi Herbal dan Hortikultura Indonesia"                                                                                                     => "Indonesian Herbal and Horticulture Science Techno Park",
     "Temukan Tanaman Herbal dan Hortikultura Favoritmu Sekarang dan Cari Tahu Manfaat Tanaman Lokal di Sekitarmu!"                                                => "Find Your Favorite Herbal and Horticultural Plants Now and Find Out the Benefits of Local Plants Around You!",
     "Lihat Selengkapnya"                                                                                                                                          => "Read More",
     "Tentang Kami"                                                                                                                                                => "About Us",
