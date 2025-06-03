@@ -9,6 +9,7 @@ use App\Response\Response;
 use App\Services\Staff\PlantValidationService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Maatwebsite\Excel\Facades\Excel;
 
 class PlantValidationController extends Controller
@@ -119,7 +120,8 @@ class PlantValidationController extends Controller
     public function export()
     {
         try {
-            return Excel::download(new PlantValidationExport, 'validation.xlsx');
+            $staff = Auth::user();
+            return Excel::download(new PlantValidationExport($staff->id), 'validation.xlsx');
         } catch (\Throwable $th) {
             return Response::error('Internal server error', $th->getMessage(), 500);
         }

@@ -8,11 +8,17 @@ use Maatwebsite\Excel\Concerns\WithMapping;
 
 class PlantValidationExport implements FromCollection, WithHeadings, WithMapping
 {
-    private $validations;
+    private $validations, $validatorId;
+
+    public function __construct($validatorId)
+    {
+        $this->validatorId = $validatorId;
+    }
 
     public function collection()
     {
-        $this->validations = PlantValidation::with(['plants', 'users'])->get(); // Menghilangkan hubungan dengan images
+        $this->validations = PlantValidation::with(['plants', 'users'])
+            ->where('validator_id', $this->validatorId)->get(); // Menghilangkan hubungan dengan images
         return $this->validations;
     }
 

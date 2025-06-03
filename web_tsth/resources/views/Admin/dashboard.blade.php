@@ -214,7 +214,7 @@
                             y: {
                                 beginAtZero: true,
                                 min: 0,
-                                max: maxData, // Tetap set max ke 100
+                                max: maxData,
                                 title: {
                                     display: true,
                                     text: 'Jumlah'
@@ -437,7 +437,7 @@
                     </div>
 
                     <div>
-                        Habitus Total
+                        {{ __('messages.Total Habitus') }}
                         <div class="fs-sm opacity-75">{{ $avgHabitus }}% avg</div>
                     </div>
                 </div>
@@ -458,7 +458,7 @@
                     </div>
 
                     <div>
-                        Staff Total
+                        {{ __('messages.Total Staf') }}
                         <div class="fs-sm opacity-75">{{ $avgStaff }}% avg</div>
                     </div>
                 </div>

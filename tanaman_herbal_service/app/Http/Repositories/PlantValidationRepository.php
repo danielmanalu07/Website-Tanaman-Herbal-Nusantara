@@ -36,4 +36,5 @@ class PlantValidationRepository
         $validation->update($data);
         return $validation;
     }
+
 }

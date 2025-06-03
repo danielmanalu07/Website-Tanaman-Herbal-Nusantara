@@ -38,4 +38,6 @@ return [
     "Tidak Ada Berita Terbaru."                                                                                                                                   => "No Latest News.",
     "Detail Berita"                                                                                                                                               => "News Details",
     "Cari Berita"                                                                                                                                                 => "Search News",
+    "Total Habitus"                                                                                                                                               => "Total Habitus",
+    "Total Staf"                                                                                                                                                  => "Total Staff",
 ];

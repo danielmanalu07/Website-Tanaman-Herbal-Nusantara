@@ -38,4 +38,6 @@ return [
     "Tidak Ada Berita Terbaru."                                                                                                                                   => "Tidak Ada Berita Terbaru.",
     "Detail Berita"                                                                                                                                               => "Detail Berita",
     "Cari Berita"                                                                                                                                                 => "Cari Berita",
+    "Total Habitus"                                                                                                                                               => "Total Habitus",
+    "Total Staf"                                                                                                                                                  => "Total Staf",
 ];
