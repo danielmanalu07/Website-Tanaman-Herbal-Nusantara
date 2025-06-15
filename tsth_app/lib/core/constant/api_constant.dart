@@ -1,3 +1,3 @@
 class ApiConstant {
-  static const String api = "http://192.168.150.215:8002/api";
+  static const String api = "http://172.27.67.193:8002/api";
 }
