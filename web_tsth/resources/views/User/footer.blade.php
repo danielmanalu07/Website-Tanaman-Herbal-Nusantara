@@ -9,7 +9,7 @@
                         <h5 class="footer-widget-title">
                             <img src="{{ asset('images/logoweb-removebg.png') }}" alt="">
                         </h5>
-                        <p class="comp-desc">{{ __('messages.Taman Sains Teknologi Herbal & Hortikultura') }}
+                        <p class="comp-desc">{{ __('Taman Sains Teknologi Herbal dan Hortikultura Indonesia') }}
                         </p>
                         <div class="contact-item style1">
                             <div class="contact-icon">

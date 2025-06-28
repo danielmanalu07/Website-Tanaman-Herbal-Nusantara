@@ -57,17 +57,21 @@
                                     <!-- Left Column -->
                                     <ul class="list-style project-desc-list" style="flex: 1; margin-right: 15px;">
                                         <li class="d-flex flex-column mb-2">
-                                            <h6 class="fw-bold" style="font-size: 1.25rem;">Plant Name</h6>
-                                            <p class="mb-0" style="font-size: 1.1rem;">{{ $plants['data']['name'] }}</p>
+                                            <h6 class="fw-bold" style="font-size: 1.25rem;">
+                                                {{ __('messages.Nama Tanaman') }}</h6>
+                                            <p class="mb-0" style="font-size: 1.1rem;">{{ $plants['data']['name'] }}
+                                            </p>
                                         </li>
                                         <li class="d-flex flex-column mb-2">
-                                            <h6 class="fw-bold" style="font-size: 1.25rem;">Latin Name</h6>
+                                            <h6 class="fw-bold" style="font-size: 1.25rem;">{{ __('messages.Nama Latin') }}
+                                            </h6>
                                             <p class="mb-0" style="font-size: 1.1rem;">
                                                 {{ $plants['data']['latin_name'] }}
                                             </p>
                                         </li>
                                         <li class="d-flex flex-column mb-2">
-                                            <h6 class="fw-bold" style="font-size: 1.25rem;">Location</h6>
+                                            <h6 class="fw-bold" style="font-size: 1.25rem;">{{ __('messages.Lokasi') }}
+                                            </h6>
                                             <p class="mb-0" style="font-size: 1.1rem;">
                                                 {{ $lands->isEmpty() ? '-' : $lands->pluck('name')->implode(', ') }}
                                             </p>
@@ -76,17 +80,20 @@
                                     <!-- Right Column -->
                                     <ul class="list-style project-desc-list" style="flex: 1; margin-left: 15px;">
                                         <li class="d-flex flex-column mb-2">
-                                            <h6 class="fw-bold" style="font-size: 1.25rem;">Ecology</h6>
+                                            <h6 class="fw-bold" style="font-size: 1.25rem;">{{ __('messages.Ekologi') }}
+                                            </h6>
                                             <p class="mb-0" style="font-size: 1.1rem;">{{ $plants['data']['ecology'] }}
                                             </p>
                                         </li>
                                         <li class="d-flex flex-column mb-2">
-                                            <h6 class="fw-bold" style="font-size: 1.25rem;">Endemic Information</h6>
+                                            <h6 class="fw-bold" style="font-size: 1.25rem;">
+                                                {{ __('messages.Informasi Endemik') }}</h6>
                                             <p class="mb-0" style="font-size: 1.1rem;">
                                                 {{ $plants['data']['endemic_information'] }}</p>
                                         </li>
                                         <li class="d-flex flex-column mb-2">
-                                            <h6 class="fw-bold" style="font-size: 1.25rem;">Habitus</h6>
+                                            <h6 class="fw-bold" style="font-size: 1.25rem;">{{ __('messages.Habitus') }}
+                                            </h6>
                                             <p class="mb-0" style="font-size: 1.1rem;">
                                                 {{ $plants['data']['habitus']['name'] }}</p>
                                         </li>

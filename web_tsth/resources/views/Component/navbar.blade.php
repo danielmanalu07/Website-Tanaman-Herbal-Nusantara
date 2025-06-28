@@ -7,7 +7,7 @@
         </div>
 
         <div class="navbar-brand flex-1 flex-lg-0">
-            <a href="index.html" class="d-inline-flex align-items-center" style="padding-left: 20%;">
+            <a href="{{ route('home') }}" class="d-inline-flex align-items-center" style="padding-left: 20%;">
                 <img src="{{ asset('images/logoweb-removebg.png') }}" style="height: 40px; width: auto;" alt="">
             </a>
         </div>

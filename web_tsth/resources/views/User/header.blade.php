@@ -134,8 +134,9 @@
                                     </a>
                                 </li>
                                 <li class="children">
-                                    <a href="#" class="{{ request()->is('#') ? 'active' : '' }}">
-                                        <i class="fi fi-rr-marker"></i>{{ __('messages.Peta Tanaman') }}
+                                    <a href="{{ route('user.location.plant') }}"
+                                        class="{{ request()->is('#') ? 'active' : '' }}">
+                                        <i class="fi fi-rr-marker"></i>{{ __('messages.Lokasi Tanaman') }}
                                     </a>
                                 </li>
                                 <li class="children">

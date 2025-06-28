@@ -41,7 +41,7 @@ class _UpdateValidationBottomSheetState
   void initState() {
     super.initState();
     final parsedDate = DateFormat(
-      'dd MMM yyyy',
+      "dd MMMM yyyy",
     ).parse(widget.initialValidation.date);
     final formattedDate = DateFormat('yyyy-MM-dd').format(parsedDate);
 

@@ -9,6 +9,7 @@ use App\Http\Controllers\LanguageController;
 use App\Http\Controllers\NewsController;
 use App\Http\Controllers\OurGardenController;
 use App\Http\Controllers\PlantController;
+use App\Http\Controllers\PlantLocationController;
 use App\Http\Controllers\PlantValidationController;
 use App\Http\Controllers\StaffController;
 use App\Http\Controllers\UserController;
@@ -139,5 +140,7 @@ Route::middleware([SetAcceptLanguage::class, SetLocale::class])->group(function 
 
     Route::get('/profile/{id}', [UserController::class, 'profile_detail'])->name('user.profile.detail');
     Route::get('/contact-us-user', [UserController::class, 'contact_us'])->name('user.contact');
+
+    Route::get('/locations', [PlantLocationController::class, 'index'])->name('user.location.plant');
 
 });
