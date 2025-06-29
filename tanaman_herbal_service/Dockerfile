@@ -62,5 +62,5 @@ RUN php artisan key:generate --force --no-interaction && \
 RUN chown -R www-data:www-data storage bootstrap/cache
 
 # Railway akan meng‑inject $PORT
-EXPOSE 8080
+EXPOSE 80
 CMD ["apache2-foreground"]
