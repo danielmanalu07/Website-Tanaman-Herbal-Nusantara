@@ -83,7 +83,7 @@
     <div class="page-wrapper ">
 
         <!-- Header  Start -->
-        @include('user.header')
+        @include('User.header')
         <!-- Header  end -->
 
 
@@ -546,7 +546,7 @@
         <!-- Gallery Section end -->
 
         <!-- Footer  start -->
-        @include('user.footer')
+        @include('User.footer')
         <!-- Footer  end -->
 
     </div>
