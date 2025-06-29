@@ -42,8 +42,13 @@ RUN php artisan key:generate --force --no-interaction
 
 RUN npm ci
 
-# Expose port
+# Copy startup script
+COPY start.sh /app/start.sh
+RUN chmod +x /app/start.sh
+
+
+# Expose port 8080 (sesuai dengan Railway)
 EXPOSE 8080
 
-# Start Laravel development server
+# Start Laravel development server di port 8080
 CMD ["php", "artisan", "serve", "--host=0.0.0.0", "--port=8080"]
