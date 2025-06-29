@@ -39,11 +39,17 @@ CMD bash -c '\
     # kosongkan cache konfigurasi lawas
     php artisan config:clear; \
     php artisan view:clear; \
+    php artisan route:clear; \
     \
     php artisan migrate --force; \
     php artisan db:seed --class=RolePermissionSeeder --force; \
     php artisan db:seed --class=AdminSeeder       --force; \
     php artisan storage:link --force || true; \
+    \
+    # (opsional) re‑cache config & route setelah path valid
+    php artisan config:cache; \
+    php artisan route:cache;  \
+    php artisan route:cache;   \
     \
     php artisan serve --host=0.0.0.0 --port=${PORT:-8000} \
     '
