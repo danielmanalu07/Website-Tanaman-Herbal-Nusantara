@@ -1,5 +1,5 @@
 # Gunakan official PHP image dengan ekstensi yang dibutuhkan Laravel
-FROM php:8.2-fpm
+FROM php:8.2-cli
 
 # Install system dependencies
 RUN apt-get update && apt-get install -y \
@@ -37,8 +37,8 @@ RUN composer install --no-dev --prefer-dist --optimize-autoloader \
     && php artisan view:clear \
     && composer dump-autoload
 
-# Jalankan perintah tambahan jika diperlukan
-# RUN php artisan migrate --force
+# Buka port 8000
+EXPOSE 8000
 
-# Jalankan PHP-FPM sebagai default command
-CMD ["php-fpm"]
+# Jalankan Laravel development server
+CMD ["php", "artisan", "serve", "--host=0.0.0.0", "--port=8000"]
