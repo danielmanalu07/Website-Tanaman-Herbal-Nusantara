@@ -1,44 +1,43 @@
-# Gunakan official PHP image dengan ekstensi yang dibutuhkan Laravel
 FROM php:8.2-cli
 
-# Install system dependencies
+# Install system dependencies & PHP extensions
 RUN apt-get update && apt-get install -y \
     git \
     unzip \
     curl \
     libpng-dev \
+    libjpeg-dev \
+    libfreetype6-dev \
     libonig-dev \
     libxml2-dev \
     zip \
     libzip-dev \
-    && docker-php-ext-install pdo_mysql mbstring zip exif pcntl bcmath
+    && docker-php-ext-configure gd --with-freetype --with-jpeg \
+    && docker-php-ext-install gd pdo_mysql mbstring zip exif pcntl bcmath
 
 # Install Composer
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
-# Buat direktori aplikasi
 WORKDIR /var/www
 
-# Salin file Laravel ke image
+# Copy source code
 COPY . .
 
-# Set permission untuk storage dan bootstrap
+# Set folder permissions
 RUN chmod -R 775 storage bootstrap/cache
 
-# Gunakan driver file saat build untuk hindari koneksi ke mysql.railway.internal
+# Environment setting during build
 ENV CACHE_DRIVER=file
 ENV SESSION_DRIVER=file
 ENV QUEUE_CONNECTION=sync
 
-# Install dependencies Laravel (tanpa dev)
+# Install Laravel dependencies
 RUN composer install --no-dev --prefer-dist --optimize-autoloader \
     && php artisan config:clear \
     && php artisan route:clear \
     && php artisan view:clear \
     && composer dump-autoload
 
-# Buka port 8000
+# Expose port and run Laravel server
 EXPOSE 8000
-
-# Jalankan Laravel development server
 CMD ["php", "artisan", "serve", "--host=0.0.0.0", "--port=8000"]
