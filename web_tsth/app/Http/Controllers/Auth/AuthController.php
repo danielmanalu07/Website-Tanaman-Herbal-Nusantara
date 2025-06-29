@@ -53,28 +53,25 @@ class AuthController extends Controller
 
     public function dashboard()
     {
-        try {
-            $habituses          = $this->habitus_service->get_all()->count();
-            $data               = $this->auth_service->dashboard();
-            $languages          = $this->language_service->get_all_lang();
-            $staff              = $this->staff_service->get_all_staff()->count();
-            $plants             = $this->plant_service->get_all_plant()->count();
-            $lands              = $this->land_service->get_all_land()->count();
-            $visitor_categories = $this->visitor_category_service->get_all_visitor_category()->count();
-            $visitors           = $this->visitor_service->get_all_visitor()->count();
-            $news               = $this->news_service->get_all_news()->count();
-            $plant_validations  = $this->plant_validation_service->get_all_validation()->count();
+        $habituses          = $this->habitus_service->get_all()->count();
+        $data               = $this->auth_service->dashboard();
+        $languages          = $this->language_service->get_all_lang();
+        $staff              = $this->staff_service->get_all_staff()->count();
+        $plants             = $this->plant_service->get_all_plant()->count();
+        $lands              = $this->land_service->get_all_land()->count();
+        $visitor_categories = $this->visitor_category_service->get_all_visitor_category()->count();
+        $visitors           = $this->visitor_service->get_all_visitor()->count();
+        $news               = $this->news_service->get_all_news()->count();
+        $plant_validations  = $this->plant_validation_service->get_all_validation()->count();
 
-            $visitor_category = $this->visitor_category_service->get_all_visitor_category();
-            $visitor          = $this->visitor_service->get_all_visitor();
+        $visitor_category = $this->visitor_category_service->get_all_visitor_category();
+        $visitor          = $this->visitor_service->get_all_visitor();
 
-            $validations = $this->plant_validation_service->get_all_validation();
-            $plant       = $this->plant_service->get_all_plant();
-            $berita      = $this->news_service->get_all_news();
-            return view('Admin.dashboard', compact('data', 'habituses', 'languages', 'staff', 'plants', 'lands', 'visitor_categories', 'visitors', 'news', 'plant_validations', 'visitor_category', 'visitor', 'validations', 'plant', 'berita'));
-        } catch (\Throwable $th) {
-            return redirect()->route('admin.login')->with('error', 'You must be logged in.');
-        }
+        $validations = $this->plant_validation_service->get_all_validation();
+        $plant       = $this->plant_service->get_all_plant();
+        $berita      = $this->news_service->get_all_news();
+        return view('Admin.dashboard', compact('data', 'habituses', 'languages', 'staff', 'plants', 'lands', 'visitor_categories', 'visitors', 'news', 'plant_validations', 'visitor_category', 'visitor', 'validations', 'plant', 'berita'));
+
     }
     public function logout(Request $request)
     {
