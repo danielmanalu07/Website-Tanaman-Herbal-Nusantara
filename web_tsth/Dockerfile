@@ -1,6 +1,6 @@
 FROM php:8.2-fpm
 
-# Install system dependencies
+# Install dependencies
 RUN apt-get update && apt-get install -y \
     git \
     curl \
@@ -11,8 +11,6 @@ RUN apt-get update && apt-get install -y \
     unzip \
     libzip-dev \
     libpq-dev \
-    nano \
-    libcurl4-openssl-dev \
     nodejs \
     npm
 
@@ -28,26 +26,26 @@ WORKDIR /app
 # Copy project files
 COPY . .
 
-# Create necessary Laravel directories
+# Set permissions for Laravel
 RUN mkdir -p storage/logs storage/framework/{cache,sessions,views} bootstrap/cache \
     && chmod -R 775 storage bootstrap/cache
 
-# Generate .env if not exists
-RUN cp .env.example .env 2>/dev/null || echo "APP_NAME=Laravel\nAPP_ENV=production\nAPP_KEY=\nAPP_DEBUG=true\nAPP_URL=http://localhost\nCACHE_DRIVER=file\nSESSION_DRIVER=file\nQUEUE_CONNECTION=sync\nLOG_CHANNEL=single" > .env
+# Copy .env (fallback only, Railway akan override di deploy)
+RUN cp .env.example .env 2>/dev/null || true
 
-# Install PHP and JS dependencies
+# Install dependencies
 RUN composer install --no-dev --optimize-autoloader --ignore-platform-reqs --no-scripts \
-    && php artisan key:generate --force --no-interaction \
     && npm ci
 
-# Clear Laravel caches
-RUN php artisan config:clear \
-    && php artisan cache:clear \
-    && php artisan route:clear \
-    && php artisan view:clear
+# Expose port (optional for Railway)
+EXPOSE 8000
 
-# Expose port (Railway will map this)
-EXPOSE 8080
-
-# Start PHP-FPM
-CMD ["php-fpm"]
+# ✅ Jalankan Laravel Artisan hanya saat container dijalankan
+CMD sh -c "\
+    php artisan config:clear && \
+    php artisan cache:clear && \
+    php artisan route:clear && \
+    php artisan view:clear && \
+    php artisan key:generate --force --no-interaction && \
+    chmod -R 775 storage bootstrap/cache && \
+    php-fpm"
