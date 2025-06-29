@@ -41,10 +41,13 @@ WORKDIR /var/www/html
 
 # Salin & install dependensi prod
 COPY composer.json composer.lock ./
-RUN composer install --no-dev --optimize-autoloader --prefer-dist --no-progress
+RUN composer install --no-dev --no-scripts \
+    --optimize-autoloader --prefer-dist --no-progress
 
 # Salin source lainnya
 COPY . .
+
+RUN composer dump-autoload --no-dev --optimize
 
 # Laravel bootstrap
 RUN php artisan key:generate --force --no-interaction && \
