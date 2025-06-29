@@ -1,4 +1,4 @@
-@extends('component.main')
+@extends('Component.main')
 @section('title')
     Plant
 @endsection

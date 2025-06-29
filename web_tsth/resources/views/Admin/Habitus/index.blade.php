@@ -1,4 +1,4 @@
-@extends('component.main')
+@extends('Component.main')
 
 @section('menu')
     Home
