@@ -12,9 +12,10 @@
         "laravel/sanctum": "^4.0",
         "laravel/tinker": "^2.9",
         "maatwebsite/excel": "~3.1.48",
-        "simplesoftwareio/simple-qrcode": "^4.2",
+        "simplesoftwareio/simple-qrcode": "4.2",
         "spatie/laravel-permission": "^6.12",
-        "stichoza/google-translate-php": "^5.2"
+        "stichoza/google-translate-php": "^5.2",
+        "ext-imagick" : "*"
     },
     "require-dev": {
         "fakerphp/faker": "^1.23",
