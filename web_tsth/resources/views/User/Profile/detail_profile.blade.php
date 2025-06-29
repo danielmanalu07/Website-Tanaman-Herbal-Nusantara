@@ -1,4 +1,4 @@
-@extends('user.main')
+@extends('User.main')
 @section('content')
     <div class="breadcrumb-wrapper bg-f br-bg-1 container">
         <img src="{{ asset('images/breadcrumb.jpg') }}" alt="Image"

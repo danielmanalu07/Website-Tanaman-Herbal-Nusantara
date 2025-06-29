@@ -1,4 +1,4 @@
-@extends('user.main')
+@extends('User.main')
 @section('content')
     @php
         $contact = $contacts->first();

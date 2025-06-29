@@ -1,4 +1,4 @@
-@extends('user.main')
+@extends('User.main')
 @push('resource')
     <style>
         .project-img {
