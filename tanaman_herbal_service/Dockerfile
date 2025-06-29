@@ -1,70 +1,44 @@
-# ────────────────────────────────
-# PHP 8.2 + Apache
-# ────────────────────────────────
-FROM php:8.2-apache
+# ───────────────────────────
+# 1. Base image PHP 8.2 CLI
+# ───────────────────────────
+FROM php:8.2-cli
 
-# ────────────────────────────────
-# Sistem & ekstensi PHP
-# ────────────────────────────────
-RUN apt-get update && \
-    apt-get install -y --no-install-recommends \
-    build-essential pkg-config \
+# 2. Ekstensi yang dibutuhkan
+RUN apt-get update && apt-get install -y --no-install-recommends \
     libmagickwand-dev \
     libpng-dev libjpeg-dev libfreetype6-dev \
-    libzip-dev libonig-dev \
-    unzip git ca-certificates && \
-    # GD – dukungan JPEG + FreeType
-    docker-php-ext-configure gd --with-freetype --with-jpeg && \
-    docker-php-ext-install -j"$(nproc)" gd pdo_mysql zip mbstring && \
-    # PECL Imagick
-    pecl install imagick && \
-    docker-php-ext-enable imagick && \
-    # bersih‑bersih
-    apt-get clean && rm -rf /var/lib/apt/lists/*
+    libzip-dev libonig-dev unzip git ca-certificates \
+    && docker-php-ext-configure gd --with-freetype --with-jpeg \
+    && docker-php-ext-install -j"$(nproc)" gd pdo_mysql zip mbstring \
+    && pecl install imagick \
+    && docker-php-ext-enable imagick \
+    && apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# ────────────────────────────────
-# Dokumen root Apache → /public
-# ────────────────────────────────
-ENV APACHE_DOCUMENT_ROOT=/var/www/html/public
-RUN sed -ri 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' \
-    /etc/apache2/sites-available/*.conf /etc/apache2/apache2.conf && \
-    a2enmod rewrite headers && \
-    \
-    # ▸ Tambah ServerName agar warning AH00558 hilang
-    echo "ServerName localhost" >> /etc/apache2/apache2.conf
-
-# ────────────────────────────────
-# Composer
-# ────────────────────────────────
+# 3. Tambah Composer
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
-ENV COMPOSER_MEMORY_LIMIT=-1 COMPOSER_NO_INTERACTION=1
+ENV COMPOSER_MEMORY_LIMIT=-1
 
-# ────────────────────────────────
-WORKDIR /var/www/html
+# 4. Workspace
+WORKDIR /app
 
-# Dependensi PHP (tanpa scripts)
+# 5. Install vendor (tanpa script)
 COPY composer.json composer.lock ./
-RUN composer install --no-dev --no-scripts \
-    --optimize-autoloader --prefer-dist --no-progress
+RUN composer install --no-dev --no-scripts --optimize-autoloader --prefer-dist
 
-# Aplikasi
+# 6. Copy source
 COPY . .
+
 RUN composer dump-autoload --no-dev --optimize
+RUN php artisan key:generate --force --no-interaction
 
-# Laravel bootstrap
-RUN php artisan key:generate      --force --no-interaction && \
-    php artisan storage:link      || true                     && \
-    php artisan config:cache      && \
-    php artisan route:cache       && \
-    php artisan migrate           --force --no-interaction && \
-    php artisan db:seed --class=RolePermissionSeeder --force --no-interaction && \
-    php artisan db:seed --class=AdminSeeder          --force --no-interaction
-
-# Permission
+# 7. Beri writable storage
 RUN chown -R www-data:www-data storage bootstrap/cache
 
-# ────────────────────────────────
-# Expose & start
-# ────────────────────────────────
-EXPOSE 80
-CMD ["apache2-foreground"]
+
+# 9. Start Laravel dev server + migrate + seeder
+CMD bash -c "\
+    php artisan migrate --force --no-interaction && \
+    php artisan db:seed --class=RolePermissionSeeder --force --no-interaction && \
+    php artisan db:seed --class=AdminSeeder          --force --no-interaction && \
+    php artisan storage:link --force || true && \
+    php artisan serve --host=0.0.0.0 --port=8002"
