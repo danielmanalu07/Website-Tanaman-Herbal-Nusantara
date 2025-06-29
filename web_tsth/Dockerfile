@@ -1,6 +1,7 @@
+# Gunakan image PHP CLI yang sesuai
 FROM php:8.2-cli
 
-# Install system dependencies & PHP extensions
+# Install sistem dependency & ekstensi PHP
 RUN apt-get update && apt-get install -y \
     git \
     unzip \
@@ -18,26 +19,30 @@ RUN apt-get update && apt-get install -y \
 # Install Composer
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
+# Set direktori kerja aplikasi
 WORKDIR /var/www
 
-# Copy source code
+# Salin semua source code
 COPY . .
 
-# Set folder permissions
+# Set permission folder Laravel
 RUN chmod -R 775 storage bootstrap/cache
 
-# Environment setting during build
+# Set env build-time (safe untuk Railway)
 ENV CACHE_DRIVER=file
 ENV SESSION_DRIVER=file
 ENV QUEUE_CONNECTION=sync
 
-# Install Laravel dependencies
+# Install dependencies dan jalankan migration
 RUN composer install --no-dev --prefer-dist --optimize-autoloader \
     && php artisan config:clear \
     && php artisan route:clear \
     && php artisan view:clear \
-    && composer dump-autoload
+    && composer dump-autoload \
+    && php artisan migrate --force
 
-# Expose port and run Laravel server
+# Expose port Laravel serve
 EXPOSE 8000
+
+# Jalankan Laravel secara built-in dengan PHP
 CMD ["php", "artisan", "serve", "--host=0.0.0.0", "--port=8000"]
