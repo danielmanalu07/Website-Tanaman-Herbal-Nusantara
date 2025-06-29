@@ -20,10 +20,6 @@ use App\Http\Middleware\SetAcceptLanguage;
 use App\Http\Middleware\SetLocale;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', function () {
-    return redirect()->route('admin.login');
-});
-
 Route::match(['get', 'post'], '/login', [AuthController::class, 'login'])->name('admin.login');
 Route::post('/logout', [AuthController::class, 'logout'])->name('admin.logout');
 Route::prefix('/admin')->middleware(Authorization::class)->group(function () {
