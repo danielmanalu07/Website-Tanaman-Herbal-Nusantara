@@ -34,10 +34,22 @@ RUN mkdir -p \
 
 # 7) Runtime commands
 CMD bash -c '\
+    # pastikan direktori runtime ada
+    mkdir -p storage/framework/{cache/data,sessions,views} storage/logs; \
+    # kosongkan cache konfigurasi lawas
+    php artisan config:clear; \
+    php artisan view:clear; \
+    \
     php artisan migrate --force; \
     php artisan db:seed --class=RolePermissionSeeder --force; \
-    php artisan db:seed --class=AdminSeeder --force; \
+    php artisan db:seed --class=AdminSeeder       --force; \
     php artisan storage:link --force || true; \
+    \
+    # (opsional) re‑cache config & route setelah path valid
+    php artisan config:cache; \
+    php artisan route:cache;  \
+    \
     php artisan serve --host=0.0.0.0 --port=${PORT:-8000} \
     '
+
 EXPOSE 8000
