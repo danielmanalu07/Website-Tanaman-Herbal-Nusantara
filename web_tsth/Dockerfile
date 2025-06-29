@@ -22,7 +22,11 @@ RUN curl -fsSL https://deb.nodesource.com/setup_18.x | bash - \
 
 WORKDIR /app
 
-# Copy composer files first
+# Copy startup script PERTAMA (sebelum copy files lain)
+COPY start.sh /app/start.sh
+RUN chmod +x /app/start.sh
+
+# Copy composer files
 COPY composer.json composer.lock ./
 COPY package.json package-lock.json ./
 
@@ -33,8 +37,8 @@ COPY . .
 RUN mkdir -p storage/logs storage/framework/{cache,sessions,views} bootstrap/cache
 RUN chmod -R 775 storage bootstrap/cache
 
-# Setup environment
-RUN cp .env.example .env 2>/dev/null || echo "APP_NAME=Laravel\nAPP_ENV=production\nAPP_KEY=\nAPP_DEBUG=false\nAPP_URL=https://website-tanaman-herbal-nusantara-production.up.railway.app\nCACHE_DRIVER=file\nSESSION_DRIVER=file\nQUEUE_CONNECTION=sync" > .env
+# Setup environment dengan DEBUG=true untuk troubleshooting
+RUN cp .env.example .env 2>/dev/null || echo "APP_NAME=Laravel\nAPP_ENV=production\nAPP_KEY=\nAPP_DEBUG=true\nAPP_URL=https://website-tanaman-herbal-nusantara-production.up.railway.app\nCACHE_DRIVER=file\nSESSION_DRIVER=file\nQUEUE_CONNECTION=sync\nLOG_CHANNEL=single" > .env
 
 # Install dependencies
 RUN composer install --no-dev --optimize-autoloader --ignore-platform-reqs --no-scripts
@@ -42,13 +46,8 @@ RUN php artisan key:generate --force --no-interaction
 
 RUN npm ci
 
-# Copy startup script
-COPY start.sh /app/start.sh
-RUN chmod +x /app/start.sh
-
-
-# Expose port 8080 (sesuai dengan Railway)
+# Expose port 8080
 EXPOSE 8080
 
-# Start Laravel development server di port 8080
-CMD ["php", "artisan", "serve", "--host=0.0.0.0", "--port=8080"]
+# Gunakan script startup
+CMD ["/app/start.sh"]
