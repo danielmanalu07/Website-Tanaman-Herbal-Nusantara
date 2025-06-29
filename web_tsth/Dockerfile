@@ -15,7 +15,7 @@ ENV COMPOSER_MEMORY_LIMIT=-1
 # 3) Set direktori kerja aplikasi
 WORKDIR /app
 
-# 4) Salin file composer dan install dependensi (lebih cepat)
+# 4) Salin file composer dan install dependensi
 COPY composer.json composer.lock ./
 RUN composer install --no-dev --no-scripts --optimize-autoloader --prefer-dist
 
@@ -23,12 +23,12 @@ RUN composer install --no-dev --no-scripts --optimize-autoloader --prefer-dist
 COPY . .
 RUN composer dump-autoload --no-dev --optimize
 
-# 6) Buat folder yang dibutuhkan Laravel dan set permission
+# 6) Buat folder Laravel yang dibutuhkan dan set permission
 RUN mkdir -p storage/framework/{cache/data,sessions,views} storage/logs bootstrap/cache \
     && chmod -R 775 storage bootstrap/cache \
     && chown -R www-data:www-data storage bootstrap/cache
 
-# 7) Jalankan proses Laravel di runtime
+# 7) Jalankan proses Laravel saat runtime
 CMD bash -c '\
     php artisan config:clear && \
     php artisan route:clear && \
@@ -37,7 +37,7 @@ CMD bash -c '\
     php artisan storage:link --force || true && \
     php artisan config:cache && \
     php artisan route:cache && \
-    php artisan serve --host=0.0.0.0 --port=${PORT:-8080}'
+    php artisan serve --host=0.0.0.0 --port=${PORT:-8001}'
 
-# Railway butuh port 8080
-EXPOSE 8080
+# Railway akan gunakan ENV PORT jadi ini tetap di-expose
+EXPOSE 8001
