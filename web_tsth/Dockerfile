@@ -43,7 +43,7 @@ RUN php artisan key:generate --force --no-interaction
 RUN npm ci
 
 # Expose port
-EXPOSE 8000
+EXPOSE 8080
 
 # Start Laravel development server
-CMD ["php", "artisan", "serve", "--host=0.0.0.0", "--port=8000"]
+CMD ["php", "artisan", "serve", "--host=0.0.0.0", "--port=8080"]
