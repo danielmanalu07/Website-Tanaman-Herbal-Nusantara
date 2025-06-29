@@ -39,7 +39,7 @@ class UserController extends Controller
             $languages    = $this->language_service->get_all_lang_user();
             return view('user.home', compact('contents', 'plants', 'plantCount', 'visitorCount', 'landCount', 'habitusCount', 'news', 'habituses', 'languages'));
         } catch (\Throwable $th) {
-            return redirect()->back()->with('error', 'Something went wrong.');
+            return redirect()->back()->with('error', $th);
         }
     }
 
