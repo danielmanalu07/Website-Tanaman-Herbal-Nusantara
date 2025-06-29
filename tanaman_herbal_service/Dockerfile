@@ -30,11 +30,9 @@ RUN chown -R www-data:www-data storage bootstrap/cache
 
 # 7.  CMD hanya untuk runtime (migrate, seed, serve)
 CMD bash -c '\
-    [ -f .env ] || cp .env.example .env; \
-    grep -q "APP_KEY=" .env || php artisan key:generate --force; \
     php artisan migrate --force; \
     php artisan db:seed --class=RolePermissionSeeder --force; \
-    php artisan db:seed --class=AdminSeeder       --force; \
+    php artisan db:seed --class=AdminSeeder --force; \
     php artisan storage:link --force || true; \
     php artisan serve --host=0.0.0.0 --port=${PORT:-8000} \
     '
