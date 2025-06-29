@@ -28,7 +28,7 @@ RUN mkdir -p storage/framework/{cache/data,sessions,views} storage/logs bootstra
     && chmod -R 775 storage bootstrap/cache \
     && chown -R www-data:www-data storage bootstrap/cache
 
-# 7) Jalankan proses Laravel saat runtime
+# 7) Jalankan proses Laravel saat runtimes
 CMD bash -c '\
     php artisan config:clear && \
     php artisan route:clear && \
@@ -37,7 +37,10 @@ CMD bash -c '\
     php artisan storage:link --force || true && \
     php artisan config:cache && \
     php artisan route:cache && \
+    echo "✅ Laravel ready. Showing latest error log if exists..." && \
+    tail -n 50 storage/logs/laravel.log || true && \
     php artisan serve --host=0.0.0.0 --port=${PORT:-8001}'
+
 
 # Railway akan gunakan ENV PORT jadi ini tetap di-expose
 EXPOSE 8001
