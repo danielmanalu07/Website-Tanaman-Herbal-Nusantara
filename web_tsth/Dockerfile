@@ -1,37 +1,43 @@
 FROM php:8.2-cli
 
-# Install dependencies dan extension Laravel
-RUN apt-get update && apt-get install -y \
-    git unzip curl zip libpng-dev libjpeg-dev libfreetype6-dev libonig-dev libxml2-dev libzip-dev \
+# 1) Install paket sistem & PHP extension dasar
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    libpng-dev libjpeg-dev libfreetype6-dev \
+    libzip-dev libonig-dev unzip git ca-certificates \
     && docker-php-ext-configure gd --with-freetype --with-jpeg \
-    && docker-php-ext-install gd pdo_mysql mbstring zip exif pcntl bcmath
+    && docker-php-ext-install -j$(nproc) gd pdo_mysql zip mbstring \
+    && apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# Install Composer
+# 2) Install Composer
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
+ENV COMPOSER_MEMORY_LIMIT=-1
 
-# Set working directory
-WORKDIR /var/www
+# 3) Set direktori kerja aplikasi
+WORKDIR /app
 
-# Copy source code
+# 4) Salin file composer dan install dependensi (lebih cepat)
+COPY composer.json composer.lock ./
+RUN composer install --no-dev --no-scripts --optimize-autoloader --prefer-dist
+
+# 5) Salin semua file proyek
 COPY . .
+RUN composer dump-autoload --no-dev --optimize
 
-# Set permissions
-RUN chmod -R 775 storage bootstrap/cache
+# 6) Buat folder yang dibutuhkan Laravel dan set permission
+RUN mkdir -p storage/framework/{cache/data,sessions,views} storage/logs bootstrap/cache \
+    && chmod -R 775 storage bootstrap/cache \
+    && chown -R www-data:www-data storage bootstrap/cache
 
-# Set environment (Railway compatible)
-ENV CACHE_DRIVER=file
-ENV SESSION_DRIVER=file
-ENV QUEUE_CONNECTION=sync
+# 7) Jalankan proses Laravel di runtime
+CMD bash -c '\
+    php artisan config:clear && \
+    php artisan route:clear && \
+    php artisan view:clear && \
+    php artisan migrate --force || true && \
+    php artisan storage:link --force || true && \
+    php artisan config:cache && \
+    php artisan route:cache && \
+    php artisan serve --host=0.0.0.0 --port=${PORT:-8080}'
 
-# Install dependencies dan optimasi
-RUN composer install --no-dev --prefer-dist --optimize-autoloader \
-    && php artisan config:clear \
-    && php artisan route:clear \
-    && php artisan view:clear \
-    && php artisan migrate --force
-
-# Railway uses port 8080 by default
+# Railway butuh port 8080
 EXPOSE 8080
-
-# Start Laravel using php-cli
-CMD ["php", "artisan", "serve", "--host=0.0.0.0", "--port=8080"]
