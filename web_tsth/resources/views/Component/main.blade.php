@@ -210,7 +210,7 @@
 
 
     <!-- Demo config -->
-    @include('component.demo-config')
+    @include('Component.demo-config')
     <!-- /demo config -->
 
     <script>
