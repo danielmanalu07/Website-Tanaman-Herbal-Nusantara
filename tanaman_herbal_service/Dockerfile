@@ -45,10 +45,6 @@ CMD bash -c '\
     php artisan db:seed --class=AdminSeeder       --force; \
     php artisan storage:link --force || true; \
     \
-    # (opsional) re‑cache config & route setelah path valid
-    php artisan config:cache; \
-    php artisan route:cache;  \
-    \
     php artisan serve --host=0.0.0.0 --port=${PORT:-8000} \
     '
 
