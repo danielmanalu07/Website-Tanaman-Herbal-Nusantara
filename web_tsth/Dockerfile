@@ -22,32 +22,30 @@ RUN curl -fsSL https://deb.nodesource.com/setup_18.x | bash - \
 
 WORKDIR /app
 
-# Copy startup script PERTAMA (sebelum copy files lain)
-COPY start.sh /app/start.sh
-RUN chmod +x /app/start.sh
-
-# Copy composer files
-COPY composer.json composer.lock ./
-COPY package.json package-lock.json ./
-
-# Copy application files
+# Copy Laravel files
 COPY . .
 
-# Create directories and set permissions
-RUN mkdir -p storage/logs storage/framework/{cache,sessions,views} bootstrap/cache
-RUN chmod -R 775 storage bootstrap/cache
+# Create necessary directories and set permissions
+RUN mkdir -p storage/logs storage/framework/{cache,sessions,views} bootstrap/cache \
+    && chmod -R 775 storage bootstrap/cache
 
-# Setup environment dengan DEBUG=true untuk troubleshooting
-RUN cp .env.example .env 2>/dev/null || echo "APP_NAME=Laravel\nAPP_ENV=production\nAPP_KEY=\nAPP_DEBUG=true\nAPP_URL=https://website-tanaman-herbal-nusantara-production.up.railway.app\nCACHE_DRIVER=file\nSESSION_DRIVER=file\nQUEUE_CONNECTION=sync\nLOG_CHANNEL=single" > .env
+# Setup environment file jika belum ada
+RUN cp .env.example .env 2>/dev/null || echo "APP_NAME=Laravel\nAPP_ENV=production\nAPP_KEY=\nAPP_DEBUG=true\nAPP_URL=http://localhost\nCACHE_DRIVER=file\nSESSION_DRIVER=file\nQUEUE_CONNECTION=sync\nLOG_CHANNEL=single" > .env
 
-# Install dependencies
-RUN composer install --no-dev --optimize-autoloader --ignore-platform-reqs --no-scripts
-RUN php artisan key:generate --force --no-interaction
+# Install PHP & JS dependencies
+RUN composer install --no-dev --optimize-autoloader --ignore-platform-reqs --no-scripts \
+    && php artisan key:generate --force --no-interaction \
+    && npm ci
 
-RUN npm ci
+# Clear caches & set permissions
+RUN php artisan config:clear \
+    && php artisan cache:clear \
+    && php artisan route:clear \
+    && php artisan view:clear \
+    && chmod -R 775 storage bootstrap/cache
 
-# Expose port 8080
+# Expose port
 EXPOSE 8080
 
-# Gunakan script startup
-CMD ["/app/start.sh"]
+# Jalankan Laravel built-in server
+CMD ["php", "artisan", "serve", "--host=0.0.0.0", "--port=8080"]
