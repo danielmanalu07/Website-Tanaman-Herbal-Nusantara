@@ -12,23 +12,23 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 ENV COMPOSER_MEMORY_LIMIT=-1
 
-# 3) Set direktori kerja aplikasi
-WORKDIR /app
+# 3) Direktori kerja
+WORKDIR /var/www/html
 
-# 4) Salin file composer dan install dependensi
+# 4) Salin file composer & install dependensi
 COPY composer.json composer.lock ./
 RUN composer install --no-dev --no-scripts --optimize-autoloader --prefer-dist
 
-# 5) Salin semua file proyek
+# 5) Salin semua source code Laravel
 COPY . .
-RUN composer dump-autoload --no-dev --optimize
 
-# 6) Buat folder Laravel yang dibutuhkan dan set permission
-RUN mkdir -p storage/framework/{cache/data,sessions,views} storage/logs bootstrap/cache \
+# 6) Autoload & folder Laravel
+RUN composer dump-autoload --no-dev --optimize \
+    && mkdir -p storage/framework/{cache/data,sessions,views} storage/logs bootstrap/cache \
     && chmod -R 775 storage bootstrap/cache \
     && chown -R www-data:www-data storage bootstrap/cache
 
-# 7) Jalankan proses Laravel saat runtimes
+# 7) Jalankan Laravel built-in server (blade only)
 CMD bash -c '\
     php artisan config:clear && \
     php artisan route:clear && \
@@ -37,10 +37,10 @@ CMD bash -c '\
     php artisan storage:link --force || true && \
     php artisan config:cache && \
     php artisan route:cache && \
-    echo "✅ Laravel ready. Showing latest error log if exists..." && \
-    tail -n 50 storage/logs/laravel.log || true && \
-    php artisan serve --host=0.0.0.0 --port=${PORT:-8001}'
+    echo "✅ Laravel is ready." && \
+    echo "📄 Showing last 20 lines from laravel.log (if any):" && \
+    tail -n 20 storage/logs/laravel.log || true && \
+    php artisan serve --host=0.0.0.0 --port=${PORT:-8080}'
 
-
-# Railway akan gunakan ENV PORT jadi ini tetap di-expose
-EXPOSE 8001
+# Railway akan gunakan ENV PORT (default: 8080)
+EXPOSE 8080
