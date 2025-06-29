@@ -34,10 +34,16 @@ RUN mkdir -p storage/logs storage/framework/{cache,sessions,views} bootstrap/cac
 RUN chmod -R 775 storage bootstrap/cache
 
 # Setup environment
-RUN cp .env.example .env 2>/dev/null || echo "APP_NAME=Laravel\nAPP_ENV=production\nAPP_KEY=\nAPP_DEBUG=false\nAPP_URL=http://localhost\nCACHE_DRIVER=file\nSESSION_DRIVER=file\nQUEUE_CONNECTION=sync" > .env
+RUN cp .env.example .env 2>/dev/null || echo "APP_NAME=Laravel\nAPP_ENV=production\nAPP_KEY=\nAPP_DEBUG=false\nAPP_URL=https://website-tanaman-herbal-nusantara-production.up.railway.app\nCACHE_DRIVER=file\nSESSION_DRIVER=file\nQUEUE_CONNECTION=sync" > .env
 
 # Install dependencies
 RUN composer install --no-dev --optimize-autoloader --ignore-platform-reqs --no-scripts
 RUN php artisan key:generate --force --no-interaction
 
 RUN npm ci
+
+# Expose port
+EXPOSE 8000
+
+# Start Laravel development server
+CMD ["php", "artisan", "serve", "--host=0.0.0.0", "--port=8000"]
