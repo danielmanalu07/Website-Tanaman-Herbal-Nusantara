@@ -24,6 +24,6 @@ RUN composer install --no-dev --prefer-dist --optimize-autoloader \
 
 RUN chmod -R 775 storage bootstrap/cache
 
-EXPOSE 9000
+EXPOSE 8080
 
 CMD ["php-fpm"]
