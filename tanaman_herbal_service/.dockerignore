@@ -1,0 +1,6 @@
+.git
+node_modules
+vendor     # biarkan Composer di dalam container yang mengunduh
+tests
+storage/logs/*
+storage/framework/*
