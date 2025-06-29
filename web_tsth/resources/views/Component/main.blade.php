@@ -108,7 +108,7 @@
 <body>
 
     <!-- Main navbar -->
-    @include('component.navbar')
+    @include('Component.navbar')
     <!-- /main navbar -->
 
 
@@ -116,7 +116,7 @@
     <div class="page-content">
 
         <!-- Main sidebar -->
-        @include('component.sidebar')
+        @include('Component.sidebar')
         <!-- /main sidebar -->
 
 
@@ -191,7 +191,7 @@
 
 
                 <!-- Footer -->
-                @include('component.footer')
+                @include('Component.footer')
                 <!-- /footer -->
 
             </div>
