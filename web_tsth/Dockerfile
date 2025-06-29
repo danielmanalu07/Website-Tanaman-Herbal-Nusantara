@@ -42,7 +42,7 @@ RUN composer install --no-dev --prefer-dist --optimize-autoloader \
     && php artisan migrate --force
 
 # Expose port Laravel serve
-EXPOSE 8000
+EXPOSE 8080
 
 # Jalankan Laravel secara built-in dengan PHP
-CMD php artisan migrate --force && php artisan serve --host=0.0.0.0 --port=8000
+CMD php artisan migrate --force && php artisan serve --host=0.0.0.0 --port=8080
