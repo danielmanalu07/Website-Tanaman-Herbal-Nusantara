@@ -16,7 +16,6 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\VisitorCategoryController;
 use App\Http\Controllers\VisitorController;
 use App\Http\Middleware\Authorization;
-use App\Http\Middleware\SetAcceptLanguage;
 use App\Http\Middleware\SetLocale;
 use Illuminate\Support\Facades\Route;
 
@@ -124,7 +123,7 @@ Route::prefix('/admin')->middleware(Authorization::class)->group(function () {
 });
 
 //ROUTE USER
-Route::middleware([SetAcceptLanguage::class, SetLocale::class])->group(function () {
+Route::middleware([SetLocale::class])->group(function () {
     Route::get('/', [UserController::class, 'home'])->name('home');
     Route::get('/news', [UserController::class, 'news'])->name('news');
     Route::get('/news/search', [UserController::class, 'search'])->name('user.news.search');

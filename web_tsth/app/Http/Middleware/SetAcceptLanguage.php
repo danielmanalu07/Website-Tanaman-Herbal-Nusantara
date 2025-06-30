@@ -1,7 +1,6 @@
 <?php
 namespace App\Http\Middleware;
 
-use App\Http\Constant\LanguageConstant;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
@@ -16,13 +15,13 @@ class SetAcceptLanguage
      */
     public function handle(Request $request, Closure $next): Response
     {
-        $language = LanguageConstant::GetLanguageUser();
+        // $language = LanguageConstant::GetLanguageUser();
 
-        Http::macro('language', function () use ($language) {
-            return Http::withHeaders([
-                'Accept-Language' => $language,
-            ]);
-        });
+        // Http::macro('language', function () use ($language) {
+        //     return Http::withHeaders([
+        //         'Accept-Language' => $language,
+        //     ]);
+        // });
         return $next($request);
     }
 }
