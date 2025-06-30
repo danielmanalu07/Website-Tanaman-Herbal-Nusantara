@@ -124,8 +124,8 @@ Route::prefix('/admin')->middleware(Authorization::class)->group(function () {
 });
 
 //ROUTE USER
-Route::get('/', [UserController::class, 'home'])->name('home')->middleware([SetAcceptLanguage::class, SetLocale::class]);
 Route::middleware([SetAcceptLanguage::class, SetLocale::class])->group(function () {
+    Route::get('/', [UserController::class, 'home'])->name('home');
     Route::get('/news', [UserController::class, 'news'])->name('news');
     Route::get('/news/search', [UserController::class, 'search'])->name('user.news.search');
     Route::post('/lang', [LanguageController::class, 'SetLanguageUser'])->name('user.language');
