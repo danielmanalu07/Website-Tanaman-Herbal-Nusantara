@@ -22,7 +22,7 @@
 
         .about-content p {
             font-size: 1.1rem;
-            color: #5813c7;
+            color: black;
         }
 
         .btn.style1 {
