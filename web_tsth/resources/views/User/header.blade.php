@@ -42,7 +42,7 @@
                     </div>
                 </div>
                 <div class="col-xl-4 col-lg-12 text-center lg-none">
-                    <a href="index.html" class="logo">
+                    <a href="{{ route('home') }}" class="logo">
                         <img class="logo-light" src="{{ asset('images/logoweb-removebg.png') }}" alt="Image">
                         <img class="logo-dark" src="{{ asset('images/logoweb-removebg.png') }}" alt="Image">
                     </a>
@@ -88,7 +88,7 @@
         <div class="header-bottom">
             <div class="row align-items-center">
                 <div class="col-lg-6 col-md-6 col-6 xl-none">
-                    <a href="index.html" class="logo">
+                    <a href="{{ route('home') }}" class="logo">
                         <img class="logo-light" src="{{ asset('images/logoweb-removebg.png') }}" alt="Image">
                         <img class="logo-dark" src="{{ asset('images/logoweb-removebg.png') }}" alt="Image">
                     </a>
