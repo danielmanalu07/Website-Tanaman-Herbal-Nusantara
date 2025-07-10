@@ -22,7 +22,7 @@
 
         .about-content p {
             font-size: 1.1rem;
-            color: #555;
+            color: #5813c7;
         }
 
         .btn.style1 {
@@ -299,10 +299,22 @@
             <div class="row">
                 <div class="col-xl-8 offset-xl-2 col-lg-10 offset-lg-1">
                     <div class="social-icons">
-                        <a target="_blank" href="https://facebook.com"><i class="lab la-facebook-f"></i></a>
-                        <a target="_blank" href="https://twitter.com"><i class="lab la-twitter"></i></a>
-                        <a target="_blank" href="https://linkedin.com"><i class="lab la-linkedin-in"></i></a>
-                        <a target="_blank" href="https://instagram.com"><i class="lab la-instagram"></i></a>
+                        {{-- <a target="_blank" href="https://facebook.com">
+                            <i class="lab la-facebook-f"></i>
+                        </a> --}}
+                        {{-- <a target="_blank" href="https://twitter.com">
+                            <i class="lab la-twitter"></i>
+                        </a> --}}
+                        <a target="_blank" href="https://tsth2.id">
+                            <i class="lab la-instagram"></i>
+                        </a>
+                        <a target="_blank" href="mailto:tsth2@del.ac.id">
+                            <i class="las la-envelope"></i>
+                        </a>
+                        <a target="_blank" href="tel:085262886462">
+                            <i class="las la-phone"></i>
+                        </a>
+
                     </div>
                 </div>
             </div>

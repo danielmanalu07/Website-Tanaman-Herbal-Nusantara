@@ -16,7 +16,7 @@
                                 <i class="las la-phone-volume"></i>
                             </div>
                             <div class="contact-info">
-                                <a href="tel:8882222200">888-222-2200</a>
+                                <a href="tel:085262886462">0852-6288-6462</a>
                             </div>
                         </div>
                         <div class="contact-item style1">
@@ -24,7 +24,7 @@
                                 <i class="lar la-envelope"></i>
                             </div>
                             <div class="contact-info">
-                                <a href="mailto:support@hort.com">support@hort.com</a>
+                                <a href="mailto:tsth2@del.ac.id">tsth2@del.ac.id</a>
                             </div>
                         </div>
                         <div class="contact-item style1">
@@ -32,8 +32,8 @@
                                 <i class="las la-map-marker"></i>
                             </div>
                             <div class="contact-info">
-                                <span>121 Second Street Mount Holly,
-                                    NJ 08060</span>
+                                <span>Pollung,
+                                    Humbang Hasundutan</span>
                             </div>
                         </div>
                     </div>

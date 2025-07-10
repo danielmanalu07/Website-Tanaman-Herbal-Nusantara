@@ -28,7 +28,7 @@
                                 <i class="flaticon-phone-call"></i>
                             </div>
                             <div class="contact-text">
-                                <a href="tel:8882222200">888-222-2200</a>
+                                <a href="tel:085262886462">0852-6288-6462</a>
                             </div>
                         </div>
                         <div class="contact-item">
@@ -36,7 +36,7 @@
                                 <i class="flaticon-mail"></i>
                             </div>
                             <div class="contact-text">
-                                <a href="mailto:support@hort.com">support@hort.com</a>
+                                <a href="tsth2@del.ac.id">tsth2@del.ac.id</a>
                             </div>
                         </div>
                     </div>
@@ -49,13 +49,13 @@
                 </div>
                 <div class="col-xl-4 col-lg-12 text-xl-end">
                     <ul class="social-profile style1 list-style">
-                        <li><a target="_blank" href="https://facebook.com"><i class="lab la-facebook-f"></i>
+                        {{-- <li><a target="_blank" href="https://facebook.com"><i class="lab la-facebook-f"></i>
                             </a></li>
                         <li><a target="_blank" href="https://twitter.com"> <i class="lab la-twitter"></i> </a>
                         </li>
                         <li><a target="_blank" href="https://linkedin.com"> <i class="lab la-linkedin-in"></i>
-                            </a></li>
-                        <li><a target="_blank" href="https://instagram.com"> <i class="lab la-instagram"></i>
+                            </a></li> --}}
+                        <li><a target="_blank" href="https://tsth2.id"> <i class="lab la-instagram"></i>
                             </a></li>
                     </ul>
                 </div>
