@@ -104,7 +104,7 @@ class UserController extends Controller
             $habituses     = $this->habitus_service->get_all_user();
             return view('User.profile.detail_profile', compact('contents', 'languages', 'contentDetail', 'habituses'));
         } catch (\Throwable $th) {
-            return redirect()->back()->with('error', 'Something went wrong.');
+            return redirect()->back()->with('error', $th->getMessage());
         }
     }
 
