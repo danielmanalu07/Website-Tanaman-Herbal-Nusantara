@@ -76,7 +76,7 @@ class UserController extends Controller
             })
             ->sortByDesc(fn($item) => \Carbon\Carbon::parse($item->published));
 
-        return view('User.news.search-result', compact('results'));
+        return view('User.News.search-result', compact('results'));
     }
 
     public function news_detail(int $id)
@@ -89,7 +89,7 @@ class UserController extends Controller
             $habituses  = $this->habitus_service->get_all_user();
 
             // dd($detailNews);
-            return view('User.news.detail_news', compact('news', 'contents', 'languages', 'detailNews', 'habituses'));
+            return view('User.News.detail_news', compact('news', 'contents', 'languages', 'detailNews', 'habituses'));
         } catch (\Throwable $th) {
             return redirect()->back()->with('error', 'Something went wrong.');
         }
@@ -102,7 +102,7 @@ class UserController extends Controller
             $languages     = $this->language_service->get_all_lang_user();
             $contentDetail = $this->content_service->get_detail_content_user($id);
             $habituses     = $this->habitus_service->get_all_user();
-            return view('User.profile.detail_profile', compact('contents', 'languages', 'contentDetail', 'habituses'));
+            return view('User.Profile.detail_profile', compact('contents', 'languages', 'contentDetail', 'habituses'));
         } catch (\Throwable $th) {
             return redirect()->back()->with('error', $th->getMessage());
         }
